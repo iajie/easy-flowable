@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+    id: load-default-data
+    author: MoJie
+    changes:
+#      - loadData:
+#        file: liquibase/data/default.csv
+#        tableName: easy_model

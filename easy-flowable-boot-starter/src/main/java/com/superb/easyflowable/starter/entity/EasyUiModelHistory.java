@@ -27,7 +27,7 @@ public class EasyUiModelHistory implements EasyModelHistory {
     private String id;
 
     /**
-     * 模型名称
+     * 模型ID
      */
     private String modelId;
 

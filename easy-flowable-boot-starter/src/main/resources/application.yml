@@ -1,0 +1,5 @@
+spring:
+  liquibase:
+    change-log: liquibase/changelog/changelog-master.yaml
+    # 数据表更新开关
+    enabled: true
