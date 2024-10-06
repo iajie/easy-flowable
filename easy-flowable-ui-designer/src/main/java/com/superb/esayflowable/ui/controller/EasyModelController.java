@@ -27,7 +27,7 @@ import java.util.Date;
  * @Author: MoJie
  */
 @RestController
-@RequestMapping("easy-model")
+@RequestMapping("easy-flowable/model")
 public class EasyModelController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class EasyModelController {
      * @Author: MoJie
      * @Date: 2024-09-27 14:27:20
      */
-    @PostMapping("page")
+    @PostMapping("pageQuery")
     public Result<Page<EasyUiModel>> page(@RequestBody PageParams<EasyUiModel> pageParams) {
         EasyUiModel params = pageParams.getParams();
         QueryWrapper queryWrapper = new QueryWrapper();
