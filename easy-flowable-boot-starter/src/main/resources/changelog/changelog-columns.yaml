@@ -1,0 +1,13 @@
+# 字段变化https://docs.liquibase.com/change-types/add-column.html
+databaseChangeLog:
+  - changeSet:
+      id: 20241005-1
+      author: MoJie
+      changes:
+        - addColumn:
+            tableName: easy_model
+            columns:
+              - column:
+                  name: thumbnail
+                  type: LONGTEXT
+                  remarks: 缩略图

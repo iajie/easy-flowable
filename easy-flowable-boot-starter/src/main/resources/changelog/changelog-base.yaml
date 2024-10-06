@@ -1,3 +1,4 @@
+# https://docs.liquibase.com/change-types/create-table.html
 databaseChangeLog:
   # changeSet表示针对每个表的操作
   - changeSet:

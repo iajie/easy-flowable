@@ -31,6 +31,11 @@ public interface EasyModel {
     String getModelEditorXml();
 
     /**
+     * 缩略图
+     */
+    byte[] getThumbnail();
+
+    /**
      * 0: bpmn图形化模型
      * 2：表单类型的流程模型
      * 3：应用程序类型的流程模型

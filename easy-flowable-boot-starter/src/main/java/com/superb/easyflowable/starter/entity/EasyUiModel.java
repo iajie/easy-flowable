@@ -42,6 +42,8 @@ public class EasyUiModel implements EasyModel {
     @Column(isLarge = true)
     private String modelEditorXml;
 
+    private byte[] thumbnail;
+
     /**
      * 0: bpmn图形化模型
      * 2：表单类型的流程模型
@@ -111,6 +113,11 @@ public class EasyUiModel implements EasyModel {
     @Override
     public String getModelEditorXml() {
         return modelEditorXml;
+    }
+
+    @Override
+    public byte[] getThumbnail() {
+        return this.thumbnail;
     }
 
     @Override
