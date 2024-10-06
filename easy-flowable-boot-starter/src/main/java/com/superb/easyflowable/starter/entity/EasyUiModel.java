@@ -42,7 +42,7 @@ public class EasyUiModel implements EasyModel {
     @Column(isLarge = true)
     private String modelEditorXml;
 
-    private byte[] thumbnail;
+    private String thumbnail;
 
     /**
      * 0: bpmn图形化模型
@@ -116,7 +116,7 @@ public class EasyUiModel implements EasyModel {
     }
 
     @Override
-    public byte[] getThumbnail() {
+    public String getThumbnail() {
         return this.thumbnail;
     }
 

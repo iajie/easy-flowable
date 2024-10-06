@@ -31,9 +31,9 @@ public interface EasyModel {
     String getModelEditorXml();
 
     /**
-     * 缩略图
+     * 缩略图base64
      */
-    byte[] getThumbnail();
+    String getThumbnail();
 
     /**
      * 0: bpmn图形化模型

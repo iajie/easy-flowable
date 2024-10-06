@@ -48,6 +48,7 @@ public class EasyModelController {
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.like(EasyUiModel::getName, params.getName(), StringUtils.isNotBlank(params.getName()));
         queryWrapper.like(EasyUiModel::getKey, params.getKey(), StringUtils.isNotBlank(params.getKey()));
+        queryWrapper.eq(EasyUiModel::getModelType, params.getModelType(), params.getModelType() != null);
         queryWrapper.orderBy(EasyUiModel::getCreateTime);
         return Result.success(modelService.page(pageParams.getPage(), queryWrapper));
     }
@@ -91,8 +92,9 @@ public class EasyModelController {
     @GetMapping("remove/{id}")
     public Result<Boolean> remove(@PathVariable String id) {
         // 删除流程模型发布历史
-        if (modelHistoryService.remove(QueryWrapper.create().eq(EasyModelHistory::getModelId, id))) {
-            return Result.success(modelService.removeById(id));
+        modelHistoryService.remove(QueryWrapper.create().eq(EasyUiModelHistory::getModelId, id));
+        if (modelService.removeById(id)) {
+            return Result.success();
         }
         return Result.error();
     }
