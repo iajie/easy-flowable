@@ -11,5 +11,4 @@ import com.superb.easyflowable.starter.entity.EasyUiModel;
  */
 public interface EasyModelService extends IService<EasyUiModel> {
 
-
 }

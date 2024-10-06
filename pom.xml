@@ -20,6 +20,7 @@
         <spring.version>5.3.27</spring.version>
         <spring.boot.version>2.7.11</spring.boot.version>
         <mybatis.flex.version>1.9.7</mybatis.flex.version>
+        <HikariCP.version>6.0.0</HikariCP.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,6 +39,16 @@
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-engine</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mybatis</groupId>
+                        <artifactId>mybatis</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-beans</artifactId>
+                    </exclusion>
+                </exclusions>
                 <version>${flowable.version}</version>
             </dependency>
             <dependency>
@@ -90,6 +101,11 @@
                 <groupId>com.mybatis-flex</groupId>
                 <artifactId>mybatis-flex-spring-boot-starter</artifactId>
                 <version>${mybatis.flex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${HikariCP.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

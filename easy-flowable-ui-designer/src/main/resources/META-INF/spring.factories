@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.superb.esayflowable.ui.config.MvConfiguration
+  com.superb.esayflowable.ui.config.MvConfiguration,\
+  com.superb.esayflowable.ui.controller.EasyModelController

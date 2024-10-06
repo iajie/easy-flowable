@@ -1,11 +1,16 @@
 package com.superb.easyflowable.starter;
 
+import com.mybatisflex.core.datasource.DataSourceBuilder;
 import com.superb.easyflowable.core.config.EasyFlowableConfig;
 import com.superb.easyflowable.core.config.EasyFlowableDataSourceConfig;
 import com.superb.easyflowable.core.enums.HistoryLevelEnum;
 import com.superb.easyflowable.core.exception.EasyFlowableException;
 import com.superb.easyflowable.core.utils.StringUtils;
 import com.superb.easyflowable.starter.config.EasyFlowableConfigProperties;
+import com.superb.easyflowable.starter.service.EasyModelHistoryService;
+import com.superb.easyflowable.starter.service.EasyModelService;
+import com.superb.easyflowable.starter.service.impl.EasyModelHistoryServiceImpl;
+import com.superb.easyflowable.starter.service.impl.EasyModelServiceImpl;
 import liquibase.integration.spring.SpringLiquibase;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
@@ -15,9 +20,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @package: {@link com.superb.easyflowable.starter}
@@ -31,10 +37,20 @@ import javax.sql.DataSource;
 public class EasyFlowableAutoConfiguration {
 
     private final static String CHANGE_LOG = "classpath:/changelog/changelog-master.yaml";
-    @Autowired(required = false)
-    private DataSource dataSource;
     @Autowired
     private EasyFlowableConfigProperties properties;
+
+    @Bean
+    public DataSource easyFlowableDatasource() {
+        EasyFlowableDataSourceConfig jdbc = properties.getDataSource();
+        Map<String, String> map = new HashMap<>();
+        map.put("url", jdbc.getUrl());
+        map.put("type", "hikari");
+        map.put("username", jdbc.getUsername());
+        map.put("password", jdbc.getPassword());
+        DataSourceBuilder builder = new DataSourceBuilder(map);
+        return builder.build();
+    }
 
     @Bean
     public ProcessEngine processEngine() {
@@ -42,8 +58,8 @@ public class EasyFlowableAutoConfiguration {
         this.printBanner(properties.isBanner());
         ProcessEngineConfiguration engineConfiguration = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
         // 数据源配置
-        if (properties.isProjectDatasource() && dataSource != null) {
-            engineConfiguration.setDataSource(dataSource);
+        if (properties.isProjectDatasource()) {
+            engineConfiguration.setDataSource(this.easyFlowableDatasource());
         } else {
             EasyFlowableDataSourceConfig jdbc = properties.getDataSource();
             if (StringUtils.isBlank(jdbc.getDriver())) {
@@ -105,15 +121,21 @@ public class EasyFlowableAutoConfiguration {
 
     @Bean
     public SpringLiquibase liquibase() {
-        if (dataSource == null) {
-            EasyFlowableDataSourceConfig source = properties.getDataSource();
-            dataSource = new DriverManagerDataSource(source.getUrl(), source.getUsername(), source.getPassword());
-        }
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setChangeLog(CHANGE_LOG);
-        liquibase.setDataSource(dataSource);
+        liquibase.setDataSource(this.easyFlowableDatasource());
         liquibase.setShouldRun(true);
         return liquibase;
+    }
+
+    @Bean
+    public EasyModelService easyModelService() {
+        return new EasyModelServiceImpl();
+    }
+
+    @Bean
+    public EasyModelHistoryService easyModelHistoryService() {
+        return new EasyModelHistoryServiceImpl();
     }
 
 }

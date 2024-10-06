@@ -4,7 +4,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.superb.easyflowable.starter.entity.EasyUiModelHistory;
 import com.superb.easyflowable.starter.mapper.EasyModelHistoryMapper;
 import com.superb.easyflowable.starter.service.EasyModelHistoryService;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @package: {@link com.superb.easyflowable.starter.service.impl}
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
  * @Description:
  * @Author: MoJie
  */
-@Service
+@Transactional
 public class EasyModelHistoryServiceImpl extends ServiceImpl<EasyModelHistoryMapper, EasyUiModelHistory> implements EasyModelHistoryService {
+
 }

@@ -4,7 +4,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.superb.easyflowable.starter.entity.EasyUiModel;
 import com.superb.easyflowable.starter.mapper.EasyModelMapper;
 import com.superb.easyflowable.starter.service.EasyModelService;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @package: {@link com.superb.easyflowable.starter.service.impl}
@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
  * @Description:
  * @Author: MoJie
  */
-@Service
+@Transactional
 public class EasyModelServiceImpl extends ServiceImpl<EasyModelMapper, EasyUiModel> implements EasyModelService {
-
 
 }
