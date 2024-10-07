@@ -124,7 +124,7 @@ public class EasyFlowableAutoConfiguration {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setChangeLog(CHANGE_LOG);
         liquibase.setDataSource(this.easyFlowableDatasource());
-        liquibase.setShouldRun(false);
+        liquibase.setShouldRun(this.properties.getConfig().isTableSchema());
         return liquibase;
     }
 
