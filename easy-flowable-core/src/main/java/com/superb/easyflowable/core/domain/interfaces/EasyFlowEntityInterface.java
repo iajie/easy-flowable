@@ -9,18 +9,19 @@ package com.superb.easyflowable.core.domain.interfaces;
 public interface EasyFlowEntityInterface {
 
     /** 当前租户 */
-    default String getCurrentTenant() {
+    default String getTenantId() {
         return null;
     }
 
     /** 当前部门 */
-    default String getCurrentOrganId() {
+    default String getOrganId() {
         return null;
     }
 
     /** 当前用户 */
-    default String getCurrentUserId() {
-        return null;
-    }
+    String getUserId();
+
+    /** 当前用户昵称 */
+    String getUsername();
 
 }

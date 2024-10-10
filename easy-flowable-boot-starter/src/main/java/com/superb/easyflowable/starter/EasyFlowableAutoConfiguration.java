@@ -3,19 +3,32 @@ package com.superb.easyflowable.starter;
 import com.mybatisflex.core.datasource.DataSourceBuilder;
 import com.superb.easyflowable.core.config.EasyFlowableConfig;
 import com.superb.easyflowable.core.config.EasyFlowableDataSourceConfig;
+import com.superb.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.superb.easyflowable.core.enums.HistoryLevelEnum;
 import com.superb.easyflowable.core.exception.EasyFlowableException;
+import com.superb.easyflowable.core.service.EasyFlowDeploymentService;
+import com.superb.easyflowable.core.service.EasyFlowProcessInstanceService;
+import com.superb.easyflowable.core.service.EasyFlowTaskService;
 import com.superb.easyflowable.core.utils.StringUtils;
+import com.superb.easyflowable.starter.api.EasyFlowDeploymentServiceImpl;
+import com.superb.easyflowable.starter.api.EasyFlowProcessInstanceServiceImpl;
+import com.superb.easyflowable.starter.api.EasyFlowTaskServiceImpl;
 import com.superb.easyflowable.starter.config.EasyFlowableConfigProperties;
-import com.superb.easyflowable.starter.service.EasyModelHistoryService;
-import com.superb.easyflowable.starter.service.EasyModelService;
-import com.superb.easyflowable.starter.service.impl.EasyModelHistoryServiceImpl;
-import com.superb.easyflowable.starter.service.impl.EasyModelServiceImpl;
+import com.superb.easyflowable.core.service.EasyModelService;
+import com.superb.easyflowable.starter.api.EasyModelServiceServiceImpl;
+import com.superb.easyflowable.starter.config.EntityInterfaceImpl;
 import liquibase.integration.spring.SpringLiquibase;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -99,6 +112,41 @@ public class EasyFlowableAutoConfiguration {
         return engineConfiguration.buildProcessEngine();
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnClass(ProcessEngine.class)
+    public RuntimeService runtimeService(ProcessEngine processEngine) {
+        return processEngine.getRuntimeService();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnClass(ProcessEngine.class)
+    public RepositoryService repositoryService(ProcessEngine processEngine) {
+        return processEngine.getRepositoryService();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnClass(ProcessEngine.class)
+    public HistoryService historyService(ProcessEngine processEngine) {
+        return processEngine.getHistoryService();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnClass(ProcessEngine.class)
+    public TaskService taskService(ProcessEngine processEngine) {
+        return processEngine.getTaskService();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnClass(ProcessEngine.class)
+    public ProcessDiagramGenerator processDiagramGenerator(ProcessEngine processEngine) {
+        return processEngine.getProcessEngineConfiguration().getProcessDiagramGenerator();
+    }
+
     /**
      * @param isBanner 是否打印banner
      * @Author: MoJie
@@ -128,14 +176,36 @@ public class EasyFlowableAutoConfiguration {
         return liquibase;
     }
 
+    /**
+     * 如果没有注册自定义条件器，使用默认
+     * @return {@link EasyFlowEntityInterface}
+     * @Author: MoJie
+     * @Date: 2024-10-09 15:55:36
+     */
     @Bean
-    public EasyModelService easyModelService() {
-        return new EasyModelServiceImpl();
+    @ConditionalOnMissingBean
+    public EasyFlowEntityInterface easyFlowEntityInterface() {
+        return new EntityInterfaceImpl();
     }
 
     @Bean
-    public EasyModelHistoryService easyModelHistoryService() {
-        return new EasyModelHistoryServiceImpl();
+    public EasyModelService easyModelService() {
+        return new EasyModelServiceServiceImpl();
+    }
+
+    @Bean
+    public EasyFlowDeploymentService easyFlowDeploymentService() {
+        return new EasyFlowDeploymentServiceImpl();
+    }
+
+    @Bean
+    public EasyFlowProcessInstanceService easyFlowProcessInstanceService() {
+        return new EasyFlowProcessInstanceServiceImpl();
+    }
+
+    @Bean
+    public EasyFlowTaskService easyFlowTaskService() {
+        return new EasyFlowTaskServiceImpl();
     }
 
 }

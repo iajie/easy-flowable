@@ -1,39 +1,55 @@
 package com.superb.easyflowable.core.domain.entity;
 
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
+import com.mybatisflex.annotation.Table;
+import lombok.Data;
+
 import java.util.Date;
 
 /**
- * @package: {@link com.superb.easyflowable.core.domain.entity}
- * @Date: 2024-09-27-10:32
- * @Description: 模型发布历史
+ * @package: {@link com.superb.easyflowable.starter.entity}
+ * @Date: 2024-09-27-13:41
+ * @Description: 流程引擎模型
  * @Author: MoJie
  */
-public interface EasyModelHistory {
+@Data
+@Table("easy_model_history")
+public class EasyModelHistory {
 
     /**
      * 业务主键
      */
-    String getId();
+    @Id(keyType = KeyType.Generator)
+    private String id;
 
-    /** 模型ID */
-    String getModelId();
+    /**
+     * 模型ID
+     */
+    private String modelId;
 
-    /** 模型数据BPMNXML内容：以XML形式保存的流程定义信息 */
-    String getModelEditorXml();
+    /**
+     * 模型数据
+     */
+    private String modelEditorXml;
 
-    /** 发布版本 */
-    Integer getVersion();
+    /**
+     * 发布版本
+     */
+    private Integer version;
 
-    /** 创建时间 */
-    Date getCreateTime();
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
-    /** 创建人 */
-    String getCreateBy();
+    /**
+     * 创建人
+     */
+    private String createBy;
 
-    /** 所属部门id：如果您有模型数据权限，可以实现接口达到数据权限控制 */
-    String getOrganId();
-
-    /** 备注 */
-    String getRemarks();
-
+    /**
+     * 备注
+     */
+    private String remarks;
 }

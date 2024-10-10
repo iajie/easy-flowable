@@ -1,39 +1,46 @@
 package com.superb.easyflowable.core.domain.entity;
 
+import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
+import com.mybatisflex.annotation.Table;
+import lombok.Data;
+
 import java.util.Date;
 
 /**
- * @package: {@link com.superb.easyflowable.core.domain.entity}
- * @Date: 2024-09-27-10:32
- * @Description: 模型实体
+ * @package: {@link com.superb.easyflowable.starter.entity}
+ * @Date: 2024-09-27-13:41
+ * @Description: 流程引擎模型
  * @Author: MoJie
  */
-public interface EasyModel {
+@Data
+@Table("easy_model")
+public class EasyModel {
 
     /**
      * 业务主键
      */
-    String getId();
+    @Id(keyType = KeyType.Generator)
+    private String id;
 
     /**
      * 模型名称
      */
-    String getName();
+    private String name;
 
     /**
      * 模型唯一标识
      */
-    String getKey();
+    private String key;
 
     /**
      * 模型数据
      */
-    String getModelEditorXml();
+    @Column(isLarge = true)
+    private String modelEditorXml;
 
-    /**
-     * 缩略图base64
-     */
-    String getThumbnail();
+    private String thumbnail;
 
     /**
      * 0: bpmn图形化模型
@@ -41,51 +48,48 @@ public interface EasyModel {
      * 3：应用程序类型的流程模型
      * 4：决策表类型的流程模型
      */
-    Integer getModelType();
+    private Integer modelType;
 
     /**
-     * 数据版本
+     * 乐观锁
      */
-    Integer getVersion();
-
-    /**
-     * 发布版本
-     */
-    Integer publishVersion();
+    @Column(version = true)
+    private Integer version;
+    /** 发布版本 */
+    private Integer publishVersion;
 
     /**
      * 创建时间
      */
-    Date getCreateTime();
+    private Date createTime;
 
     /**
      * 创建人
      */
-    String getCreateBy();
+    private String createBy;
 
     /**
      * 更新时间
      */
-    Date getUpdateTime();
+    private Date updateTime;
 
     /**
      * 更新人
      */
-    String getUpdateBy();
+    private String updateBy;
 
     /**
      * 租户id
      */
-    String getTenantId();
+    private String tenantId;
 
     /**
      * 所属部门id：如果您有模型数据权限，可以实现接口达到数据权限控制
      */
-    String getOrganId();
+    private String organId;
 
     /**
      * 备注
      */
-    String getRemarks();
-
+    private String remarks;
 }

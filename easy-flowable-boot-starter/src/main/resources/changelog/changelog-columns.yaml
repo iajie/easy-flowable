@@ -4,10 +4,10 @@ databaseChangeLog:
       id: 20241005-1
       author: MoJie
       changes:
-        - addColumn:
-            tableName: easy_model
-            columns:
-              - column:
-                  name: thumbnail
-                  type: LONGTEXT
-                  remarks: 缩略图
+#        - addColumn:
+#            tableName: easy_model
+#            columns:
+#              - column:
+#                  name: thumbnail
+#                  type: LONGTEXT
+#                  remarks: 缩略图

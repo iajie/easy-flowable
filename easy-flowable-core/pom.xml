@@ -23,6 +23,11 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.mybatis-flex</groupId>
+            <artifactId>mybatis-flex-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

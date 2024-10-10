@@ -34,6 +34,10 @@ databaseChangeLog:
                 type: LONGTEXT
                 remarks: 模型设计内容
             - column:
+                  name: thumbnail
+                  type: LONGTEXT
+                  remarks: 缩略图
+            - column:
                 name: model_type
                 type: INT
                 remarks: 模型类型(用户自定义)
@@ -110,14 +114,11 @@ databaseChangeLog:
               name: create_time
               type: DATETIME
               remarks: 发布时间
+              defaultValue: now()
           - column:
               name: create_by
               type: VARCHAR(32)
               remarks: 发布人
-          - column:
-              name: organ_id
-              type: VARCHAR(255)
-              remarks: 部门ID
           - column:
               name: remarks
               type: VARCHAR(400)

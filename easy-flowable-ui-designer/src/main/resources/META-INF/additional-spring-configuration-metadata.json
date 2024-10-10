@@ -1,0 +1,32 @@
+{
+    "properties": [
+        {
+            "name": "easy-flowable.ui",
+            "description": "easy-flowable-ui配置.",
+            "type": "com.superb.easyflowable.ui.properties.EasyFlowableUiProperties",
+            "sourceType": "com.superb.easyflowable.ui.properties.EasyFlowableUiProperties"
+        },
+        {
+            "defaultValue": "/easy-flowable",
+            "name": "easy-flowable.ui.path",
+            "description": "ui访问路径.",
+            "type": "java.lang.String"
+        },
+        {
+            "defaultValue": false,
+            "name": "easy-flowable.ui.is-login",
+            "type": "java.lang.Boolean",
+            "description": "是否开启登录."
+        },
+        {
+            "name": "easy-flowable.ui.users",
+            "type": "java.util.List<com.superb.easyflowable.ui.properties.EasyFlowableUiProperties.User>",
+            "description": "用户列表(可配置登录)."
+        },
+        {
+            "name": "easy-flowable.ui.groups",
+            "type": "java.util.List<com.superb.easyflowable.core.domain.dto.Option>",
+            "description": "候选组."
+        }
+    ]
+}
