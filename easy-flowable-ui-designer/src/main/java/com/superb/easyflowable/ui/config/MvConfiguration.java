@@ -1,6 +1,5 @@
 package com.superb.easyflowable.ui.config;
 
-import com.superb.easyflowable.core.exception.EasyFlowableException;
 import com.superb.easyflowable.starter.config.EasyFlowableConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -44,10 +43,11 @@ public class MvConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(new HandlerInterceptor() {
             @Override
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-                if (properties.getUi().isLogin()) {
+                if (properties.getUi().isLogin() && !"/easy-flowable/login".equals(request.getRequestURI())) {
                     Object username = request.getSession().getAttribute("username");
                     if (username == null) {
-                        throw new EasyFlowableException("会话过期，请登录");
+                        response.setStatus(401);
+                        return false;
                     }
                 }
                 return true;

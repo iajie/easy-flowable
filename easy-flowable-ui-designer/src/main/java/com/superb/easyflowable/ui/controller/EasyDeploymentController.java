@@ -66,7 +66,7 @@ public class EasyDeploymentController {
      * @Author: MoJie
      * @Date: 2024-10-09 16:19:05
      */
-    @GetMapping(value = "deployment/{modelId}")
+    @GetMapping(value = "/{modelId}")
     public Result<String> deploymentModel(@PathVariable String modelId) {
         return Result.success("流程部署成功！", deploymentService.deploymentModel(modelId));
     }
