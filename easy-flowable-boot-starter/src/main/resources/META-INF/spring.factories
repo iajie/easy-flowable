@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration =\
-    com.superb.easyflowable.starter.EasyFlowableAutoConfiguration
+    com.superb.easyflowable.starter.EasyFlowableAutoConfiguration,\
+    com.superb.easyflowable.starter.config.MybatisFlexConfiguration

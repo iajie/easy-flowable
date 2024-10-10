@@ -8,7 +8,7 @@ import com.superb.easyflowable.core.domain.entity.EasyModelHistory;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.easyflowable.starter.service}
+ * @package: {@link com.superb.easyflowable.core.service}
  * @Date: 2024-09-27-14:12
  * @Description:
  * @Author: MoJie

@@ -1,7 +1,7 @@
 package com.superb.easyflowable.ui.config;
 
 import com.superb.easyflowable.core.exception.EasyFlowableException;
-import com.superb.easyflowable.ui.properties.EasyFlowableUiProperties;
+import com.superb.easyflowable.starter.config.EasyFlowableConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -23,20 +23,20 @@ import javax.servlet.http.HttpServletResponse;
 public class MvConfiguration implements WebMvcConfigurer {
 
     @Autowired
-    private EasyFlowableUiProperties properties;
+    private EasyFlowableConfigProperties properties;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(properties.getPath() + "/**")
+        registry.addResourceHandler(properties.getUi().getPath() + "/**")
                 .addResourceLocations("classpath:/static/", "classpath:/static/flowable/");
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/easy-flowable")
-                .setViewName("redirect:/" + properties.getPath() + "/index.html");
+                .setViewName("redirect:/" + properties.getUi().getPath() + "/index.html");
         registry.addViewController("/flowable/index.html")
-                .setViewName("redirect:/" + properties.getPath() + "/index.html");
+                .setViewName("redirect:/" + properties.getUi().getPath() + "/index.html");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MvConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(new HandlerInterceptor() {
             @Override
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-                if (properties.isLogin()) {
+                if (properties.getUi().isLogin()) {
                     Object username = request.getSession().getAttribute("username");
                     if (username == null) {
                         throw new EasyFlowableException("会话过期，请登录");
@@ -52,6 +52,6 @@ public class MvConfiguration implements WebMvcConfigurer {
                 }
                 return true;
             }
-        }).addPathPatterns(properties.getPath() + "/**");
+        }).addPathPatterns(properties.getUi().getPath() + "/**");
     }
 }

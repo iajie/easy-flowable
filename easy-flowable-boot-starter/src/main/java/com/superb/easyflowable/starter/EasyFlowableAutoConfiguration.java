@@ -15,7 +15,7 @@ import com.superb.easyflowable.starter.api.EasyFlowProcessInstanceServiceImpl;
 import com.superb.easyflowable.starter.api.EasyFlowTaskServiceImpl;
 import com.superb.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.superb.easyflowable.core.service.EasyModelService;
-import com.superb.easyflowable.starter.api.EasyModelServiceServiceImpl;
+import com.superb.easyflowable.starter.api.EasyModelServiceImpl;
 import com.superb.easyflowable.starter.config.EntityInterfaceImpl;
 import liquibase.integration.spring.SpringLiquibase;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -30,9 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -52,15 +54,23 @@ public class EasyFlowableAutoConfiguration {
     private final static String CHANGE_LOG = "classpath:/changelog/changelog-master.yaml";
     @Autowired
     private EasyFlowableConfigProperties properties;
+    @Autowired
+    private DataSourceProperties dataSourceProperties;
 
     @Bean
     public DataSource easyFlowableDatasource() {
-        EasyFlowableDataSourceConfig jdbc = properties.getDataSource();
         Map<String, String> map = new HashMap<>();
-        map.put("url", jdbc.getUrl());
         map.put("type", "hikari");
-        map.put("username", jdbc.getUsername());
-        map.put("password", jdbc.getPassword());
+        if (!properties.isProjectDatasource()) {
+            EasyFlowableDataSourceConfig jdbc = properties.getDataSource();
+            map.put("url", jdbc.getUrl());
+            map.put("username", jdbc.getUsername());
+            map.put("password", jdbc.getPassword());
+        } else {
+            map.put("url", dataSourceProperties.getUrl());
+            map.put("username", dataSourceProperties.getUsername());
+            map.put("password", dataSourceProperties.getPassword());
+        }
         DataSourceBuilder builder = new DataSourceBuilder(map);
         return builder.build();
     }
@@ -113,36 +123,30 @@ public class EasyFlowableAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnClass(ProcessEngine.class)
+    @Primary
     public RuntimeService runtimeService(ProcessEngine processEngine) {
         return processEngine.getRuntimeService();
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnClass(ProcessEngine.class)
+    @Primary
     public RepositoryService repositoryService(ProcessEngine processEngine) {
         return processEngine.getRepositoryService();
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnClass(ProcessEngine.class)
+    @Primary
     public HistoryService historyService(ProcessEngine processEngine) {
         return processEngine.getHistoryService();
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnClass(ProcessEngine.class)
+    @Primary
     public TaskService taskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnClass(ProcessEngine.class)
     public ProcessDiagramGenerator processDiagramGenerator(ProcessEngine processEngine) {
         return processEngine.getProcessEngineConfiguration().getProcessDiagramGenerator();
     }
@@ -189,21 +193,25 @@ public class EasyFlowableAutoConfiguration {
     }
 
     @Bean
+    @Primary
     public EasyModelService easyModelService() {
-        return new EasyModelServiceServiceImpl();
+        return new EasyModelServiceImpl();
     }
 
     @Bean
+    @ConditionalOnClass({RepositoryService.class, RuntimeService.class})
     public EasyFlowDeploymentService easyFlowDeploymentService() {
         return new EasyFlowDeploymentServiceImpl();
     }
 
     @Bean
+    @ConditionalOnClass({RepositoryService.class, RuntimeService.class, TaskService.class, HistoryService.class})
     public EasyFlowProcessInstanceService easyFlowProcessInstanceService() {
         return new EasyFlowProcessInstanceServiceImpl();
     }
 
     @Bean
+    @ConditionalOnClass({RuntimeService.class, TaskService.class, HistoryService.class})
     public EasyFlowTaskService easyFlowTaskService() {
         return new EasyFlowTaskServiceImpl();
     }

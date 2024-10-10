@@ -1,9 +1,10 @@
 package com.superb.easyflowable.ui.controller;
 
+import com.superb.easyflowable.core.config.EasyFlowableUiConfig;
 import com.superb.easyflowable.core.domain.dto.Option;
 import com.superb.easyflowable.core.utils.StringUtils;
+import com.superb.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.superb.easyflowable.ui.model.Result;
-import com.superb.easyflowable.ui.properties.EasyFlowableUiProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,11 +24,11 @@ import javax.servlet.http.HttpServletRequest;
  * @Author: MoJie
  */
 @RestController
-@RequestMapping("easy-flowable/")
+@RequestMapping("easy-flowable")
 public class EasyFlowableController {
 
     @Autowired
-    private EasyFlowableUiProperties properties;
+    private EasyFlowableConfigProperties properties;
 
     /**
      * 获取用户列表
@@ -38,7 +39,7 @@ public class EasyFlowableController {
     @GetMapping("/users")
     public Result<List<Option>> users() {
         List<Option> list = new ArrayList<>();
-        for (EasyFlowableUiProperties.User user : properties.getUsers()) {
+        for (EasyFlowableUiConfig.User user : properties.getUi().getUsers()) {
             list.add(new Option(user.getUsername(), user.getId()));
         }
         return Result.success(list);
@@ -52,7 +53,7 @@ public class EasyFlowableController {
      */
     @GetMapping("/groups")
     public Result<List<Option>> groups() {
-        return Result.success(properties.getGroups());
+        return Result.success(properties.getUi().getGroups());
     }
 
     /**
@@ -63,22 +64,22 @@ public class EasyFlowableController {
      */
     @GetMapping("isLogin")
     public Result<Boolean> isLogin() {
-        return Result.success(properties.isLogin());
+        return Result.success(properties.getUi().isLogin());
     }
 
     @PostMapping("login")
-    public Result<?> login(@RequestBody EasyFlowableUiProperties.User user, HttpServletRequest request) {
+    public Result<?> login(@RequestBody EasyFlowableUiConfig.User user, HttpServletRequest request) {
         String username = user.getUsername();
         String password = user.getPassword();
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             return Result.error("账号/密码不能为空");
         }
-        List<EasyFlowableUiProperties.User> users = properties.getUsers();
-        Optional<EasyFlowableUiProperties.User> first = users.stream().filter(i -> i.getUsername().equals(username)).findFirst();
+        List<EasyFlowableUiConfig.User> users = properties.getUi().getUsers();
+        Optional<EasyFlowableUiConfig.User> first = users.stream().filter(i -> i.getUsername().equals(username)).findFirst();
         if (first.isEmpty()) {
             return Result.error("账号/密码错误");
         }
-        EasyFlowableUiProperties.User user1 = first.get();
+        EasyFlowableUiConfig.User user1 = first.get();
         if (user1.getPassword().equals(password)) {
             request.getSession().setAttribute("username", username);
             return Result.success(true);

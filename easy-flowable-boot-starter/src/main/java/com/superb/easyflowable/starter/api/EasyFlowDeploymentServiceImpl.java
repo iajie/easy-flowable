@@ -34,7 +34,6 @@ import java.util.Map;
  * @Description:
  * @Author: MoJie
  */
-@Service
 @Transactional
 public class EasyFlowDeploymentServiceImpl extends ServiceImpl<EasyFlowDeploymentMapper, ActReDeployment> implements EasyFlowDeploymentService {
 

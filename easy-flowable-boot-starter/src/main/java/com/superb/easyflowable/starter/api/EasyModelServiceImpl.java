@@ -16,14 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.easyflowable.starter.service}
+ * @package: {@link com.superb.easyflowable.starter.api}
  * @Date: 2024-09-27-14:13
  * @Description:
  * @Author: MoJie
  */
-@Service
 @Transactional
-public class EasyModelServiceServiceImpl extends ServiceImpl<EasyModelMapper, EasyModel> implements EasyModelService {
+public class EasyModelServiceImpl extends ServiceImpl<EasyModelMapper, EasyModel> implements EasyModelService {
 
     @Autowired
     private EasyModelHistoryMapper modelHistoryMapper;

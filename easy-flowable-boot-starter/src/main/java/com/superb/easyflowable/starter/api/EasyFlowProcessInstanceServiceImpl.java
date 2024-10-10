@@ -44,7 +44,6 @@ import java.util.Map;
  * @Description:
  * @Author: MoJie
  */
-@Service
 @Transactional
 public class EasyFlowProcessInstanceServiceImpl implements EasyFlowProcessInstanceService {
 

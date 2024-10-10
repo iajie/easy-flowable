@@ -73,7 +73,7 @@ public class EasyProcessInstanceController {
      * @Author: MoJie
      * @Date: 2024-10-09 16:28:55
      */
-    @GetMapping(value = "backUserTasks/{processInstanceId}")
+    @GetMapping(value = "executionHistory/{processInstanceId}")
     public Result<List<FlowExecutionHistory>> executionHistory(@PathVariable String processInstanceId) {
         return Result.success(processInstanceService.getFlowExecutionHistoryList(processInstanceId));
     }

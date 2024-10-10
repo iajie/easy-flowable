@@ -37,7 +37,6 @@ import java.util.List;
  * @Description:
  * @Author: MoJie
  */
-@Service
 @Transactional
 public class EasyFlowTaskServiceImpl implements EasyFlowTaskService {
 

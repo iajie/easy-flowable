@@ -2,6 +2,7 @@ package com.superb.easyflowable.starter.config;
 
 import com.superb.easyflowable.core.config.EasyFlowableConfig;
 import com.superb.easyflowable.core.config.EasyFlowableDataSourceConfig;
+import com.superb.easyflowable.core.config.EasyFlowableUiConfig;
 import lombok.Data;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -34,5 +35,9 @@ public class EasyFlowableConfigProperties {
     /** easy-flowable全局配置 */
     @NestedConfigurationProperty
     private EasyFlowableConfig config = new EasyFlowableConfig();
+
+    /** easy-flowable-ui配置 */
+    @NestedConfigurationProperty
+    private EasyFlowableUiConfig ui = new EasyFlowableUiConfig();
 
 }

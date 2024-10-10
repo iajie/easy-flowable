@@ -1,25 +1,22 @@
-package com.superb.easyflowable.ui.properties;
+package com.superb.easyflowable.core.config;
 
 import com.superb.easyflowable.core.domain.dto.Option;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.easyflowable.ui.properties}
- * @Date: 2024-10-09-17:16
- * @Description:
+ * @package: {@link com.superb.easyflowable.core.config}
+ * @Date: 2024-10-10-13:33
+ * @Description: UI控制器参数
  * @Author: MoJie
  */
 @Data
-@Component
-@ConfigurationProperties(prefix = "easy-flowable.ui")
-public class EasyFlowableUiProperties {
+public class EasyFlowableUiConfig {
 
     /**
      * admin默认访问路径
@@ -76,21 +73,31 @@ public class EasyFlowableUiProperties {
 
     public List<User> getUsers() {
         if (users.isEmpty()) {
-            users.add(EasyFlowableUiProperties.User.defaultUser());
-            users.add(new EasyFlowableUiProperties.User("甲", "123", "123456", "220"));
-            users.add(new EasyFlowableUiProperties.User("乙", "124", "123456", "220"));
-            users.add(new EasyFlowableUiProperties.User("丙", "125", "123456", "221"));
-            users.add(new EasyFlowableUiProperties.User("丁", "126", "123456", "222"));
+            users = new ArrayList<>();
+            users.add(User.defaultUser());
+            users.add(new User("甲", "123", "123456", "220"));
+            users.add(new User("乙", "124", "123456", "220"));
+            users.add(new User("丙", "125", "123456", "221"));
+            users.add(new User("丁", "126", "123456", "222"));
         }
         return users;
     }
 
     public List<Option> getGroups() {
         if (groups.isEmpty()) {
+            groups = new ArrayList<>();
             groups.add(new Option("easy-flowable业务部", "220"));
             groups.add(new Option("easy-flowable商务部", "221"));
             groups.add(new Option("easy-flowable研发部", "222"));
         }
         return groups;
     }
+
+    public String getPath() {
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        return path;
+    }
+
 }
