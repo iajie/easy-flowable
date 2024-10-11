@@ -8,6 +8,7 @@ import com.superb.easyflowable.core.domain.entity.ActReDeployment;
 import com.superb.easyflowable.core.domain.entity.ActReProcessDef;
 import com.superb.easyflowable.core.service.EasyFlowDeploymentService;
 import com.superb.easyflowable.core.utils.StringUtils;
+import com.superb.easyflowable.ui.context.EasyFlowableContext;
 import com.superb.easyflowable.ui.model.PageParams;
 import com.superb.easyflowable.ui.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,7 @@ public class EasyDeploymentController {
         queryWrapper.like(ActReDeployment::getName, params.getName(), StringUtils.isNotBlank(params.getName()));
         queryWrapper.like(ActReDeployment::getFlowKey, params.getKey(), StringUtils.isNotBlank(params.getKey()));
         queryWrapper.eq(ActReDeployment::getModelType, params.getModelType(), params.getModelType() != null);
+        queryWrapper.eq(ActReDeployment::getTenantId, params.getTenantId(), EasyFlowableContext.getTenantId() != null);
         queryWrapper.leftJoin(ActReProcessDef.class).as("rp").on(ActReDeployment::getId, ActReProcessDef::getDeploymentId);
         queryWrapper.orderBy(ActReDeployment::getDeploymentTime);
         return Result.success(deploymentService.pageAs(pageParams.getPage(), queryWrapper, DeploymentProcessDef.class));

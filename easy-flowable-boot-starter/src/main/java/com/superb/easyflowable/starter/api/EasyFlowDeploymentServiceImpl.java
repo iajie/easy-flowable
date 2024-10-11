@@ -82,6 +82,7 @@ public class EasyFlowDeploymentServiceImpl extends ServiceImpl<EasyFlowDeploymen
         modelService.saveHistory(modelHistory);
         modelService.updateChain()
                 .setRaw(EasyModel::getPublishVersion, "publish_version + 1")
+                .eq(EasyModel::getId, modelId)
                 .update();
         return deployment.getId();
     }
