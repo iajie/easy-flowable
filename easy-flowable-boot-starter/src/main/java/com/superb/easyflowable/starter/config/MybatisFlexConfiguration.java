@@ -2,8 +2,10 @@ package com.superb.easyflowable.starter.config;
 
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.core.FlexGlobalConfig;
+import com.mybatisflex.core.audit.AuditManager;
 import com.mybatisflex.core.keygen.KeyGenerators;
 import com.mybatisflex.spring.boot.MyBatisFlexCustomizer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * @Description: MybatisFlex配置
  * @Author: MoJie
  */
+@Slf4j
 @Configuration
 public class MybatisFlexConfiguration implements MyBatisFlexCustomizer {
 
@@ -24,5 +27,9 @@ public class MybatisFlexConfiguration implements MyBatisFlexCustomizer {
         keyConfig.setKeyType(KeyType.Generator);
         keyConfig.setValue(KeyGenerators.uuid);
         flexGlobalConfig.setKeyConfig(keyConfig);
+
+        // sql审计
+        AuditManager.setAuditEnable(true);
+        AuditManager.setMessageCollector(auditMessage -> log.info("\n耗时【{}】ms，执行SQL：{}", auditMessage.getElapsedTime(), auditMessage.getFullSql()));
     }
 }

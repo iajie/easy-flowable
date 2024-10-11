@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @package: {@link com.superb.easyflowable.starter.entity}
+ * @package: {@link com.superb.easyflowable.core.domain.entity}
  * @Date: 2024-09-27-13:41
  * @Description: 流程引擎模型
  * @Author: MoJie

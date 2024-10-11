@@ -2,11 +2,11 @@ package com.superb.easyflowable.ui.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.superb.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.superb.easyflowable.core.utils.StringUtils;
 import com.superb.easyflowable.core.domain.entity.EasyModel;
 import com.superb.easyflowable.core.domain.entity.EasyModelHistory;
 import com.superb.easyflowable.core.service.EasyModelService;
-import com.superb.easyflowable.ui.context.EasyFlowableContext;
 import com.superb.easyflowable.ui.model.PageParams;
 import com.superb.easyflowable.ui.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,23 +31,27 @@ public class EasyModelController {
 
     @Autowired
     private EasyModelService modelService;
+    @Autowired
+    private EasyFlowEntityInterface entityInterface;
 
     /**
      * 模型分页查询
      * @param pageParams 分页查询
-     * @return {@link Page< EasyModel >}
+     * @return {@link Page<EasyModel>}
      * @Author: MoJie
      * @Date: 2024-09-27 14:27:20
      */
     @PostMapping("pageQuery")
     public Result<Page<EasyModel>> page(@RequestBody PageParams<EasyModel> pageParams) {
+        String tenantId = entityInterface.getTenantId();
+        String organId = entityInterface.getOrganId();
         EasyModel params = pageParams.getParams();
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.like(EasyModel::getName, params.getName(), StringUtils.isNotBlank(params.getName()));
         queryWrapper.like(EasyModel::getKey, params.getKey(), StringUtils.isNotBlank(params.getKey()));
         queryWrapper.eq(EasyModel::getModelType, params.getModelType(), params.getModelType() != null);
-        queryWrapper.eq(EasyModel::getTenantId, params.getTenantId(), EasyFlowableContext.getTenantId() != null);
-        queryWrapper.eq(EasyModel::getOrganId, params.getOrganId(), EasyFlowableContext.getOrganId() != null);
+        queryWrapper.eq(EasyModel::getTenantId, tenantId, tenantId != null);
+        queryWrapper.eq(EasyModel::getOrganId, organId, organId != null);
         queryWrapper.orderBy(EasyModel::getCreateTime).desc();
         return Result.success(modelService.page(pageParams.getPage(), queryWrapper));
     }
@@ -55,7 +59,7 @@ public class EasyModelController {
     /**
      * 模型发布历史分页查询
      * @param pageParams 分页查询
-     * @return {@link Page< EasyModel >}
+     * @return {@link Page<EasyModel>}
      * @Author MoJie
      * @Date 2024-09-27 14:27:20
      */
@@ -82,8 +86,8 @@ public class EasyModelController {
         if (modelService.count(queryWrapper) > 0) {
             return Result.error("当前模型标识已存在，无法创建!");
         }
-        model.setTenantId(EasyFlowableContext.getTenantId());
-        model.setOrganId(EasyFlowableContext.getOrganId());
+        model.setTenantId(entityInterface.getTenantId());
+        model.setOrganId(entityInterface.getOrganId());
         return Result.success(modelService.saveOrUpdate(model));
     }
 

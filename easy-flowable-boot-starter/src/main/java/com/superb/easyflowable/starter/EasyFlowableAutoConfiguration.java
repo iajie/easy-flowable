@@ -9,13 +9,13 @@ import com.superb.easyflowable.core.exception.EasyFlowableException;
 import com.superb.easyflowable.core.service.EasyFlowDeploymentService;
 import com.superb.easyflowable.core.service.EasyFlowProcessInstanceService;
 import com.superb.easyflowable.core.service.EasyFlowTaskService;
+import com.superb.easyflowable.core.service.EasyModelService;
 import com.superb.easyflowable.core.utils.StringUtils;
 import com.superb.easyflowable.starter.api.EasyFlowDeploymentServiceImpl;
 import com.superb.easyflowable.starter.api.EasyFlowProcessInstanceServiceImpl;
 import com.superb.easyflowable.starter.api.EasyFlowTaskServiceImpl;
-import com.superb.easyflowable.starter.config.EasyFlowableConfigProperties;
-import com.superb.easyflowable.core.service.EasyModelService;
 import com.superb.easyflowable.starter.api.EasyModelServiceImpl;
+import com.superb.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.superb.easyflowable.starter.config.EntityInterfaceImpl;
 import liquibase.integration.spring.SpringLiquibase;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -36,9 +36,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
+import javax.sql.DataSource;
 
 /**
  * @package: {@link com.superb.easyflowable.starter}

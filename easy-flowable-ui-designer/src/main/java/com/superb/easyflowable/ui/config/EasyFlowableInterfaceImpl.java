@@ -4,6 +4,7 @@ import com.superb.easyflowable.core.config.EasyFlowableUiConfig;
 import com.superb.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.superb.easyflowable.core.utils.StringUtils;
 import com.superb.easyflowable.ui.context.EasyFlowableContext;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
  * @Description: 自定义实现信息获取
  * @Author: MoJie
  */
+@Primary
 @Component
 public class EasyFlowableInterfaceImpl implements EasyFlowEntityInterface {
 

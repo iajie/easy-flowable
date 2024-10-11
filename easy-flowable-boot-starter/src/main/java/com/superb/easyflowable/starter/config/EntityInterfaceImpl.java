@@ -1,6 +1,7 @@
 package com.superb.easyflowable.starter.config;
 
 import com.superb.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 
 /**
  * @package: {@link com.superb.easyflowable.starter.config}
@@ -8,6 +9,7 @@ import com.superb.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
  * @Description:
  * @Author: MoJie
  */
+@AutoConfigureBefore
 public class EntityInterfaceImpl implements EasyFlowEntityInterface {
 
     @Override

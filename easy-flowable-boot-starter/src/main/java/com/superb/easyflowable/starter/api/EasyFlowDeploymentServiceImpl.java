@@ -20,10 +20,10 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +77,8 @@ public class EasyFlowDeploymentServiceImpl extends ServiceImpl<EasyFlowDeploymen
         modelHistory.setModelId(modelId);
         modelHistory.setModelEditorXml(model.getModelEditorXml());
         modelHistory.setRemarks(model.getRemarks());
-        modelHistory.setVersion(model.getPublishVersion());
+        modelHistory.setCreateTime(new Date());
+        modelHistory.setVersion(model.getPublishVersion() + 1);
         modelHistory.setCreateBy(entityInterface.getTenantId());
         modelService.saveHistory(modelHistory);
         modelService.updateChain()
