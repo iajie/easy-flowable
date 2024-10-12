@@ -35,11 +35,11 @@ public class EasyModelController {
     private EasyFlowEntityInterface entityInterface;
 
     /**
-     * 模型分页查询
      * @param pageParams 分页查询
-     * @return {@link Page<EasyModel>}
+     * @return {@link Result} {@link Page} {@link EasyModel} 
      * @Author: MoJie
-     * @Date: 2024-09-27 14:27:20
+     * @Date: 2024-10-12 11:09
+     * @Description: 模型分页查询
      */
     @PostMapping("pageQuery")
     public Result<Page<EasyModel>> page(@RequestBody PageParams<EasyModel> pageParams) {
@@ -60,8 +60,8 @@ public class EasyModelController {
      * 模型发布历史分页查询
      * @param pageParams 分页查询
      * @return {@link Page<EasyModel>}
-     * @Author MoJie
-     * @Date 2024-09-27 14:27:20
+     * @Author: MoJie
+     * @Date: 2024-09-27 14:27:20
      */
     @PostMapping("historyPage")
     public Result<Page<EasyModelHistory>> historyPage(@RequestBody PageParams<EasyModelHistory> pageParams) {
@@ -72,6 +72,25 @@ public class EasyModelController {
         return Result.success(modelService.modelHistory(pageParams.getPage(), params));
     }
 
+    /**
+     * @param historyId 历史ID
+     * @return {@link Result} {@link Boolean}
+     * @Author: MoJie
+     * @Date: 2024-10-12 11:21
+     * @Description: 版本回滚 不能回滚缩略图
+     */
+    @GetMapping("rollback/{historyId}")
+    public Result<Boolean> rollback(@PathVariable String historyId) {
+        return Result.success(modelService.modelHistoryRollback(historyId));
+    }
+
+    /**
+     * @param model 模型参数
+     * @return {@link Result<Boolean>}
+     * @Author: MoJie
+     * @Date: 2024-10-12 10:37
+     * @Description: 保存模型
+     */
     @PostMapping("save")
     public Result<Boolean> save(@RequestBody EasyModel model) {
         QueryWrapper queryWrapper = new QueryWrapper();
@@ -91,6 +110,13 @@ public class EasyModelController {
         return Result.success(modelService.saveOrUpdate(model));
     }
 
+    /**
+     * @param id 模型ID
+     * @return {@link Result<Boolean>}
+     * @Author: MoJie
+     * @Date: 2024-10-12 10:41
+     * @Description: 根据ID删除流程模型
+     */
     @GetMapping("remove/{id}")
     public Result<Boolean> remove(@PathVariable String id) {
         // 删除流程模型发布历史
@@ -101,6 +127,13 @@ public class EasyModelController {
         return Result.error();
     }
 
+    /**
+     * @param id 模型ID
+     * @return {@link Result<EasyModel>}
+     * @Author: MoJie
+     * @Date: 2024-10-12 10:42
+     * @Description: 根据ID获取模型信息
+     */
     @GetMapping("info/{id}")
     public Result<EasyModel> getInfo(@PathVariable String id) {
         return Result.success(modelService.getById(id));

@@ -5,6 +5,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.superb.easyflowable.core.domain.entity.EasyModel;
 import com.superb.easyflowable.core.domain.entity.EasyModelHistory;
+import com.superb.easyflowable.core.exception.EasyFlowableException;
 import com.superb.easyflowable.core.mapper.EasyModelHistoryMapper;
 import com.superb.easyflowable.core.mapper.EasyModelMapper;
 import com.superb.easyflowable.core.service.EasyModelService;
@@ -55,5 +56,17 @@ public class EasyModelServiceImpl extends ServiceImpl<EasyModelMapper, EasyModel
     public boolean deleteHistoryByModelId(String modelId) {
         this.modelHistoryMapper.deleteByQuery(QueryWrapper.create().eq(EasyModelHistory::getModelId, modelId));
         return true;
+    }
+
+    @Override
+    public boolean modelHistoryRollback(String historyId) {
+        EasyModelHistory history = this.modelHistoryMapper.selectOneById(historyId);
+        if (history == null) {
+            throw new EasyFlowableException("流程历史信息不存在, 回滚失败！");
+        }
+        return this.updateChain().eq(EasyModel::getId, history.getModelId())
+                .set(EasyModel::getModelEditorXml, history.getModelEditorXml())
+                .set(EasyModel::getThumbnail, null)
+                .update();
     }
 }

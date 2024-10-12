@@ -49,4 +49,13 @@ public interface EasyModelService extends IService<EasyModel> {
      * @Date: 2024-10-09 12:47:50
      */
     boolean deleteHistoryByModelId(String modelId);
+
+    /**
+     * @param historyId 发布历史ID
+     * @return {@link boolean}
+     * @Author: MoJie
+     * @Date: 2024-10-12 11:15
+     * @Description: 历史版本回退
+     */
+    boolean modelHistoryRollback(String historyId);
 }

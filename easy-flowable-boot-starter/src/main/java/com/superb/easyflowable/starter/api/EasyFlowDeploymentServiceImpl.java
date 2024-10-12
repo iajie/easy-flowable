@@ -79,7 +79,7 @@ public class EasyFlowDeploymentServiceImpl extends ServiceImpl<EasyFlowDeploymen
         modelHistory.setRemarks(model.getRemarks());
         modelHistory.setCreateTime(new Date());
         modelHistory.setVersion(model.getPublishVersion() + 1);
-        modelHistory.setCreateBy(entityInterface.getTenantId());
+        modelHistory.setCreateBy(entityInterface.getUserId());
         modelService.saveHistory(modelHistory);
         modelService.updateChain()
                 .setRaw(EasyModel::getPublishVersion, "publish_version + 1")
