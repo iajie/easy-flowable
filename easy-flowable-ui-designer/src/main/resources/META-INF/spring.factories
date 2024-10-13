@@ -1,3 +1,9 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.superb.easyflowable.ui.config.MvConfiguration,\
-  com.superb.easyflowable.ui.config.EasyFlowableInterfaceImpl
+  online.easyflowable.ui.config.MvConfiguration,\
+  online.easyflowable.ui.config.EasyFlowableInterfaceImpl,\
+  online.easyflowable.ui.controller.EasyFlowableController,\
+  online.easyflowable.ui.controller.EasyModelController,\
+  online.easyflowable.ui.controller.EasyDeploymentController,\
+  online.easyflowable.ui.controller.EasyProcessInstanceController,\
+  online.easyflowable.ui.controller.EasyTaskController
+
