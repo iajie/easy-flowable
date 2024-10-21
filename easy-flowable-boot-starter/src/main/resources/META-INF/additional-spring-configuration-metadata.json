@@ -21,17 +21,17 @@
         {
             "name": "easy-flowable.data-source",
             "description": "数据源配置.",
-            "type": "online.easyflowable.core.config.EasyFlowableDataSourceConfig"
+            "type": "com.easyflowable.core.config.EasyFlowableDataSourceConfig"
         },
         {
             "name": "easy-flowable.config",
             "description": "easy-flowable全局配置.",
-            "type": "online.easyflowable.core.config.EasyFlowableConfig"
+            "type": "com.easyflowable.core.config.EasyFlowableConfig"
         },
         {
             "name": "easy-flowable.ui",
             "description": "easy-flowable-ui可选配置（需要引入easy-flowable-ui-designer依赖）.",
-            "type": "online.easyflowable.core.config.EasyFlowableUiConfig"
+            "type": "com.easyflowable.core.config.EasyFlowableUiConfig"
         }
     ]
 }

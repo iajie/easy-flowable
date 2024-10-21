@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>online.easy-flowable</groupId>
-    <artifactId>easy-flowable</artifactId>
+    <groupId>com.easy-flowable</groupId>
+    <artifactId>parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>
     <modules>
@@ -62,17 +62,17 @@
                 <version>${flowable.version}</version>
             </dependency>
             <dependency>
-                <groupId>online.easy-flowable</groupId>
+                <groupId>com.easy-flowable</groupId>
                 <artifactId>easy-flowable-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>online.easy-flowable</groupId>
+                <groupId>com.easy-flowable</groupId>
                 <artifactId>easy-flowable-boot-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>online.easy-flowable</groupId>
+                <groupId>com.easy-flowable</groupId>
                 <artifactId>easy-flowable-ui-designer</artifactId>
                 <version>${project.version}</version>
             </dependency>
