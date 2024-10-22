@@ -1,8 +1,6 @@
 package com.easyflowable.ui.controller;
 
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryWrapper;
-import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.utils.StringUtils;
 import com.easyflowable.core.domain.entity.EasyModel;
 import com.easyflowable.core.domain.entity.EasyModelHistory;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-
 /**
  * @package: {@link com.easyflowable.ui.controller}
  * @Date: 2024-09-27-12:47
@@ -31,8 +27,6 @@ public class EasyModelController {
 
     @Autowired
     private EasyModelService modelService;
-    @Autowired
-    private EasyFlowEntityInterface entityInterface;
 
     /**
      * @param pageParams 分页查询
@@ -43,17 +37,8 @@ public class EasyModelController {
      */
     @PostMapping("pageQuery")
     public Result<Page<EasyModel>> page(@RequestBody PageParams<EasyModel> pageParams) {
-        String tenantId = entityInterface.getTenantId();
-        String organId = entityInterface.getOrganId();
         EasyModel params = pageParams.getParams();
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.like(EasyModel::getName, params.getName(), StringUtils.isNotBlank(params.getName()));
-        queryWrapper.like(EasyModel::getKey, params.getKey(), StringUtils.isNotBlank(params.getKey()));
-        queryWrapper.eq(EasyModel::getModelType, params.getModelType(), params.getModelType() != null);
-        queryWrapper.eq(EasyModel::getTenantId, tenantId, tenantId != null);
-        queryWrapper.eq(EasyModel::getOrganId, organId, organId != null);
-        queryWrapper.orderBy(EasyModel::getCreateTime).desc();
-        return Result.success(modelService.page(pageParams.getPage(), queryWrapper));
+        return Result.success(modelService.queryPage(pageParams.getCurrent(), pageParams.getSize(), params));
     }
 
     /**
@@ -93,21 +78,10 @@ public class EasyModelController {
      */
     @PostMapping("save")
     public Result<Boolean> save(@RequestBody EasyModel model) {
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq(EasyModel::getKey, model.getKey());
         if (StringUtils.isNotBlank(model.getId())) {
-            model.setUpdateTime(new Date());
-            queryWrapper.ne(EasyModel::getId, model.getId());
-        } else {
-            // 模型版本
-            model.setPublishVersion(0);
+            return Result.success(modelService.updateById(model));
         }
-        if (modelService.count(queryWrapper) > 0) {
-            return Result.error("当前模型标识已存在，无法创建!");
-        }
-        model.setTenantId(entityInterface.getTenantId());
-        model.setOrganId(entityInterface.getOrganId());
-        return Result.success(modelService.saveOrUpdate(model));
+        return Result.success(modelService.insert(model));
     }
 
     /**
