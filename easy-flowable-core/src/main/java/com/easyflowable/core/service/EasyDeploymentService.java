@@ -12,7 +12,7 @@ import java.util.List;
  * @Description:
  * @Author: MoJie
  */
-public interface EasyFlowDeploymentService extends IService<ActReDeployment> {
+public interface EasyDeploymentService extends IService<ActReDeployment> {
 
     /**
      * 通过模型id部署流程

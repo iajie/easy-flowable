@@ -13,7 +13,7 @@ import java.util.List;
  * @Description: 流程实例接口
  * @Author: MoJie
  */
-public interface EasyFlowProcessInstanceService {
+public interface EasyProcessInstanceService {
 
     /**
      * 获取实例列表

@@ -3,7 +3,7 @@ package com.easyflowable.ui.controller;
 import com.easyflowable.core.domain.dto.FlowUserTask;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
 import com.easyflowable.core.domain.params.FlowExecuteParam;
-import com.easyflowable.core.service.EasyFlowTaskService;
+import com.easyflowable.core.service.EasyTaskService;
 import com.easyflowable.ui.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +26,7 @@ import java.util.List;
 public class EasyTaskController {
 
     @Autowired
-    private EasyFlowTaskService taskService;
+    private EasyTaskService taskService;
 
     /**
      * 执行任务

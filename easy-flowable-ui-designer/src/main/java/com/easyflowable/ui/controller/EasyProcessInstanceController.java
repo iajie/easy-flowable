@@ -4,7 +4,7 @@ import com.easyflowable.core.domain.dto.FlowExecutionHistory;
 import com.easyflowable.core.domain.dto.FlowProcessInstance;
 import com.easyflowable.core.domain.dto.Option;
 import com.easyflowable.core.domain.params.FlowStartParam;
-import com.easyflowable.core.service.EasyFlowProcessInstanceService;
+import com.easyflowable.core.service.EasyProcessInstanceService;
 import com.easyflowable.ui.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +28,7 @@ import java.util.List;
 public class EasyProcessInstanceController {
 
     @Autowired
-    private EasyFlowProcessInstanceService processInstanceService;
+    private EasyProcessInstanceService processInstanceService;
 
     /**
      * 获取启动的流程实例 包含流程终止和激活的

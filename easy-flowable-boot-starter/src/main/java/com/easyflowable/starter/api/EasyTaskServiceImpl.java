@@ -9,7 +9,7 @@ import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
 import com.easyflowable.core.domain.params.FlowExecuteParam;
 import com.easyflowable.core.exception.EasyFlowableException;
-import com.easyflowable.core.service.EasyFlowTaskService;
+import com.easyflowable.core.service.EasyTaskService;
 import com.easyflowable.core.utils.StringUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
@@ -36,7 +36,7 @@ import java.util.List;
  * @Author: MoJie
  */
 @Transactional
-public class EasyFlowTaskServiceImpl implements EasyFlowTaskService {
+public class EasyTaskServiceImpl implements EasyTaskService {
 
     @Autowired
     private RuntimeService runtimeService;

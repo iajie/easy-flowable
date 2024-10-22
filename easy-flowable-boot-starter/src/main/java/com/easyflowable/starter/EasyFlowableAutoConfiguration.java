@@ -6,14 +6,14 @@ import com.easyflowable.core.config.EasyFlowableDataSourceConfig;
 import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.enums.HistoryLevelEnum;
 import com.easyflowable.core.exception.EasyFlowableException;
-import com.easyflowable.core.service.EasyFlowDeploymentService;
-import com.easyflowable.core.service.EasyFlowProcessInstanceService;
-import com.easyflowable.core.service.EasyFlowTaskService;
+import com.easyflowable.core.service.EasyDeploymentService;
+import com.easyflowable.core.service.EasyProcessInstanceService;
+import com.easyflowable.core.service.EasyTaskService;
 import com.easyflowable.core.service.EasyModelService;
 import com.easyflowable.core.utils.StringUtils;
-import com.easyflowable.starter.api.EasyFlowDeploymentServiceImpl;
-import com.easyflowable.starter.api.EasyFlowProcessInstanceServiceImpl;
-import com.easyflowable.starter.api.EasyFlowTaskServiceImpl;
+import com.easyflowable.starter.api.EasyDeploymentServiceImpl;
+import com.easyflowable.starter.api.EasyProcessInstanceServiceImpl;
+import com.easyflowable.starter.api.EasyTaskServiceImpl;
 import com.easyflowable.starter.api.EasyModelServiceImpl;
 import com.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.easyflowable.starter.config.EntityInterfaceImpl;
@@ -200,20 +200,20 @@ public class EasyFlowableAutoConfiguration {
 
     @Bean
     @ConditionalOnClass({RepositoryService.class, RuntimeService.class})
-    public EasyFlowDeploymentService easyFlowDeploymentService() {
-        return new EasyFlowDeploymentServiceImpl();
+    public EasyDeploymentService easyFlowDeploymentService() {
+        return new EasyDeploymentServiceImpl();
     }
 
     @Bean
     @ConditionalOnClass({RepositoryService.class, RuntimeService.class, TaskService.class, HistoryService.class})
-    public EasyFlowProcessInstanceService easyFlowProcessInstanceService() {
-        return new EasyFlowProcessInstanceServiceImpl();
+    public EasyProcessInstanceService easyFlowProcessInstanceService() {
+        return new EasyProcessInstanceServiceImpl();
     }
 
     @Bean
     @ConditionalOnClass({RuntimeService.class, TaskService.class, HistoryService.class})
-    public EasyFlowTaskService easyFlowTaskService() {
-        return new EasyFlowTaskServiceImpl();
+    public EasyTaskService easyFlowTaskService() {
+        return new EasyTaskServiceImpl();
     }
 
 }

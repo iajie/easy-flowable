@@ -15,7 +15,7 @@ import java.util.List;
  * @Description: 任务接口
  * @Author: MoJie
  */
-public interface EasyFlowTaskService {
+public interface EasyTaskService {
 
     /**
      * 流程任务执行下一步

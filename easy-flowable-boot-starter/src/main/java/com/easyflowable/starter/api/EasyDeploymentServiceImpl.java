@@ -8,7 +8,7 @@ import com.easyflowable.core.domain.entity.EasyModelHistory;
 import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.mapper.EasyFlowDeploymentMapper;
-import com.easyflowable.core.service.EasyFlowDeploymentService;
+import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.core.service.EasyModelService;
 import com.easyflowable.core.utils.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @Author: MoJie
  */
 @Transactional
-public class EasyFlowDeploymentServiceImpl extends ServiceImpl<EasyFlowDeploymentMapper, ActReDeployment> implements EasyFlowDeploymentService {
+public class EasyDeploymentServiceImpl extends ServiceImpl<EasyFlowDeploymentMapper, ActReDeployment> implements EasyDeploymentService {
 
     @Autowired
     private EasyFlowEntityInterface entityInterface;

@@ -10,7 +10,7 @@ import com.easyflowable.core.domain.enums.FlowExecuteType;
 import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.domain.params.FlowStartParam;
 import com.easyflowable.core.exception.EasyFlowableException;
-import com.easyflowable.core.service.EasyFlowProcessInstanceService;
+import com.easyflowable.core.service.EasyProcessInstanceService;
 import com.easyflowable.core.utils.StringUtils;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
@@ -44,7 +44,7 @@ import java.util.Map;
  * @Author: MoJie
  */
 @Transactional
-public class EasyFlowProcessInstanceServiceImpl implements EasyFlowProcessInstanceService {
+public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceService {
 
     @Autowired
     private RepositoryService repositoryService;

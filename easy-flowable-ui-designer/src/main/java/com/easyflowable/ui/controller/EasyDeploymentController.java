@@ -6,7 +6,7 @@ import com.easyflowable.core.domain.dto.DeploymentProcessDef;
 import com.easyflowable.core.domain.dto.FlowUserTask;
 import com.easyflowable.core.domain.entity.ActReDeployment;
 import com.easyflowable.core.domain.entity.ActReProcessDef;
-import com.easyflowable.core.service.EasyFlowDeploymentService;
+import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.core.utils.StringUtils;
 import com.easyflowable.ui.context.EasyFlowableContext;
 import com.easyflowable.ui.model.PageParams;
@@ -33,7 +33,7 @@ import java.util.List;
 public class EasyDeploymentController {
 
     @Autowired
-    private EasyFlowDeploymentService deploymentService;
+    private EasyDeploymentService deploymentService;
 
     /**
      * 流程部署定义分页查询
