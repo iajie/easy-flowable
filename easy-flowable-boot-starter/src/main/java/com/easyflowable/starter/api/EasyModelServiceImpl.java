@@ -3,6 +3,7 @@ package com.easyflowable.starter.api;
 import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.utils.StringUtils;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.easyflowable.core.domain.entity.EasyModel;
@@ -56,6 +57,16 @@ public class EasyModelServiceImpl implements EasyModelService {
             throw new EasyFlowableException("当前模型标识已存在，无法创建!");
         }
         return modelMapper.update(model) > 0;
+    }
+
+    @Override
+    public UpdateChain<EasyModel> updateChain() {
+        return UpdateChain.create(this.modelMapper);
+    }
+
+    @Override
+    public QueryChain<EasyModel> queryChain() {
+        return QueryChain.of(this.modelMapper);
     }
 
     @Override

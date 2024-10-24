@@ -1,16 +1,12 @@
 package com.easyflowable.ui.controller;
 
-import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryWrapper;
 import com.easyflowable.core.domain.dto.DeploymentProcessDef;
 import com.easyflowable.core.domain.dto.FlowUserTask;
 import com.easyflowable.core.domain.entity.ActReDeployment;
-import com.easyflowable.core.domain.entity.ActReProcessDef;
 import com.easyflowable.core.service.EasyDeploymentService;
-import com.easyflowable.core.utils.StringUtils;
-import com.easyflowable.ui.context.EasyFlowableContext;
 import com.easyflowable.ui.model.PageParams;
 import com.easyflowable.ui.model.Result;
+import com.mybatisflex.core.paginate.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,22 +39,9 @@ public class EasyDeploymentController {
      * @Date: 2024-10-09 16:15:19
      */
     @PostMapping("page")
-    public Result<Page<DeploymentProcessDef>> page(@RequestBody PageParams<DeploymentProcessDef> pageParams) {
-        DeploymentProcessDef params = pageParams.getParams();
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.select("rd.ID_ AS id", "rp.ID_ AS processDefinitionId", "rd.NAME_ AS name",
-                "rp.HAS_START_FORM_KEY_ AS hasStartFormKey", "rd.DEPLOY_TIME_ AS deploymentTime", "rd.KEY_ AS `key`",
-                "rd.CATEGORY_ AS modelType", "rd.TENANT_ID_ AS tenantId", "rp.VERSION_ AS version",
-                "rp.SUSPENSION_STATE_ AS suspensionState");
-        // 主表
-        queryWrapper.from(ActReDeployment.class).as("rd");
-        queryWrapper.like(ActReDeployment::getName, params.getName(), StringUtils.isNotBlank(params.getName()));
-        queryWrapper.like(ActReDeployment::getFlowKey, params.getKey(), StringUtils.isNotBlank(params.getKey()));
-        queryWrapper.eq(ActReDeployment::getModelType, params.getModelType(), params.getModelType() != null);
-        queryWrapper.eq(ActReDeployment::getTenantId, params.getTenantId(), EasyFlowableContext.getTenantId() != null);
-        queryWrapper.leftJoin(ActReProcessDef.class).as("rp").on(ActReDeployment::getId, ActReProcessDef::getDeploymentId);
-        queryWrapper.orderBy(ActReDeployment::getDeploymentTime);
-        return Result.success(deploymentService.pageAs(pageParams.getPage(), queryWrapper, DeploymentProcessDef.class));
+    public Result<Page<DeploymentProcessDef>> page(@RequestBody PageParams<ActReDeployment> pageParams) {
+        ActReDeployment params = pageParams.getParams();
+        return Result.success(deploymentService.page(pageParams.getCurrent(), pageParams.getSize(), params));
     }
 
     /**

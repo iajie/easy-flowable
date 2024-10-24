@@ -3,7 +3,8 @@ package com.easyflowable.core.service;
 import com.easyflowable.core.domain.entity.EasyModel;
 import com.easyflowable.core.domain.entity.EasyModelHistory;
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.service.IService;
+import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.update.UpdateChain;
 
 import java.util.List;
 
@@ -32,7 +33,10 @@ public interface EasyModelService {
      * @Description: 根据ID修改模型      
      */
     boolean updateById(EasyModel model);
-    
+
+    UpdateChain<EasyModel> updateChain();
+    QueryChain<EasyModel> queryChain();
+
     /**
      * @param id 主键
      * @return {@link EasyModel} 

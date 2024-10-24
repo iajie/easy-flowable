@@ -26,7 +26,6 @@
         <dependency>
             <groupId>com.mybatis-flex</groupId>
             <artifactId>mybatis-flex-core</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

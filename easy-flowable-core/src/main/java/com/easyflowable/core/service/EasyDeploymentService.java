@@ -1,8 +1,12 @@
 package com.easyflowable.core.service;
 
-import com.mybatisflex.core.service.IService;
+import com.easyflowable.core.domain.dto.DeploymentProcessDef;
 import com.easyflowable.core.domain.dto.FlowUserTask;
 import com.easyflowable.core.domain.entity.ActReDeployment;
+import com.easyflowable.core.domain.entity.ActReProcessDef;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.update.UpdateChain;
 
 import java.util.List;
 
@@ -12,7 +16,47 @@ import java.util.List;
  * @Description:
  * @Author: MoJie
  */
-public interface EasyDeploymentService extends IService<ActReDeployment> {
+public interface EasyDeploymentService {
+
+    /**
+     * @return {@link UpdateChain} {@link ActReDeployment}
+     * @Author: MoJie
+     * @Date: 2024-10-24 17:45
+     * @Description: 使用Mybatis-Flex带有的链式更新
+     */
+    UpdateChain<ActReDeployment> updateChain();
+
+    /**
+     * @return {@link QueryChain} {@link ActReDeployment}
+     * @Author: MoJie
+     * @Date: 2024-10-24 17:45
+     * @Description: 使用Mybatis-Flex带有的链式查询
+     */
+    QueryChain<ActReDeployment> queryChain();
+
+    /**
+     * @param current 页码
+     * @param size 页大小
+     * @param params 查询参数
+     * @return {@link Page} {@link DeploymentProcessDef}
+     * @Author: MoJie
+     * @Date: 2024-10-24 17:42
+     * @Description: 分页查询
+     */
+    default Page<DeploymentProcessDef> page(Integer current, Integer size, ActReDeployment params) {
+        return this.queryChain()
+                .select("rd.ID_ AS id", "rp.ID_ AS processDefinitionId", "rd.NAME_ AS name",
+                        "rp.HAS_START_FORM_KEY_ AS hasStartFormKey", "rd.DEPLOY_TIME_ AS deploymentTime", "rd.KEY_ AS `key`",
+                        "rd.CATEGORY_ AS modelType", "rd.TENANT_ID_ AS tenantId", "rp.VERSION_ AS version",
+                        "rp.SUSPENSION_STATE_ AS suspensionState")
+                .from(ActReDeployment.class).as("rd")
+                .like(ActReDeployment::getName, params.getName())
+                .like(ActReDeployment::getFlowKey, params.getFlowKey())
+                .eq(ActReDeployment::getModelType, params.getModelType())
+                .eq(ActReDeployment::getTenantId, params.getTenantId())
+                .leftJoin(ActReProcessDef.class).as("rp").on(ActReDeployment::getId, ActReProcessDef::getDeploymentId)
+                .orderBy(ActReDeployment::getDeploymentTime).desc().pageAs(new Page<>(current, size), DeploymentProcessDef.class);
+    }
 
     /**
      * 通过模型id部署流程

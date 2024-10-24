@@ -11,6 +11,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @Author: MoJie
  */
 @Mapper
-public interface EasyFlowDeploymentMapper extends BaseMapper<ActReDeployment> {
+public interface EasyDeploymentMapper extends BaseMapper<ActReDeployment> {
 
 }

@@ -1,5 +1,7 @@
 package com.easyflowable.starter.api;
 
+import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.easyflowable.core.domain.dto.FlowUserTask;
 import com.easyflowable.core.domain.entity.ActReDeployment;
@@ -7,7 +9,7 @@ import com.easyflowable.core.domain.entity.EasyModel;
 import com.easyflowable.core.domain.entity.EasyModelHistory;
 import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.exception.EasyFlowableException;
-import com.easyflowable.core.mapper.EasyFlowDeploymentMapper;
+import com.easyflowable.core.mapper.EasyDeploymentMapper;
 import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.core.service.EasyModelService;
 import com.easyflowable.core.utils.StringUtils;
@@ -35,8 +37,10 @@ import java.util.Map;
  * @Author: MoJie
  */
 @Transactional
-public class EasyDeploymentServiceImpl extends ServiceImpl<EasyFlowDeploymentMapper, ActReDeployment> implements EasyDeploymentService {
+public class EasyDeploymentServiceImpl implements EasyDeploymentService {
 
+    @Autowired
+    private EasyDeploymentMapper deploymentMapper;
     @Autowired
     private EasyFlowEntityInterface entityInterface;
     @Autowired
@@ -45,6 +49,16 @@ public class EasyDeploymentServiceImpl extends ServiceImpl<EasyFlowDeploymentMap
     private RepositoryService repositoryService;
     @Autowired
     private RuntimeService runtimeService;
+
+    @Override
+    public UpdateChain<ActReDeployment> updateChain() {
+        return UpdateChain.create(deploymentMapper);
+    }
+
+    @Override
+    public QueryChain<ActReDeployment> queryChain() {
+        return QueryChain.of(deploymentMapper);
+    }
 
     @Override
     public String deploymentModel(String modelId) {
