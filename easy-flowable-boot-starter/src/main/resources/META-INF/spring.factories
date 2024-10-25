@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration =\
     com.easyflowable.starter.EasyFlowableAutoConfiguration,\
-    com.easyflowable.starter.config.MybatisFlexConfiguration
+    com.easyflowable.starter.config.MybatisFlexConfiguration,\
+    com.easyflowable.starter.config.EntityInterfaceImpl

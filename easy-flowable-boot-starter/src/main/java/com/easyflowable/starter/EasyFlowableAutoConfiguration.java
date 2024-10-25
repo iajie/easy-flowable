@@ -1,22 +1,20 @@
 package com.easyflowable.starter;
 
-import com.mybatisflex.core.datasource.DataSourceBuilder;
 import com.easyflowable.core.config.EasyFlowableConfig;
 import com.easyflowable.core.config.EasyFlowableDataSourceConfig;
-import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.enums.HistoryLevelEnum;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyDeploymentService;
+import com.easyflowable.core.service.EasyModelService;
 import com.easyflowable.core.service.EasyProcessInstanceService;
 import com.easyflowable.core.service.EasyTaskService;
-import com.easyflowable.core.service.EasyModelService;
 import com.easyflowable.core.utils.StringUtils;
 import com.easyflowable.starter.api.EasyDeploymentServiceImpl;
+import com.easyflowable.starter.api.EasyModelServiceImpl;
 import com.easyflowable.starter.api.EasyProcessInstanceServiceImpl;
 import com.easyflowable.starter.api.EasyTaskServiceImpl;
-import com.easyflowable.starter.api.EasyModelServiceImpl;
 import com.easyflowable.starter.config.EasyFlowableConfigProperties;
-import com.easyflowable.starter.config.EntityInterfaceImpl;
+import com.mybatisflex.core.datasource.DataSourceBuilder;
 import liquibase.integration.spring.SpringLiquibase;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.HistoryService;
@@ -28,7 +26,6 @@ import org.flowable.engine.TaskService;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -178,18 +175,6 @@ public class EasyFlowableAutoConfiguration {
         liquibase.setDataSource(this.easyFlowableDatasource());
         liquibase.setShouldRun(this.properties.getConfig().isTableSchema());
         return liquibase;
-    }
-
-    /**
-     * 如果没有注册自定义条件器，使用默认
-     * @return {@link EasyFlowEntityInterface}
-     * @Author: MoJie
-     * @Date: 2024-10-09 15:55:36
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public EasyFlowEntityInterface easyFlowEntityInterface() {
-        return new EntityInterfaceImpl();
     }
 
     @Bean
