@@ -1,8 +1,5 @@
 package com.easyflowable.starter.api;
 
-import com.mybatisflex.core.query.QueryChain;
-import com.mybatisflex.core.update.UpdateChain;
-import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.easyflowable.core.domain.dto.FlowUserTask;
 import com.easyflowable.core.domain.entity.ActReDeployment;
 import com.easyflowable.core.domain.entity.EasyModel;
@@ -13,6 +10,7 @@ import com.easyflowable.core.mapper.EasyDeploymentMapper;
 import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.core.service.EasyModelService;
 import com.easyflowable.core.utils.StringUtils;
+import com.mybatisflex.core.query.QueryChain;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.UserTask;
@@ -49,11 +47,6 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
     private RepositoryService repositoryService;
     @Autowired
     private RuntimeService runtimeService;
-
-    @Override
-    public UpdateChain<ActReDeployment> updateChain() {
-        return UpdateChain.create(deploymentMapper);
-    }
 
     @Override
     public QueryChain<ActReDeployment> queryChain() {

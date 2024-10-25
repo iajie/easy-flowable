@@ -1,12 +1,12 @@
 package com.easyflowable.core.service;
 
+import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.DeploymentProcessDef;
 import com.easyflowable.core.domain.dto.FlowUserTask;
 import com.easyflowable.core.domain.entity.ActReDeployment;
 import com.easyflowable.core.domain.entity.ActReProcessDef;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
-import com.mybatisflex.core.update.UpdateChain;
 
 import java.util.List;
 
@@ -17,14 +17,6 @@ import java.util.List;
  * @Author: MoJie
  */
 public interface EasyDeploymentService {
-
-    /**
-     * @return {@link UpdateChain} {@link ActReDeployment}
-     * @Author: MoJie
-     * @Date: 2024-10-24 17:45
-     * @Description: 使用Mybatis-Flex带有的链式更新
-     */
-    UpdateChain<ActReDeployment> updateChain();
 
     /**
      * @return {@link QueryChain} {@link ActReDeployment}
@@ -45,10 +37,7 @@ public interface EasyDeploymentService {
      */
     default Page<DeploymentProcessDef> page(Integer current, Integer size, ActReDeployment params) {
         return this.queryChain()
-                .select("rd.ID_ AS id", "rp.ID_ AS processDefinitionId", "rd.NAME_ AS name",
-                        "rp.HAS_START_FORM_KEY_ AS hasStartFormKey", "rd.DEPLOY_TIME_ AS deploymentTime", "rd.KEY_ AS `key`",
-                        "rd.CATEGORY_ AS modelType", "rd.TENANT_ID_ AS tenantId", "rp.VERSION_ AS version",
-                        "rp.SUSPENSION_STATE_ AS suspensionState")
+                .select(Constants.DEPLOYMENT_COLUMNS)
                 .from(ActReDeployment.class).as("rd")
                 .like(ActReDeployment::getName, params.getName())
                 .like(ActReDeployment::getFlowKey, params.getFlowKey())
