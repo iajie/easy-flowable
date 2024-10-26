@@ -1,7 +1,6 @@
 package com.easyflowable.starter.config;
 
 import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
  * @Author: MoJie
  */
 @Component
-@ConditionalOnMissingBean
 public class EntityInterfaceImpl implements EasyFlowEntityInterface {
 
     @Override

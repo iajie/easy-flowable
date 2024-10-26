@@ -10,7 +10,7 @@ public interface EasyFlowEntityInterface {
 
     /** 当前租户 */
     default String getTenantId() {
-        return null;
+        return "easy-flowable";
     }
 
     /** 当前部门 */

@@ -7,7 +7,10 @@ import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.ui.model.PageParams;
 import com.easyflowable.ui.model.Result;
 import com.mybatisflex.core.paginate.Page;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -41,7 +50,8 @@ public class EasyDeploymentController {
     @PostMapping("page")
     public Result<Page<DeploymentProcessDef>> page(@RequestBody PageParams<ActReDeployment> pageParams) {
         ActReDeployment params = pageParams.getParams();
-        return Result.success(deploymentService.page(pageParams.getCurrent(), pageParams.getSize(), params));
+        Page<ActReDeployment> page = pageParams.getPage();
+        return Result.success(deploymentService.page(page.getPageNumber(), page.getPageSize(), params));
     }
 
     /**
@@ -96,5 +106,19 @@ public class EasyDeploymentController {
     @GetMapping(value = "flowUserList/{flowKey}")
     public Result<List<FlowUserTask>> getFlowUserTaskList(@PathVariable String flowKey) {
         return Result.success(deploymentService.getAllFlowUserTask(flowKey));
+    }
+
+    /**
+     * 流程部署图片
+     * @param processDefinitionId 流程定义id
+     * @Author: MoJie
+     * @Date: 2024-10-09 16:21:50
+     */
+    @SneakyThrows
+    @GetMapping(value = "deploymentImage/{processDefinitionId}")
+    public void deploymentImage(@PathVariable String processDefinitionId, HttpServletResponse response) {
+        InputStream inputStream = deploymentService.getFlowImage(processDefinitionId);
+        response.setContentType("image/png");
+        ImageIO.write(ImageIO.read(inputStream), "png", response.getOutputStream());
     }
 }

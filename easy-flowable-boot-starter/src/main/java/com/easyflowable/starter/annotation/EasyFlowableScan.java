@@ -15,8 +15,8 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@MapperScan({"com.easyflowable.core"})
-@ComponentScan(basePackages = {"com.easyflowable"})
+@MapperScan({"com.easyflowable.core.mapper"})
+@ComponentScan(basePackages = {"com.easyflowable.starter"})
 public @interface EasyFlowableScan {
 
 }

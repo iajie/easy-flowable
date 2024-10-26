@@ -2,6 +2,7 @@ package com.easyflowable.starter;
 
 import com.easyflowable.core.config.EasyFlowableConfig;
 import com.easyflowable.core.config.EasyFlowableDataSourceConfig;
+import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.enums.HistoryLevelEnum;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyDeploymentService;
@@ -17,25 +18,19 @@ import com.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.mybatisflex.core.datasource.DataSourceBuilder;
 import liquibase.integration.spring.SpringLiquibase;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.flowable.engine.*;
 import org.flowable.image.ProcessDiagramGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
+import javax.annotation.Resource;
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
-import javax.sql.DataSource;
 
 /**
  * @package: {@link com.easyflowable.starter}
@@ -48,10 +43,9 @@ import javax.sql.DataSource;
 @ConditionalOnProperty(prefix = "easy-flowable", name = "enable", havingValue = "true", matchIfMissing = true)
 public class EasyFlowableAutoConfiguration {
 
-    private final static String CHANGE_LOG = "classpath:/changelog/changelog-master.yaml";
-    @Autowired
+    @Resource
     private EasyFlowableConfigProperties properties;
-    @Autowired
+    @Resource
     private DataSourceProperties dataSourceProperties;
 
     @Bean
@@ -73,13 +67,13 @@ public class EasyFlowableAutoConfiguration {
     }
 
     @Bean
-    public ProcessEngine processEngine() {
+    public ProcessEngine processEngine(DataSource dataSource) {
         // 打印banner
         this.printBanner(properties.isBanner());
         ProcessEngineConfiguration engineConfiguration = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
         // 数据源配置
         if (properties.isProjectDatasource()) {
-            engineConfiguration.setDataSource(this.easyFlowableDatasource());
+            engineConfiguration.setDataSource(dataSource);
         } else {
             EasyFlowableDataSourceConfig jdbc = properties.getDataSource();
             if (StringUtils.isBlank(jdbc.getDriver())) {
@@ -120,25 +114,21 @@ public class EasyFlowableAutoConfiguration {
     }
 
     @Bean
-    @Primary
     public RuntimeService runtimeService(ProcessEngine processEngine) {
         return processEngine.getRuntimeService();
     }
 
     @Bean
-    @Primary
     public RepositoryService repositoryService(ProcessEngine processEngine) {
         return processEngine.getRepositoryService();
     }
 
     @Bean
-    @Primary
     public HistoryService historyService(ProcessEngine processEngine) {
         return processEngine.getHistoryService();
     }
 
     @Bean
-    @Primary
     public TaskService taskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
     }
@@ -169,16 +159,15 @@ public class EasyFlowableAutoConfiguration {
     }
 
     @Bean
-    public SpringLiquibase liquibase() {
+    public SpringLiquibase liquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setChangeLog(CHANGE_LOG);
-        liquibase.setDataSource(this.easyFlowableDatasource());
+        liquibase.setChangeLog(Constants.CHANGE_LOG);
+        liquibase.setDataSource(dataSource);
         liquibase.setShouldRun(this.properties.getConfig().isTableSchema());
         return liquibase;
     }
 
     @Bean
-    @Primary
     public EasyModelService easyModelService() {
         return new EasyModelServiceImpl();
     }

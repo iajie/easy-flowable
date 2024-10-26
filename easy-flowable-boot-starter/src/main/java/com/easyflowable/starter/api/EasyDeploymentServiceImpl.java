@@ -1,5 +1,6 @@
 package com.easyflowable.starter.api;
 
+import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.FlowUserTask;
 import com.easyflowable.core.domain.entity.ActReDeployment;
 import com.easyflowable.core.domain.entity.EasyModel;
@@ -19,14 +20,12 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Resource;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * @package: {@link com.easyflowable.starter.api}
@@ -37,15 +36,15 @@ import java.util.Map;
 @Transactional
 public class EasyDeploymentServiceImpl implements EasyDeploymentService {
 
-    @Autowired
+    @Resource
     private EasyDeploymentMapper deploymentMapper;
-    @Autowired
+    @Resource
     private EasyFlowEntityInterface entityInterface;
-    @Autowired
+    @Resource
     private EasyModelService modelService;
-    @Autowired
+    @Resource
     private RepositoryService repositoryService;
-    @Autowired
+    @Resource
     private RuntimeService runtimeService;
 
     @Override
@@ -70,13 +69,17 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
          * 2.添加模型部署历史
          * 3.更新流程模型发布版本
          */
+        byte[] decode = Base64.getDecoder().decode(model.getThumbnail().replace("data:image/png;base64,", ""));
+        ByteArrayInputStream flowImageStream = new ByteArrayInputStream(decode);
         Deployment deployment = repositoryService.createDeployment()
                 .name(model.getName())
                 .key(model.getKey())
                 .category(model.getModelType().toString())
                 .tenantId(model.getTenantId())
-                .addString("easy-flowable-" + model.getName(), model.getModelEditorXml())
+                .addString(Constants.BPMN20_XML(model.getName()), model.getModelEditorXml())
+                .addInputStream(Constants.DIAGRAM_PNG(model.getName(), model.getKey()), flowImageStream)
                 .deploy();
+
         if (deployment == null) {
             throw new EasyFlowableException("流程模型部署异常");
         }
@@ -136,9 +139,10 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
      * @Date: 2024-10-09 13:12:09
      */
     private Deployment getDeployment(String flowKey) {
+        String tenantId = entityInterface.getTenantId();
         List<Deployment> list = repositoryService.createDeploymentQuery()
                 .deploymentKey(flowKey)
-                .deploymentTenantId(entityInterface.getTenantId())
+                .deploymentTenantId(tenantId)
                 .orderByDeploymentTime().desc()
                 .list();
         if (list.isEmpty()) {
@@ -195,5 +199,14 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
             list.add(flowUserTask);
         }
         return list;
+    }
+
+    @Override
+    public InputStream getFlowImage(String processDefinitionId) {
+        ProcessDefinition result = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+        if (result == null) {
+            throw new EasyFlowableException("未找到流程定义");
+        }
+        return repositoryService.getProcessDiagram(processDefinitionId);
     }
 }

@@ -8,6 +8,7 @@ import com.easyflowable.core.domain.entity.ActReProcessDef;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public interface EasyDeploymentService {
      * @Date: 2024-10-24 17:42
      * @Description: 分页查询
      */
-    default Page<DeploymentProcessDef> page(Integer current, Integer size, ActReDeployment params) {
+    default Page<DeploymentProcessDef> page(long current, long size, ActReDeployment params) {
         return this.queryChain()
                 .select(Constants.DEPLOYMENT_COLUMNS)
                 .from(ActReDeployment.class).as("rd")
@@ -43,7 +44,7 @@ public interface EasyDeploymentService {
                 .like(ActReDeployment::getFlowKey, params.getFlowKey())
                 .eq(ActReDeployment::getModelType, params.getModelType())
                 .eq(ActReDeployment::getTenantId, params.getTenantId())
-                .leftJoin(ActReProcessDef.class).as("rp").on(ActReDeployment::getId, ActReProcessDef::getDeploymentId)
+                .innerJoin(ActReProcessDef.class).as("rp").on(ActReDeployment::getId, ActReProcessDef::getDeploymentId)
                 .orderBy(ActReDeployment::getDeploymentTime).desc().pageAs(new Page<>(current, size), DeploymentProcessDef.class);
     }
 
@@ -82,4 +83,13 @@ public interface EasyDeploymentService {
      * @Date: 2024-10-09 10:22:09
      */
     List<FlowUserTask> getAllFlowUserTask(String flowKey);
+
+    /**
+     * @param processDefinitionId 流程定义ID
+     * @Return: {@link InputStream}
+     * @Author: MoJie
+     * @Date: 2024/10/26 16:19
+     * @Description: 获取流程部署图片
+     */
+    InputStream getFlowImage(String processDefinitionId);
 }

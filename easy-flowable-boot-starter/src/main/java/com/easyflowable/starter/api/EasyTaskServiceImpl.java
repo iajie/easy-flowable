@@ -23,9 +23,9 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,13 +38,13 @@ import java.util.List;
 @Transactional
 public class EasyTaskServiceImpl implements EasyTaskService {
 
-    @Autowired
+    @Resource
     private RuntimeService runtimeService;
-    @Autowired
+    @Resource
     private TaskService taskService;
-    @Autowired
+    @Resource
     private HistoryService historyService;
-    @Autowired
+    @Resource
     private EasyFlowEntityInterface entityInterface;
 
     @Override

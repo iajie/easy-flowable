@@ -12,11 +12,8 @@ import com.easyflowable.core.domain.params.FlowStartParam;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyProcessInstanceService;
 import com.easyflowable.core.utils.StringUtils;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.FlowNode;
-import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.Process;
-import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
@@ -29,9 +26,9 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,15 +43,15 @@ import java.util.Map;
 @Transactional
 public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceService {
 
-    @Autowired
+    @Resource
     private RepositoryService repositoryService;
-    @Autowired
+    @Resource
     private RuntimeService runtimeService;
-    @Autowired
+    @Resource
     private TaskService taskService;
-    @Autowired
+    @Resource
     private HistoryService historyService;
-    @Autowired
+    @Resource
     private EasyFlowEntityInterface entityInterface;
 
     @Override
@@ -102,9 +99,6 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         if (StringUtils.isBlank(businessKey)) {
             throw new EasyFlowableException("流程启动业务主键不能为空！");
         }
-        if (StringUtils.isBlank(startParam.getProcessName())) {
-            throw new EasyFlowableException("流程名称不能为空！");
-        }
         // 获取最新流程定义
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
                 .processDefinitionKey(flowKey).latestVersion().processDefinitionTenantId(entityInterface.getTenantId())
@@ -135,8 +129,10 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         // 用流程定义的KEY启动，会自动选择KEY相同的流程定义中最新版本的那个(KEY为模型中的流程唯一标识)
         ProcessInstance instance = runtimeService
                 .startProcessInstanceByKeyAndTenantId(flowKey, businessKey, variables, entityInterface.getTenantId());
-        // 设置流程名称
-        runtimeService.setProcessInstanceName(instance.getProcessInstanceId(), startParam.getProcessName());
+        if (StringUtils.isNotBlank(startParam.getProcessName())) {
+            // 设置流程名称
+            runtimeService.setProcessInstanceName(instance.getProcessInstanceId(), startParam.getProcessName());
+        }
         // 更新业务状态-默认发起
         runtimeService.updateBusinessStatus(instance.getProcessInstanceId(), "start");
         // 如果自动跳过开始节点，需要设置第一步执行人为启动流程的人

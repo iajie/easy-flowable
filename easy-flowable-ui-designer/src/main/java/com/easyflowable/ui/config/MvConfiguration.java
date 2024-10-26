@@ -1,19 +1,25 @@
 package com.easyflowable.ui.config;
 
 import com.easyflowable.core.config.EasyFlowableUiConfig;
+import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.utils.StringUtils;
 import com.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.easyflowable.ui.context.EasyFlowableContext;
+import com.easyflowable.ui.model.Result;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 public class MvConfiguration implements WebMvcConfigurer {
 
-    @Autowired
+    @Resource
     private EasyFlowableConfigProperties properties;
 
     @Override
@@ -49,11 +55,11 @@ public class MvConfiguration implements WebMvcConfigurer {
             @Override
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
                 String tenantId = request.getHeader(EasyFlowableContext.TENANT_ID);
-                if (StringUtils.isBlank(tenantId)) {
+                if (StringUtils.isNotBlank(tenantId)) {
                     EasyFlowableContext.setLocal(EasyFlowableContext.TENANT_ID, tenantId);
                 }
                 String organId = request.getHeader(EasyFlowableContext.ORGAN_ID);
-                if (StringUtils.isBlank(organId)) {
+                if (StringUtils.isNotBlank(organId)) {
                     EasyFlowableContext.setLocal(EasyFlowableContext.ORGAN_ID, organId);
                 }
                 if (properties.getUi().isLogin() && !"/easy-flowable/login".equals(request.getRequestURI())) {
@@ -73,6 +79,15 @@ public class MvConfiguration implements WebMvcConfigurer {
             @Override
             public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
                 EasyFlowableContext.clear();
+                if (ex != null) {
+                    response.setStatus(200);
+                    response.setCharacterEncoding("UTF-8");
+                    response.setContentType("application/json");
+                    PrintWriter writer = response.getWriter();
+                    writer.write(new ObjectMapper().writeValueAsString(Result.error(ex.getMessage())));
+                    writer.flush();
+                    writer.close();
+                }
             }
         }).addPathPatterns(properties.getUi().getPath() + "/**");
     }

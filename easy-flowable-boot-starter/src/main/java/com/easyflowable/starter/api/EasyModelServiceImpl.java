@@ -13,8 +13,10 @@ import com.easyflowable.core.mapper.EasyModelHistoryMapper;
 import com.easyflowable.core.mapper.EasyModelMapper;
 import com.easyflowable.core.service.EasyModelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +29,11 @@ import java.util.List;
 @Transactional
 public class EasyModelServiceImpl implements EasyModelService {
 
-    @Autowired
+    @Resource
     private EasyFlowEntityInterface entityInterface;
-    @Autowired
+    @Resource
     private EasyModelHistoryMapper modelHistoryMapper;
-    @Autowired
+    @Resource
     private EasyModelMapper modelMapper;
 
     @Override
