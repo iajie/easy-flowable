@@ -22,8 +22,19 @@ public interface EasyProcessInstanceService {
      * @Author: MoJie
      * @Date: 2024-10-09 10:28:36
      */
-    default List<FlowProcessInstance> getFlowInstanceList(String flowKey) {
-        return getFlowInstanceList(flowKey, true);
+    default List<FlowProcessInstance> getFlowInstanceListByKey(String flowKey) {
+        return getFlowInstanceList(flowKey, true, false);
+    }
+
+    /**
+     * 获取实例列表
+     * @param processDefinitionId 流程定义ID
+     * @return {@link List<FlowProcessInstance>}
+     * @Author: MoJie
+     * @Date: 2024-10-09 10:28:36
+     */
+    default List<FlowProcessInstance> getFlowInstanceListById(String processDefinitionId) {
+        return getFlowInstanceList(processDefinitionId, true, true);
     }
 
     /**
@@ -34,7 +45,7 @@ public interface EasyProcessInstanceService {
      * @Author: MoJie
      * @Date: 2024-10-09 10:29:12
      */
-    List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow);
+    List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow, boolean isProcessInstance);
 
     /**
      * 启动流程实例
@@ -61,8 +72,8 @@ public interface EasyProcessInstanceService {
      * @Author: MoJie
      * @Date: 2024-10-09 10:31:51
      */
-    default FlowProcessInstance getProcessInstance(String businessKey) {
-        return getFlowInstanceList(businessKey, false).get(0);
+    default FlowProcessInstance getProcessInstanceByBusinessKey(String businessKey) {
+        return getFlowInstanceList(businessKey, false, false).get(0);
     }
 
     /**

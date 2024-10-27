@@ -1,6 +1,5 @@
 package com.easyflowable.starter.api;
 
-import cn.hutool.json.JSONUtil;
 import com.easyflowable.core.domain.dto.FlowComment;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
 import com.easyflowable.core.domain.enums.FlowCommentType;
@@ -11,6 +10,8 @@ import com.easyflowable.core.domain.params.FlowExecuteParam;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyTaskService;
 import com.easyflowable.core.utils.StringUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
@@ -35,7 +36,7 @@ import java.util.List;
  * @Description:
  * @Author: MoJie
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class EasyTaskServiceImpl implements EasyTaskService {
 
     @Resource
@@ -222,11 +223,12 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     }
 
     @Override
+    @SneakyThrows
     public void addComment(FlowComment flowComment) {
         // 流程全局线程信息
         Authentication.setAuthenticatedUserId(flowComment.getAssignee());
         // 将审批意见转json存
-        String message = JSONUtil.toJsonStr(flowComment);
+        String message = new ObjectMapper().writeValueAsString(flowComment);
         taskService.addComment(flowComment.getTaskId(), flowComment.getProcessInstanceId(),
                 flowComment.getFlowCommentType(), message);
         // 清除线程数据
@@ -243,6 +245,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     }
 
     @Override
+    @SneakyThrows
     public List<FlowExecutionHistory> getFlowExecutionHistoryList(String taskId, String assignee) {
         List<FlowExecutionHistory> list = new ArrayList<>();
         Task flowTask = this.getFlowTask(taskId);
@@ -271,7 +274,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 for (Comment comment : commentList) {
                     // 如果任务id相同，则将批注信息追加到历史中
                     if (instance.getTaskId().equals(comment.getTaskId())) {
-                        executionHistory.setComment(JSONUtil.parse(comment.getFullMessage()).toBean(FlowComment.class));
+                        executionHistory.setComment(new ObjectMapper().readValue(comment.getFullMessage(), FlowComment.class));
                     }
                 }
                 list.add(executionHistory);

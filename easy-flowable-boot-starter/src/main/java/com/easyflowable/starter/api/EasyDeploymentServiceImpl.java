@@ -33,7 +33,7 @@ import java.util.*;
  * @Description:
  * @Author: MoJie
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class EasyDeploymentServiceImpl implements EasyDeploymentService {
 
     @Resource

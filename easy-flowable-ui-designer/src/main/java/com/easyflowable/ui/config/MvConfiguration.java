@@ -72,6 +72,8 @@ public class MvConfiguration implements WebMvcConfigurer {
                         Optional<EasyFlowableUiConfig.User> first = users.stream().filter(i -> i.getUsername().equals(username)).findFirst();
                         first.ifPresent(EasyFlowableContext::setUser);
                     }
+                } else {
+                    EasyFlowableContext.setUser(EasyFlowableUiConfig.User.defaultUser());
                 }
                 return true;
             }

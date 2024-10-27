@@ -1,19 +1,15 @@
 package com.easyflowable.ui.controller;
 
+import com.easyflowable.core.config.EasyFlowableUiConfig;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
 import com.easyflowable.core.domain.dto.FlowProcessInstance;
 import com.easyflowable.core.domain.dto.Option;
 import com.easyflowable.core.domain.params.FlowStartParam;
 import com.easyflowable.core.service.EasyProcessInstanceService;
+import com.easyflowable.ui.context.EasyFlowableContext;
 import com.easyflowable.ui.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,14 +28,14 @@ public class EasyProcessInstanceController {
 
     /**
      * 获取启动的流程实例 包含流程终止和激活的
-     * @param flowKey 流程模型标识
+     * @param processDefinitionId 流程定义ID
      * @return {@link List<FlowProcessInstance>}
      * @Author: MoJie
      * @Date: 2024-10-09 16:26:52
      */
-    @GetMapping(value = "list/{flowKey}")
-    public Result<List<FlowProcessInstance>> list(@PathVariable String flowKey) {
-        return Result.success(processInstanceService.getFlowInstanceList(flowKey));
+    @GetMapping(value = "list/{processDefinitionId}")
+    public Result<List<FlowProcessInstance>> list(@PathVariable String processDefinitionId) {
+        return Result.success(processInstanceService.getFlowInstanceListById(processDefinitionId));
     }
 
     /**
@@ -87,6 +83,9 @@ public class EasyProcessInstanceController {
      */
     @PostMapping("start")
     public Result<String> start(@RequestBody FlowStartParam param) {
+        EasyFlowableUiConfig.User user = EasyFlowableContext.getUser();
+        param.setStartUserId(user.getId());
+        param.setStartUsername(user.getUsername());
         return Result.success(processInstanceService.startProcessInstanceByKey(param));
     }
 
@@ -102,18 +101,6 @@ public class EasyProcessInstanceController {
     public Result<String> start(@RequestParam String processInstanceId, @RequestParam String status) {
         processInstanceService.updateProcessInstanceBusinessStatus(processInstanceId, status);
         return Result.success();
-    }
-
-    /**
-     * 根据业务主键获取到对应的实例
-     * @param id 业务主键
-     * @return {@link Result<FlowProcessInstance>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:32:43
-     */
-    @GetMapping("businessKey/{id}")
-    public Result<FlowProcessInstance> getProcessInstance(@PathVariable String id) {
-        return Result.success(processInstanceService.getProcessInstance(id));
     }
 
 }

@@ -19,6 +19,12 @@ public class Constants {
 
     public final static String CHANGE_LOG = "classpath:/changelog/changelog-master.yaml";
 
+    public final static String SEQUENCE_FLOW = "sequenceFlow";
+    public final static String GATEWAY = "Gateway";
+    public final static String START_EVENT = "startEvent";
+
+    public final static String INITIATOR = "initiator";
+
     /**
      * @param name 流程名称
      * @Return: {@link String}

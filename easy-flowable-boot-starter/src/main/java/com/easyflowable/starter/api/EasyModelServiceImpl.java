@@ -1,19 +1,17 @@
 package com.easyflowable.starter.api;
 
+import com.easyflowable.core.domain.entity.EasyModel;
+import com.easyflowable.core.domain.entity.EasyModelHistory;
 import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
+import com.easyflowable.core.exception.EasyFlowableException;
+import com.easyflowable.core.mapper.EasyModelHistoryMapper;
+import com.easyflowable.core.mapper.EasyModelMapper;
+import com.easyflowable.core.service.EasyModelService;
 import com.easyflowable.core.utils.StringUtils;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
-import com.easyflowable.core.domain.entity.EasyModel;
-import com.easyflowable.core.domain.entity.EasyModelHistory;
-import com.easyflowable.core.exception.EasyFlowableException;
-import com.easyflowable.core.mapper.EasyModelHistoryMapper;
-import com.easyflowable.core.mapper.EasyModelMapper;
-import com.easyflowable.core.service.EasyModelService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -26,7 +24,7 @@ import java.util.List;
  * @Description:
  * @Author: MoJie
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class EasyModelServiceImpl implements EasyModelService {
 
     @Resource
@@ -84,13 +82,11 @@ public class EasyModelServiceImpl implements EasyModelService {
     @Override
     public Page<EasyModel> queryPage(int current, int size, EasyModel model) {
         String tenantId = entityInterface.getTenantId();
-        String organId = entityInterface.getOrganId();
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.like(EasyModel::getName, model.getName(), StringUtils.isNotBlank(model.getName()));
         queryWrapper.like(EasyModel::getKey, model.getKey(), StringUtils.isNotBlank(model.getKey()));
         queryWrapper.eq(EasyModel::getModelType, model.getModelType(), model.getModelType() != null);
         queryWrapper.eq(EasyModel::getTenantId, tenantId, tenantId != null);
-        queryWrapper.eq(EasyModel::getOrganId, organId, organId != null);
         queryWrapper.orderBy(EasyModel::getCreateTime).desc();
         return modelMapper.paginate(current, size, queryWrapper);
     }

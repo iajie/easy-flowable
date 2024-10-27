@@ -1,6 +1,6 @@
 package com.easyflowable.starter.api;
 
-import cn.hutool.json.JSONUtil;
+import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.FlowComment;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
 import com.easyflowable.core.domain.dto.FlowProcessInstance;
@@ -12,6 +12,8 @@ import com.easyflowable.core.domain.params.FlowStartParam;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyProcessInstanceService;
 import com.easyflowable.core.utils.StringUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -21,6 +23,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
@@ -40,7 +43,7 @@ import java.util.Map;
  * @Description:
  * @Author: MoJie
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceService {
 
     @Resource
@@ -55,14 +58,18 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     private EasyFlowEntityInterface entityInterface;
 
     @Override
-    public List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow) {
+    public List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow, boolean isProcessInstance) {
         if (StringUtils.isBlank(key)) {
-            throw new EasyFlowableException("标识不能为空！");
+            throw new EasyFlowableException((isProcessInstance ? "流程定义ID" : "流程标识") + "不能为空！");
         }
         ProcessInstanceQuery instanceQuery = runtimeService.createProcessInstanceQuery()
                 .processInstanceTenantId(entityInterface.getTenantId());
         if (isFlow) {
-            instanceQuery.processDefinitionKey(key);
+            if (isProcessInstance) {
+                instanceQuery.processDefinitionId(key);
+            } else {
+                instanceQuery.processDefinitionKey(key);
+            }
         } else {
             instanceQuery.processInstanceBusinessKey(key);
         }
@@ -90,21 +97,32 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     }
 
     @Override
+    @SneakyThrows
     public String startProcessInstanceByKey(FlowStartParam startParam) {
+        String processDefinitionId = startParam.getProcessDefinitionId();
         String flowKey = startParam.getFlowKey();
-        if (StringUtils.isBlank(flowKey)) {
-            throw new EasyFlowableException("流程启动标识不能为空！");
+        boolean isKey = false;
+        if (StringUtils.isBlank(processDefinitionId) || StringUtils.isBlank(flowKey)) {
+            throw new EasyFlowableException("流程启动标识或流程定义ID不能为空！");
+        } else {
+            if (StringUtils.isNotBlank(flowKey)) {
+                isKey = true;
+            }
         }
         String businessKey = startParam.getBusinessKey();
         if (StringUtils.isBlank(businessKey)) {
             throw new EasyFlowableException("流程启动业务主键不能为空！");
         }
         // 获取最新流程定义
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey(flowKey).latestVersion().processDefinitionTenantId(entityInterface.getTenantId())
-                .singleResult();
+        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
+        if (StringUtils.isBlank(flowKey)) {
+            processDefinitionQuery.processDefinitionKey(flowKey).latestVersion().processDefinitionTenantId(entityInterface.getTenantId());
+        } else {
+            processDefinitionQuery.processDefinitionId(processDefinitionId);
+        }
+        ProcessDefinition processDefinition = processDefinitionQuery.singleResult();
         if (processDefinition == null) {
-            throw new EasyFlowableException("未找到指定的流程【" + flowKey + "】,无法启动流程实例");
+            throw new EasyFlowableException("未找到指定的流程【" + (isKey ? flowKey : processDefinitionId) + "】,无法启动流程实例");
         }
         if (processDefinition.isSuspended()) {
             throw new EasyFlowableException("当前流程【" + processDefinition.getName() + "】已终止，无法启动流程实例");
@@ -123,12 +141,18 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         if (variables == null || variables.isEmpty()) {
             variables = new HashMap<>();
         }
-        variables.put("initiator", startUserId);
+        variables.put(Constants.INITIATOR, startUserId);
         // 设置流程发起人-当前登录人
         Authentication.setAuthenticatedUserId(startUserId);
-        // 用流程定义的KEY启动，会自动选择KEY相同的流程定义中最新版本的那个(KEY为模型中的流程唯一标识)
-        ProcessInstance instance = runtimeService
-                .startProcessInstanceByKeyAndTenantId(flowKey, businessKey, variables, entityInterface.getTenantId());
+        ProcessInstance instance;
+        if (isKey) {
+            // 用流程定义的KEY启动，会自动选择KEY相同的流程定义中最新版本的那个(KEY为模型中的流程唯一标识)
+            instance = runtimeService
+                    .startProcessInstanceByKeyAndTenantId(flowKey, businessKey, variables, entityInterface.getTenantId());
+        } else {
+            instance = runtimeService.startProcessInstanceById(processDefinitionId, businessKey, variables);
+        }
+
         if (StringUtils.isNotBlank(startParam.getProcessName())) {
             // 设置流程名称
             runtimeService.setProcessInstanceName(instance.getProcessInstanceId(), startParam.getProcessName());
@@ -138,10 +162,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         // 如果自动跳过开始节点，需要设置第一步执行人为启动流程的人
         boolean skipFirstNode = startParam.isSkipFirstNode();
         if (skipFirstNode) {
-            Task task = taskService.createTaskQuery()
-                    .active().taskAssignee(startUserId)
-                    .processDefinitionKey(flowKey).processDefinitionId(instance.getId())
-                    .singleResult();
+            Task task = taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).singleResult();
             // 执行第一个节点任务
             if (task != null) {
                 // 获取名称
@@ -159,9 +180,10 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
                 flowComment.setExecuteTypeValue(FlowExecuteType.START.getDescription());
                 flowComment.setFlowCommentType(FlowCommentType.APPROVE.getCode());
                 // 当前任务添加备注
-                taskService.addComment(task.getId(), instance.getProcessInstanceId(), FlowCommentType.NORMAL.getCode(), JSONUtil.toJsonStr(flowComment));
+                taskService.addComment(task.getId(), instance.getProcessInstanceId(),
+                        FlowCommentType.NORMAL.getCode(), new ObjectMapper().writeValueAsString(flowComment));
                 // 执行下一步
-                taskService.complete(task.getId());
+                taskService.complete(task.getId(), variables);
             }
         }
         Authentication.setAuthenticatedUserId(null);
@@ -211,6 +233,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     }
 
     @Override
+    @SneakyThrows
     public List<FlowExecutionHistory> getFlowExecutionHistoryList(String processInstanceId) {
         List<FlowExecutionHistory> list = new ArrayList<>();
         // 根据流程实例ID获取流程历史信息
@@ -219,23 +242,35 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             // 获取历史审批材料
             List<Comment> commentList = taskService.getProcessInstanceComments(processInstanceId);
             for (HistoricActivityInstance instance : activityInstanceList) {
-                FlowExecutionHistory executionHistory = new FlowExecutionHistory();
-                executionHistory.setHistoryId(instance.getId());
-                executionHistory.setTaskId(instance.getTaskId());
-                executionHistory.setProcessDefinitionId(instance.getProcessDefinitionId());
-                executionHistory.setExecutionId(instance.getExecutionId());
-                executionHistory.setTaskName(instance.getActivityName());
-                executionHistory.setStartTime(instance.getStartTime());
-                executionHistory.setEndTime(instance.getEndTime());
-                executionHistory.setDuration(instance.getDurationInMillis());
-                executionHistory.setAssignee(instance.getAssignee());
-                for (Comment comment : commentList) {
-                    // 如果任务id相同，则将批注信息追加到历史中
-                    if (instance.getTaskId().equals(comment.getTaskId())) {
-                        executionHistory.setComment(JSONUtil.parse(comment.getFullMessage()).toBean(FlowComment.class));
+                if (!instance.getActivityType().equals(Constants.SEQUENCE_FLOW) && !instance.getActivityType().contains(Constants.GATEWAY)) {
+                    FlowExecutionHistory executionHistory = new FlowExecutionHistory();
+                    executionHistory.setHistoryId(instance.getId());
+                    executionHistory.setExecutionId(instance.getExecutionId());
+                    executionHistory.setTaskId(instance.getTaskId());
+                    executionHistory.setTaskDefKey(instance.getActivityId());
+                    executionHistory.setProcessDefinitionId(instance.getProcessDefinitionId());
+                    executionHistory.setExecutionId(instance.getExecutionId());
+                    executionHistory.setTaskName(instance.getActivityName());
+                    executionHistory.setStartTime(instance.getStartTime());
+                    executionHistory.setEndTime(instance.getEndTime());
+                    executionHistory.setDuration(instance.getDurationInMillis());
+                    executionHistory.setAssignee(instance.getAssignee());
+                    // 如果为开始节点
+                    if (instance.getActivityType().equals(Constants.START_EVENT)) {
+                        String startUser = runtimeService.getVariable(instance.getExecutionId(), Constants.INITIATOR, String.class);
+                        executionHistory.setAssignee(startUser);
                     }
+                    if (StringUtils.isNotBlank(instance.getTaskId())) {
+                        for (Comment comment : commentList) {
+                            // 如果任务id相同，则将批注信息追加到历史中
+                            if (instance.getTaskId().equals(comment.getTaskId())) {
+                                executionHistory.setComment(new ObjectMapper()
+                                        .readValue(comment.getFullMessage(), FlowComment.class));
+                            }
+                        }
+                    }
+                    list.add(executionHistory);
                 }
-                list.add(executionHistory);
             }
         }
         return list;
