@@ -29,7 +29,7 @@ public class MybatisFlexConfiguration implements MyBatisFlexCustomizer {
         flexGlobalConfig.setKeyConfig(keyConfig);
 
         // sql审计
-        AuditManager.setAuditEnable(true);
+        AuditManager.setAuditEnable(false);
         AuditManager.setMessageCollector(auditMessage -> log.info("\n耗时【{}】ms，执行SQL：{}", auditMessage.getElapsedTime(), auditMessage.getFullSql()));
     }
 }

@@ -1,16 +1,16 @@
 package com.easyflowable.starter.api;
 
+import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.FlowComment;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
 import com.easyflowable.core.domain.enums.FlowCommentType;
-import com.easyflowable.core.domain.enums.FlowExecuteType;
 import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
 import com.easyflowable.core.domain.params.FlowExecuteParam;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyTaskService;
+import com.easyflowable.core.utils.CommentUtils;
 import com.easyflowable.core.utils.StringUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
@@ -54,30 +54,70 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         if (StringUtils.isBlank(taskId)) {
             throw new EasyFlowableException("任务ID不能为空");
         }
-        if (executeParam.getExecuteType() == null) {
+        if (executeParam.getFlowCommentType() == null) {
             throw new EasyFlowableException("执行类型不能为空");
         }
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new EasyFlowableException("任务不存在或已被处理！");
         }
-        // 是否执行回退初始节点
-        if (executeParam.isInit()) {
-            executeParam.setExecuteType(FlowExecuteType.REVOCATION);
+        String assignee = executeParam.getAssignee();
+        if (StringUtils.isBlank(assignee)) {
+            assignee = entityInterface.getUserId();
+            executeParam.setAssignee(assignee);
         }
-        switch (executeParam.getExecuteType()) {
-            case AGREE:
+        String assigneeName = executeParam.getAssigneeName();
+        if (StringUtils.isBlank(assigneeName)) {
+            assigneeName = entityInterface.getUserId();
+            executeParam.setAssigneeName(assigneeName);
+        }
+        // 1.执行前检查流程
+        this.checkFlowable(task.getProcessInstanceId());
+        // 2.保存流程审批意见
+        this.saveFlowComment(task, executeParam);
+        // 3.执行(暂存没有操作，就单纯添加审批意见)
+        switch (executeParam.getFlowCommentType()) {
             case RESUBMIT:
+            case AGREE:
                 this.complete(task, executeParam);
                 break;
             case REJECT:
-                this.reject(task, executeParam);
+                this.reject(task);
                 break;
+            case REBUT:
             case REVOCATION:
-                this.revocation(task, executeParam);
+                this.revocation(task);
                 break;
             case REJECT_TO_TASK:
                 this.rejectToTask(task, executeParam);
+                break;
+            case STOP:
+                this.taskService.deleteTask(taskId, false);
+                break;
+            case BEFORE_SIGN:
+            case AFTER_SIGN:
+                // TODO 前加签/后加签
+                break;
+            case DELEGATE:
+                this.taskService.delegateTask(taskId, executeParam.getUserId());
+                break;
+            case ASSIGN:
+                taskService.setAssignee(task.getId(), executeParam.getUserId());
+                break;
+            case DEL_COMMENT:
+                Comment comment = taskService.getComment(executeParam.getCommentId());
+                if (comment == null) {
+                    throw new EasyFlowableException("评论记录不存在!");
+                }
+                FlowComment flowComment = StringUtils.toJava(comment.getFullMessage(), FlowComment.class);
+                // 删除附件
+                if (StringUtils.isNotBlank(flowComment.getAttachmentId())) {
+                    this.taskService.deleteAttachment(flowComment.getAttachmentId());
+                }
+                this.taskService.deleteComment(executeParam.getCommentId());
+                break;
+            case CANCELLATION:
+                this.cancellationProcessInstance(executeParam);
                 break;
         }
     }
@@ -108,28 +148,20 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      * @Date: 2024-10-09 14:40:28
      */
     private void saveFlowComment(Task task, FlowExecuteParam param) {
-        String assignee = param.getAssignee();
-        if (StringUtils.isBlank(assignee)) {
-            assignee = entityInterface.getUserId();
-            param.setAssignee(assignee);
-        }
-        String assigneeName = param.getAssigneeName();
-        if (StringUtils.isBlank(assigneeName)) {
-            assigneeName = entityInterface.getUserId();
-            param.setAssigneeName(assigneeName);
-        }
-        // 组装审批信息，并保存
         FlowComment flowComment = new FlowComment();
         flowComment.setTaskId(param.getTaskId());
-        flowComment.setAssignee(assignee);
-        flowComment.setAssigneeName(assigneeName);
-        flowComment.setTaskKey(task.getTaskDefinitionKey());
+        flowComment.setAssignee(param.getAssignee());
+        flowComment.setAssigneeName(param.getAssigneeName());
         flowComment.setProcessInstanceId(task.getProcessInstanceId());
         flowComment.setCommentContent(param.getCommentContent());
-        flowComment.setExecuteType(param.getExecuteType().getCode());
-        flowComment.setExecuteTypeValue(param.getExecuteType().getDescription());
         flowComment.setFlowCommentType(param.getFlowCommentType().getCode());
         flowComment.setVariables(param.getVariables());
+        flowComment.setAttachmentId(param.getAttachmentId());
+        if (param.isForm()) {
+            flowComment.setExt(param.getCommentContent());
+            flowComment.setForm(true);
+            flowComment.setCommentContent(param.getAssigneeName() + "重新提交了信息。");
+        }
         if (param.isComment()) {
             this.addComment(flowComment);
         }
@@ -143,12 +175,6 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      * @Date: 2024-10-09 14:36:46
      */
     private void complete(Task task, FlowExecuteParam param) {
-        this.checkFlowable(task.getProcessInstanceId());
-        // 增加审批意见
-        param.setFlowCommentType(FlowCommentType.APPROVE);
-        this.saveFlowComment(task, param);
-        // 设置当前任务执行人
-        taskService.setAssignee(task.getId(), param.getAssignee());
         // 执行任务
         taskService.complete(task.getId(), param.getVariables());
     }
@@ -157,19 +183,14 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      * 撤回到初始节点
      * 发起人撤回申请/驳回到初始节点
      * @param task 任务信息
-     * @param param 执行参数
      * @Author: MoJie
      * @Date: 2024-10-09 15:15:37
      */
-    private void revocation(Task task, FlowExecuteParam param) {
-        this.checkFlowable(task.getProcessInstanceId());
+    private void revocation(Task task) {
         // 获取所有任务节点
         List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).orderByHistoricTaskInstanceStartTime().asc().list();
         // 发起申请任务节点
         String startTaskKey = taskInstances.get(0).getTaskDefinitionKey();
-        // 增加审批意见
-        param.setFlowCommentType(FlowCommentType.REVOCATION);
-        this.saveFlowComment(task, param);
         // 撤回任务到初始节点
         runtimeService.createChangeActivityStateBuilder()
                 // 流程实例
@@ -182,19 +203,12 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     /**
      * 驳回任务-回退到上一节点
      * @param task 任务
-     * @param param 执行参数
      * @Author: MoJie
      * @Date: 2024-10-09 15:17:30
      */
-    private void reject(Task task, FlowExecuteParam param) {
-        this.checkFlowable(task.getProcessInstanceId());
-        // 添加审批意见
-        param.setFlowCommentType(FlowCommentType.REJECT);
-        this.saveFlowComment(task, param);
+    private void reject(Task task) {
         // 获取上次执行节点
         String upNodeKey = this.getUpNodeKey(task.getId());
-        // 驳回到上一节点
-        taskService.setAssignee(task.getId(), param.getAssignee());
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(task.getProcessInstanceId())
                 .moveActivityIdTo(task.getTaskDefinitionKey(), upNodeKey)
@@ -209,13 +223,9 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      * @Date: 2024-10-09 15:18:12
      */
     private void rejectToTask(Task task, FlowExecuteParam param) {
-        this.checkFlowable(task.getProcessInstanceId());
         if (StringUtils.isBlank(param.getRejectToTaskId())) {
             throw new EasyFlowableException("未指定驳回的任务ID，操作失败！");
         }
-        param.setFlowCommentType(FlowCommentType.REJECT);
-        this.saveFlowComment(task, param);
-        taskService.setAssignee(task.getId(), param.getAssignee());
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(task.getProcessInstanceId())
                 .moveActivityIdTo(task.getTaskDefinitionKey(), param.getRejectToTaskId())
@@ -228,9 +238,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         // 流程全局线程信息
         Authentication.setAuthenticatedUserId(flowComment.getAssignee());
         // 将审批意见转json存
-        String message = new ObjectMapper().writeValueAsString(flowComment);
         taskService.addComment(flowComment.getTaskId(), flowComment.getProcessInstanceId(),
-                flowComment.getFlowCommentType(), message);
+                flowComment.getFlowCommentType(), StringUtils.toJson(flowComment));
         // 清除线程数据
         Authentication.setAuthenticatedUserId(null);
     }
@@ -245,7 +254,6 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     }
 
     @Override
-    @SneakyThrows
     public List<FlowExecutionHistory> getFlowExecutionHistoryList(String taskId, String assignee) {
         List<FlowExecutionHistory> list = new ArrayList<>();
         Task flowTask = this.getFlowTask(taskId);
@@ -258,26 +266,11 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 .processInstanceId(flowTask.getProcessInstanceId())
                 .orderByHistoricActivityInstanceStartTime().asc().list();
         if (!historicTaskInstances.isEmpty()) {
-            // 获取历史审批材料
-            List<Comment> commentList = taskService.getTaskComments(taskId);
+            List<Comment> taskComments = taskService.getTaskComments(taskId);
             for (HistoricActivityInstance instance : historicTaskInstances) {
-                FlowExecutionHistory executionHistory = new FlowExecutionHistory();
-                executionHistory.setHistoryId(instance.getId());
-                executionHistory.setTaskId(taskId);
-                executionHistory.setProcessDefinitionId(flowTask.getProcessDefinitionId());
-                executionHistory.setExecutionId(instance.getExecutionId());
-                executionHistory.setTaskName(instance.getActivityName());
-                executionHistory.setStartTime(instance.getStartTime());
-                executionHistory.setEndTime(instance.getEndTime());
-                executionHistory.setDuration(instance.getDurationInMillis());
-                executionHistory.setAssignee(instance.getAssignee());
-                for (Comment comment : commentList) {
-                    // 如果任务id相同，则将批注信息追加到历史中
-                    if (instance.getTaskId().equals(comment.getTaskId())) {
-                        executionHistory.setComment(new ObjectMapper().readValue(comment.getFullMessage(), FlowComment.class));
-                    }
+                if (!instance.getActivityType().equals(Constants.SEQUENCE_FLOW) && !instance.getActivityType().contains(Constants.GATEWAY)) {
+                    list.add(CommentUtils.getFlowExecutionHistory(instance, taskComments, runtimeService));
                 }
-                list.add(executionHistory);
             }
         }
         return list;
@@ -328,8 +321,6 @@ public class EasyTaskServiceImpl implements EasyTaskService {
             flowComment.setTaskId(cancellation.getTaskId());
             flowComment.setProcessInstanceId(cancellation.getProcessInstanceId());
             flowComment.setCommentContent(cancellation.getCancellationCause());
-            flowComment.setExecuteType(FlowExecuteType.CANCELLATION.getCode());
-            flowComment.setExecuteTypeValue(FlowExecuteType.CANCELLATION.getDescription());
             flowComment.setFlowCommentType(FlowCommentType.CANCELLATION.getCode());
             this.addComment(flowComment);
             runtimeService.deleteProcessInstance(cancellation.getProcessInstanceId(), cancellation.getCancellationCause());

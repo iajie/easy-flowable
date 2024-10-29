@@ -1,4 +1,4 @@
-package com.easyflowable.core.enums;
+package com.easyflowable.core.domain.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

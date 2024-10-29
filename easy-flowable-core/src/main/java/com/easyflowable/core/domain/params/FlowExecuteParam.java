@@ -4,6 +4,8 @@ import com.easyflowable.core.domain.enums.FlowExecuteType;
 import com.easyflowable.core.domain.enums.FlowCommentType;
 import lombok.Data;
 
+import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,14 +23,32 @@ public class FlowExecuteParam {
     private String taskId;
 
     /**
-     * 执行类型：必填
+     * 委派人ID
      */
-    private FlowExecuteType executeType;
+    private String userId;
+
+    /** 人员列表 */
+    private List<String> userIds;
+
+    /**
+     * 评论ID
+     */
+    private String commentId;
+
+    /**
+     * 附件ID
+     */
+    private String attachmentId;
+
+    /**
+     * 流程实例id
+     */
+    private String processInstanceId;
 
     /**
      * 是否驳回倒流程发起任务，默认:false
      */
-    private boolean isInit = false;
+    private boolean init = false;
 
     /**
      * 驳回到指定任务节点ID
@@ -58,7 +78,12 @@ public class FlowExecuteParam {
     /**
      * 是否自动添加审批意见
      */
-    private boolean isComment = true;
+    private boolean comment = true;
+
+    /**
+     * 是否为表单
+     */
+    private boolean form;
 
     /**
      * 审批类型

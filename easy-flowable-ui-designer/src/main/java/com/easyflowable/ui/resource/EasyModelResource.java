@@ -1,4 +1,4 @@
-package com.easyflowable.ui.controller;
+package com.easyflowable.ui.resource;
 
 import com.mybatisflex.core.paginate.Page;
 import com.easyflowable.core.utils.StringUtils;
@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @package: {@link com.easyflowable.ui.controller}
+ * @package: {@link com.easyflowable.ui.resource}
  * @Date: 2024-09-27-12:47
  * @Description: 模型相关接口
  * @Author: MoJie
  */
 @RestController
 @RequestMapping("easy-flowable/model")
-public class EasyModelController {
+public class EasyModelResource {
 
     @Autowired
     private EasyModelService modelService;

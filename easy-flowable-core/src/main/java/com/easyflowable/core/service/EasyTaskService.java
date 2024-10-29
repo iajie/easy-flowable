@@ -119,6 +119,22 @@ public interface EasyTaskService {
     }
 
     /**
+     * 流程执行作废
+     * @param executeParam {@link FlowExecuteParam} 作废参数
+     * @Author: MoJie
+     * @Date: 2024-10-09 10:53:21
+     */
+    default void cancellationProcessInstance(FlowExecuteParam executeParam) {
+        FlowCancellationParam cancellationParam = new FlowCancellationParam();
+        cancellationParam.setCancellationCause(executeParam.getCommentContent());
+        cancellationParam.setTaskId(executeParam.getTaskId());
+        cancellationParam.setProcessInstanceId(executeParam.getProcessInstanceId());
+        cancellationParam.setAssignee(executeParam.getAssignee());
+        cancellationParam.setAssigneeName(executeParam.getAssigneeName());
+        cancellationProcessInstance(cancellationParam);
+    }
+
+    /**
      * 批量流程作废
      * @param cancellations {@link FlowCancellationParam} 作废参数
      * @Author: MoJie

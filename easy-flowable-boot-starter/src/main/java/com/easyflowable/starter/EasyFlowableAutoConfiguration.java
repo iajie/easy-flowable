@@ -3,7 +3,7 @@ package com.easyflowable.starter;
 import com.easyflowable.core.config.EasyFlowableConfig;
 import com.easyflowable.core.config.EasyFlowableDataSourceConfig;
 import com.easyflowable.core.constans.Constants;
-import com.easyflowable.core.enums.HistoryLevelEnum;
+import com.easyflowable.core.domain.enums.HistoryLevelEnum;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.core.service.EasyModelService;

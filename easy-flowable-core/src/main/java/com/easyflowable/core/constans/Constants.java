@@ -25,6 +25,8 @@ public class Constants {
 
     public final static String INITIATOR = "initiator";
 
+    public final static String FILE = "file";
+
     /**
      * @param name 流程名称
      * @Return: {@link String}

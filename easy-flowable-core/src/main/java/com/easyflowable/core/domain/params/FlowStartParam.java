@@ -52,5 +52,14 @@ public class FlowStartParam {
      * 流程名称：必填
      */
     private String processName;
-    
+
+    /**
+     * 是否为表单流程
+     */
+    private boolean startFormData = false;
+
+    /**
+     * 表单信息：为JSON字符串-后续会使用到
+     */
+    private String formData;
 }

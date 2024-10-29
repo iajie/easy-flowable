@@ -2,6 +2,7 @@ package com.easyflowable.core.domain.dto;
 
 import lombok.Data;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -14,6 +15,11 @@ import java.util.Map;
 public class FlowComment {
 
     /**
+     * 评论ID
+     */
+    private String commentId;
+
+    /**
      * 流程实例ID
      */
     private String processInstanceId;
@@ -22,11 +28,6 @@ public class FlowComment {
      * 任务ID（缺省）
      */
     private String taskId;
-
-    /**
-     * 任务定义KEY
-     */
-    private String taskKey;
 
     /**
      * 类型
@@ -44,28 +45,30 @@ public class FlowComment {
     private String assigneeName;
 
     /**
-     * 执行类型
-     */
-    private String executeType;
-
-    /**
-     * 执行类型[agree：同意（审批通过）、reject:驳回（默认驳回上一个任务）、rejectToTask:驳回到指定任务节点、revocation:撤回]
-     */
-    private String executeTypeValue;
-
-    /**
      * 审批意见
      */
     private String commentContent;
 
+    /** 附件ID */
+    private String attachmentId;
+
     /**
-     * 额外携带的内容
+     * 额外携带的内容: 表单信息
      */
     private String ext;
+
+    /**
+     * 是否为表单
+     */
+    private boolean form;
 
     /**
      * 变量参数
      */
     private Map<String, Object> variables;
 
+    /**
+     * 评论时间
+     */
+    private Date commentTime;
 }

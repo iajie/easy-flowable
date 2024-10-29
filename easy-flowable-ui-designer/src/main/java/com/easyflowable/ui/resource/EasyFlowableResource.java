@@ -1,4 +1,4 @@
-package com.easyflowable.ui.controller;
+package com.easyflowable.ui.resource;
 
 import com.easyflowable.core.config.EasyFlowableUiConfig;
 import com.easyflowable.core.domain.dto.Option;
@@ -18,14 +18,14 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @package: {@link com.easyflowable.ui.controller}
+ * @package: {@link com.easyflowable.ui.resource}
  * @Date: 2024-10-09-17:49
  * @Description:
  * @Author: MoJie
  */
 @RestController
 @RequestMapping("easy-flowable")
-public class EasyFlowableController {
+public class EasyFlowableResource {
 
     @Autowired
     private EasyFlowableConfigProperties properties;

@@ -1,4 +1,4 @@
-package com.easyflowable.ui.controller;
+package com.easyflowable.ui.resource;
 
 import com.easyflowable.core.domain.dto.DeploymentProcessDef;
 import com.easyflowable.core.domain.dto.FlowUserTask;
@@ -9,8 +9,6 @@ import com.easyflowable.ui.model.Result;
 import com.mybatisflex.core.paginate.Page;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,22 +18,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.InputStream;
 import java.util.List;
 
 /**
- * @package: {@link com.easyflowable.ui.controller}
+ * @package: {@link com.easyflowable.ui.resource}
  * @Date: 2024-10-09-9:18
  * @Description: 流程部署管理
  * @Author: MoJie
  */
 @RestController
 @RequestMapping("easy-flowable/deployment")
-public class EasyDeploymentController {
+public class EasyDeploymentResource {
 
     @Autowired
     private EasyDeploymentService deploymentService;

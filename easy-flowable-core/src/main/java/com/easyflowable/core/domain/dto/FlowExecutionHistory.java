@@ -3,6 +3,7 @@ package com.easyflowable.core.domain.dto;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @package: {@link com.easyflowable.core.domain.dto}
@@ -56,7 +57,7 @@ public class FlowExecutionHistory {
     /**
      * 任务意见
      */
-    private FlowComment comment;
+    private List<FlowComment> comments;
 
     /**
      * 任务开始时间

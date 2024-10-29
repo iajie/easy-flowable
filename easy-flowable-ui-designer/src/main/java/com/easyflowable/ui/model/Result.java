@@ -1,6 +1,6 @@
 package com.easyflowable.ui.model;
 
-import com.easyflowable.core.enums.SuperbCodeEnum;
+import com.easyflowable.core.domain.enums.SuperbCodeEnum;
 import lombok.Data;
 
 import java.io.Serializable;

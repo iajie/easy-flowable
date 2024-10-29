@@ -1,4 +1,4 @@
-package com.easyflowable.ui.controller;
+package com.easyflowable.ui.resource;
 
 import com.easyflowable.core.config.EasyFlowableUiConfig;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * @package: {@link com.easyflowable.ui.controller}
+ * @package: {@link com.easyflowable.ui.resource}
  * @Date: 2024-10-09-16:24
  * @Description: 流程实例接口
  * @Author: MoJie
  */
 @RestController
 @RequestMapping("easy-flowable/processInstance")
-public class EasyProcessInstanceController {
+public class EasyProcessInstanceResource {
 
     @Autowired
     private EasyProcessInstanceService processInstanceService;
