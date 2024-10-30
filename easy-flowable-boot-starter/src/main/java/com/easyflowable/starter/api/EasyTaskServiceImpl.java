@@ -68,7 +68,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         }
         String assigneeName = executeParam.getAssigneeName();
         if (StringUtils.isBlank(assigneeName)) {
-            assigneeName = entityInterface.getUserId();
+            assigneeName = entityInterface.getUsername();
             executeParam.setAssigneeName(assigneeName);
         }
         // 1.执行前检查流程
@@ -157,6 +157,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         flowComment.setFlowCommentType(param.getFlowCommentType().getCode());
         flowComment.setVariables(param.getVariables());
         flowComment.setAttachmentId(param.getAttachmentId());
+        flowComment.setUserId(param.getUserId());
         if (param.isForm()) {
             flowComment.setExt(param.getCommentContent());
             flowComment.setForm(true);

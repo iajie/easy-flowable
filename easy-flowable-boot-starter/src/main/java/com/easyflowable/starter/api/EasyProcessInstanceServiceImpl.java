@@ -92,6 +92,12 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             flowProcessInstance.setDeploymentId(processInstance.getDeploymentId());
             flowProcessInstance.setProcessInstanceVersion(processInstance.getProcessDefinitionVersion());
             flowProcessInstance.setStatus(processInstance.isSuspended());
+            Task task = this.taskService.createTaskQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .active().singleResult();
+            if (task != null) {
+                flowProcessInstance.setTaskId(task.getId());
+            }
             list.add(flowProcessInstance);
         }
         return list;
@@ -262,7 +268,9 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             // 获取历史审批材料
             List<Comment> commentList = taskService.getProcessInstanceComments(processInstanceId);
             for (HistoricActivityInstance instance : activityInstanceList) {
-                if (!instance.getActivityType().equals(Constants.SEQUENCE_FLOW) && !instance.getActivityType().contains(Constants.GATEWAY)) {
+                if (!instance.getActivityType().equals(Constants.SEQUENCE_FLOW) &&
+                        !instance.getActivityType().contains(Constants.EVENT) &&
+                        !instance.getActivityType().contains(Constants.GATEWAY)) {
                     list.add(CommentUtils.getFlowExecutionHistory(instance, commentList, runtimeService));
                 }
             }

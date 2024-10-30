@@ -45,6 +45,11 @@ public class FlowComment {
     private String assigneeName;
 
     /**
+     * 委派/转办人
+     */
+    private String userId;
+
+    /**
      * 审批意见
      */
     private String commentContent;

@@ -67,5 +67,10 @@ public class FlowProcessInstance {
      * 流程实例运行版本
      */
     private Integer processInstanceVersion;
+
+    /**
+     * 当前运行的任务ID
+     */
+    private String taskId;
     
 }

@@ -42,20 +42,17 @@ public class CommentUtils {
         executionHistory.setEndTime(instance.getEndTime());
         executionHistory.setDuration(instance.getDurationInMillis());
         executionHistory.setAssignee(instance.getAssignee());
-        // 如果为开始节点
-        if (instance.getActivityType().equals(Constants.START_EVENT)) {
-            String startUser = runtimeService.getVariable(instance.getExecutionId(), Constants.INITIATOR, String.class);
-            executionHistory.setAssignee(startUser);
-        }
         if (StringUtils.isNotBlank(instance.getTaskId())) {
             List<FlowComment> comments = new ArrayList<>();
             for (Comment comment : commentList) {
                 if (comment.getTaskId().equals(instance.getTaskId())) {
                     // 将批注信息追加到历史中
-                    FlowComment flowComment = StringUtils.toJava(comment.getFullMessage(), FlowComment.class);
-                    flowComment.setCommentId(comment.getId());
-                    flowComment.setCommentTime(comment.getTime());
-                    comments.add(flowComment);
+                    if (StringUtils.isNotBlank(comment.getFullMessage())) {
+                        FlowComment flowComment = StringUtils.toJava(comment.getFullMessage(), FlowComment.class);
+                        flowComment.setCommentId(comment.getId());
+                        flowComment.setCommentTime(comment.getTime());
+                        comments.add(flowComment);
+                    }
                 }
             }
             executionHistory.setComments(comments);

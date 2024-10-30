@@ -21,7 +21,7 @@ public class Constants {
 
     public final static String SEQUENCE_FLOW = "sequenceFlow";
     public final static String GATEWAY = "Gateway";
-    public final static String START_EVENT = "startEvent";
+    public final static String EVENT = "Event";
 
     public final static String INITIATOR = "initiator";
 
