@@ -27,6 +27,9 @@ public class Constants {
 
     public final static String FILE = "file";
 
+    public final static String PENDING = "PENDING";
+
+
     /**
      * @param name 流程名称
      * @Return: {@link String}

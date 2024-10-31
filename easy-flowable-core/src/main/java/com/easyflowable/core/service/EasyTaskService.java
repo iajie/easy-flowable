@@ -4,6 +4,8 @@ import com.easyflowable.core.domain.dto.FlowComment;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
 import com.easyflowable.core.domain.params.FlowExecuteParam;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
 
 import java.util.Arrays;
@@ -150,5 +152,15 @@ public interface EasyTaskService {
      * @Date: 2024-10-09 10:54:31
      */
     String getUpNodeKey(String taskId);
+
+    /**
+     * @param instance 运行实例
+     * @param commentList 意见列表
+     * @Return: {@link FlowExecutionHistory}
+     * @Author: MoJie
+     * @Date: 2024/10/31 19:39
+     * @Description: 获取流程实例
+     */
+    FlowExecutionHistory getFlowExecutionHistory(HistoricActivityInstance instance, List<Comment> commentList);
 
 }

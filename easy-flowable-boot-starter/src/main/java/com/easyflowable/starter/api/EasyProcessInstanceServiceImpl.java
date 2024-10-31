@@ -11,6 +11,7 @@ import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.domain.params.FlowStartParam;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyProcessInstanceService;
+import com.easyflowable.core.service.EasyTaskService;
 import com.easyflowable.core.utils.CommentUtils;
 import com.easyflowable.core.utils.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,6 +58,8 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     private HistoryService historyService;
     @Resource
     private EasyFlowEntityInterface entityInterface;
+    @Resource
+    private EasyTaskService easyTaskService;
 
     @Override
     public List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow, boolean isProcessInstance) {
@@ -271,7 +274,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
                 if (!instance.getActivityType().equals(Constants.SEQUENCE_FLOW) &&
                         !instance.getActivityType().contains(Constants.EVENT) &&
                         !instance.getActivityType().contains(Constants.GATEWAY)) {
-                    list.add(CommentUtils.getFlowExecutionHistory(instance, commentList, runtimeService));
+                    list.add(easyTaskService.getFlowExecutionHistory(instance, commentList));
                 }
             }
         }

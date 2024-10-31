@@ -73,5 +73,15 @@ public class FlowExecutionHistory {
      * 节点执行人
      */
     private String assignee;
-    
+
+    /**
+     * 节点候选人
+     */
+    private List<String> candidateUsers;
+
+    /**
+     * 节点候选组
+     */
+    private List<String> candidateGroups;
+
 }

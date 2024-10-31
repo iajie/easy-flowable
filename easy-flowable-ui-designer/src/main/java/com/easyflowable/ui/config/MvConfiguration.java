@@ -7,6 +7,7 @@ import com.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.easyflowable.ui.context.EasyFlowableContext;
 import com.easyflowable.ui.model.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.flowable.common.engine.api.FlowableException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -82,11 +83,17 @@ public class MvConfiguration implements WebMvcConfigurer {
             public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
                 EasyFlowableContext.clear();
                 if (ex != null) {
+                    Result<Object> error = Result.error(ex.getMessage());
+                    if (ex instanceof FlowableException) {
+                        if (ex.getMessage().equals("A delegated task cannot be completed, but should be resolved instead.")) {
+                            error.setMessage("当前任务已被委托，需委托人完成任务后即可执行！");
+                        }
+                    }
                     response.setStatus(200);
                     response.setCharacterEncoding("UTF-8");
                     response.setContentType("application/json");
                     PrintWriter writer = response.getWriter();
-                    writer.write(new ObjectMapper().writeValueAsString(Result.error(ex.getMessage())));
+                    writer.write(new ObjectMapper().writeValueAsString(error));
                     writer.flush();
                     writer.close();
                 }

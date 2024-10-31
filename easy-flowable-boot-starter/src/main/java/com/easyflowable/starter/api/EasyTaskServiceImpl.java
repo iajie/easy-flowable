@@ -73,8 +73,12 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         }
         // 1.执行前检查流程
         this.checkFlowable(task.getProcessInstanceId());
-        // 2.保存流程审批意见
-        this.saveFlowComment(task, executeParam);
+        if (executeParam.getFlowCommentType() != FlowCommentType.CANCELLATION &&
+                executeParam.getFlowCommentType() != FlowCommentType.RESUBMIT &&
+                executeParam.getFlowCommentType() != FlowCommentType.AGREE) {
+            // 保存流程审批意见
+            this.saveFlowComment(task, executeParam);
+        }
         // 3.执行(暂存没有操作，就单纯添加审批意见)
         switch (executeParam.getFlowCommentType()) {
             case RESUBMIT:
@@ -82,6 +86,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 this.complete(task, executeParam);
                 break;
             case REJECT:
+                // 保存流程审批意见
+                this.saveFlowComment(task, executeParam);
                 this.reject(task);
                 break;
             case REBUT:
@@ -176,8 +182,27 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      * @Date: 2024-10-09 14:36:46
      */
     private void complete(Task task, FlowExecuteParam param) {
-        // 执行任务
-        taskService.complete(task.getId(), param.getVariables());
+        // 委派人执行任务
+        if (task.getDelegationState() != null && task.getDelegationState().name().equals(Constants.PENDING)) {
+            if (task.getAssignee().equals(param.getAssignee())) {
+                // 保存流程审批意见
+                this.saveFlowComment(task, param);
+                taskService.resolveTask(task.getId(), param.getVariables());
+            } else {
+                throw new EasyFlowableException("当前任务已被委派，您不是被委派的人，无法执行任务！");
+            }
+        } else {
+            if (StringUtils.isBlank(task.getAssignee())) {
+                throw new EasyFlowableException("当前任务还没有人签收，无法执行！");
+            }
+            if (!task.getAssignee().equals(param.getAssignee())) {
+                throw new EasyFlowableException("您不是节点操作人，无法执行任务！");
+            }
+            // 保存流程审批意见
+            this.saveFlowComment(task, param);
+            // 执行任务
+            taskService.complete(task.getId(), param.getVariables());
+        }
     }
 
     /**
@@ -270,7 +295,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
             List<Comment> taskComments = taskService.getTaskComments(taskId);
             for (HistoricActivityInstance instance : historicTaskInstances) {
                 if (!instance.getActivityType().equals(Constants.SEQUENCE_FLOW) && !instance.getActivityType().contains(Constants.GATEWAY)) {
-                    list.add(CommentUtils.getFlowExecutionHistory(instance, taskComments, runtimeService));
+                    list.add(this.getFlowExecutionHistory(instance, taskComments));
                 }
             }
         }
@@ -338,5 +363,42 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 .list();
         HistoricTaskInstance instance = list.get(0);
         return instance.getTaskDefinitionKey();
+    }
+
+    @Override
+    public FlowExecutionHistory getFlowExecutionHistory(HistoricActivityInstance instance, List<Comment> commentList) {
+        FlowExecutionHistory executionHistory = new FlowExecutionHistory();
+        executionHistory.setHistoryId(instance.getId());
+        executionHistory.setExecutionId(instance.getExecutionId());
+        executionHistory.setTaskId(instance.getTaskId());
+        executionHistory.setTaskDefKey(instance.getActivityId());
+        executionHistory.setProcessDefinitionId(instance.getProcessDefinitionId());
+        executionHistory.setExecutionId(instance.getExecutionId());
+        executionHistory.setTaskName(instance.getActivityName());
+        executionHistory.setStartTime(instance.getStartTime());
+        executionHistory.setEndTime(instance.getEndTime());
+        executionHistory.setDuration(instance.getDurationInMillis());
+        executionHistory.setAssignee(instance.getAssignee());
+        if (StringUtils.isNotBlank(instance.getTaskId())) {
+            List<FlowComment> comments = new ArrayList<>();
+            for (Comment comment : commentList) {
+                if (instance.getTaskId().equals(comment.getTaskId())) {
+                    // 将批注信息追加到历史中
+                    if (StringUtils.isNotBlank(comment.getFullMessage())) {
+                        FlowComment flowComment = StringUtils.toJava(comment.getFullMessage(), FlowComment.class);
+                        flowComment.setCommentId(comment.getId());
+                        flowComment.setCommentTime(comment.getTime());
+                        comments.add(flowComment);
+                    }
+                }
+            }
+            executionHistory.setComments(comments);
+            // 执行人为空，那么获取候选人和组
+            if (StringUtils.isBlank(instance.getAssignee())) {
+                executionHistory.setCandidateUsers(this.getUserTaskExecutorList(instance.getTaskId(), false, false));
+                executionHistory.setCandidateGroups(this.getUserTaskExecutorList(instance.getTaskId(), false, true));
+            }
+        }
+        return executionHistory;
     }
 }

@@ -45,7 +45,7 @@ public class CommentUtils {
         if (StringUtils.isNotBlank(instance.getTaskId())) {
             List<FlowComment> comments = new ArrayList<>();
             for (Comment comment : commentList) {
-                if (comment.getTaskId().equals(instance.getTaskId())) {
+                if (instance.getTaskId().equals(comment.getTaskId())) {
                     // 将批注信息追加到历史中
                     if (StringUtils.isNotBlank(comment.getFullMessage())) {
                         FlowComment flowComment = StringUtils.toJava(comment.getFullMessage(), FlowComment.class);
@@ -56,6 +56,9 @@ public class CommentUtils {
                 }
             }
             executionHistory.setComments(comments);
+        }
+        if (StringUtils.isBlank(instance.getAssignee())) {
+
         }
         return executionHistory;
     }
