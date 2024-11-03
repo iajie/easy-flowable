@@ -92,4 +92,13 @@ public interface EasyDeploymentService {
      * @Description: 获取流程部署图片
      */
     InputStream getFlowImage(String processDefinitionId);
+
+    /**
+     * @param processDefinitionId 流程定义ID
+     * @Return: {@link InputStream}
+     * @Author: MoJie
+     * @Date: 2024/11/3 14:23
+     * @Description: 获取流程部署XML
+     */
+    String getFlowXml(String processDefinitionId);
 }

@@ -45,25 +45,25 @@ public interface EasyTaskService {
     Task getFlowTask(String taskId);
 
     /**
-     * 根据任务ID获取流程执行历史记录
-     * @param taskId 任务ID
+     * 根据实例ID获取流程执行历史记录
+     * @param processInstanceId 实例ID
      * @return {@link List<FlowExecutionHistory>}
      * @Author: MoJie
      * @Date: 2024-10-09 10:50:06
      */
-    default List<FlowExecutionHistory> getFlowExecutionHistoryList(String taskId) {
-        return getFlowExecutionHistoryList(taskId, null);
+    default List<FlowExecutionHistory> getFlowExecutionHistoryList(String processInstanceId) {
+        return getFlowExecutionHistoryList(processInstanceId, null);
     }
 
     /**
-     * 根据任务ID和用户ID获取流程用户执行历史记录
-     * @param taskId 任务ID
+     * 根据实例ID和用户ID获取流程用户执行历史记录
+     * @param processInstanceId 流程实例ID
      * @param assignee 用户ID
      * @return {@link List<FlowExecutionHistory>}
      * @Author: MoJie
      * @Date: 2024-10-09 10:50:23
      */
-    List<FlowExecutionHistory> getFlowExecutionHistoryList(String taskId, String assignee);
+    List<FlowExecutionHistory> getFlowExecutionHistoryList(String processInstanceId, String assignee);
 
     /**
      * 获取当前任务节点执行人

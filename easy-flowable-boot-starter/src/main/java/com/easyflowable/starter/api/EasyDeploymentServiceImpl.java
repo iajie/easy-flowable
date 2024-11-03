@@ -12,6 +12,8 @@ import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.core.service.EasyModelService;
 import com.easyflowable.core.utils.StringUtils;
 import com.mybatisflex.core.query.QueryChain;
+import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.UserTask;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -101,9 +104,7 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
     @Override
     public void deleteDeployment(String deploymentId, Boolean cascade) {
         // 1.查询流程部署信息
-        Deployment deployment = repositoryService.createDeploymentQuery()
-                .deploymentId(deploymentId).deploymentTenantId(entityInterface.getTenantId())
-                .singleResult();
+        Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
         if (deployment == null) {
             throw new EasyFlowableException("未查询到流程定义，无法删除");
         }
@@ -203,10 +204,23 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
 
     @Override
     public InputStream getFlowImage(String processDefinitionId) {
-        ProcessDefinition result = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+        this.checkProcessDefinition(processDefinitionId);
+        return repositoryService.getProcessDiagram(processDefinitionId);
+    }
+
+    private void checkProcessDefinition(String processDefinitionId) {
+        ProcessDefinition result = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(processDefinitionId).singleResult();
         if (result == null) {
             throw new EasyFlowableException("未找到流程定义");
         }
-        return repositoryService.getProcessDiagram(processDefinitionId);
+    }
+
+    @Override
+    @SneakyThrows
+    public String getFlowXml(String processDefinitionId) {
+        this.checkProcessDefinition(processDefinitionId);
+        InputStream processModel = repositoryService.getProcessModel(processDefinitionId);
+        return IOUtils.toString(processModel, StandardCharsets.UTF_8);
     }
 }

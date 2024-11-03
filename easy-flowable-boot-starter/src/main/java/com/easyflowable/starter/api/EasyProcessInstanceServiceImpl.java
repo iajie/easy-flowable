@@ -1,10 +1,7 @@
 package com.easyflowable.starter.api;
 
 import com.easyflowable.core.constans.Constants;
-import com.easyflowable.core.domain.dto.FlowComment;
-import com.easyflowable.core.domain.dto.FlowExecutionHistory;
-import com.easyflowable.core.domain.dto.FlowProcessInstance;
-import com.easyflowable.core.domain.dto.Option;
+import com.easyflowable.core.domain.dto.*;
 import com.easyflowable.core.domain.enums.FlowCommentType;
 import com.easyflowable.core.domain.enums.FlowExecuteType;
 import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
@@ -24,6 +21,8 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -311,5 +310,34 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
                 .list();
         HistoricTaskInstance instance = list.get(0);
         return instance.getTaskDefinitionKey();
+    }
+
+    public List<FlowProcessInstanceHistory> getFlowInstanceHistoryList(String key, boolean isDeployment) {
+        // 查询完成历史实例
+        HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery();
+        if (isDeployment) {
+            instanceQuery.deploymentId(key);
+        } else {
+            instanceQuery.processDefinitionKey(key).processInstanceTenantId(entityInterface.getTenantId());
+        }
+        List<FlowProcessInstanceHistory> list = new ArrayList<>();
+        List<HistoricProcessInstance> instances = instanceQuery.finished().list();
+        for (HistoricProcessInstance processInstance : instances) {
+            FlowProcessInstanceHistory flowProcessInstance = new FlowProcessInstanceHistory();
+            flowProcessInstance.setProcessInstanceId(processInstance.getId());
+            flowProcessInstance.setProcessDefinitionId(processInstance.getProcessDefinitionId());
+            flowProcessInstance.setStartUserId(processInstance.getStartUserId());
+            flowProcessInstance.setBusinessKey(processInstance.getBusinessKey());
+            flowProcessInstance.setName(processInstance.getName());
+            flowProcessInstance.setBusinessKeyStatus(processInstance.getBusinessStatus());
+            flowProcessInstance.setDeploymentId(processInstance.getDeploymentId());
+            flowProcessInstance.setProcessInstanceVersion(processInstance.getProcessDefinitionVersion());
+            flowProcessInstance.setStartTime(processInstance.getStartTime());
+            flowProcessInstance.setEndTime(processInstance.getEndTime());
+            flowProcessInstance.setDuration(processInstance.getDurationInMillis());
+            flowProcessInstance.setCancellationCause(processInstance.getDeleteReason());
+            list.add(flowProcessInstance);
+        }
+        return list;
     }
 }

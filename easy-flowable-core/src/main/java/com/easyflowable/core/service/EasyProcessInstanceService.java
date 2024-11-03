@@ -2,6 +2,7 @@ package com.easyflowable.core.service;
 
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
 import com.easyflowable.core.domain.dto.FlowProcessInstance;
+import com.easyflowable.core.domain.dto.FlowProcessInstanceHistory;
 import com.easyflowable.core.domain.dto.Option;
 import com.easyflowable.core.domain.params.FlowStartParam;
 
@@ -111,4 +112,36 @@ public interface EasyProcessInstanceService {
      * @Date: 2024-10-09 10:54:31
      */
     String getUpNodeKey(String processInstanceId);
+
+    /**
+     * @param key 流程标识或流程部署ID
+     * @param isDeployment 是否为部署
+     * @Return: {@link List<FlowProcessInstanceHistory>}
+     * @Author: MoJie
+     * @Date: 2024/11/3 21:15
+     * @Description: 根据流程标识或流程部署ID查询流程执行历史
+     */
+    List<FlowProcessInstanceHistory> getFlowInstanceHistoryList(String key, boolean isDeployment);
+
+    /**
+     * @param key 流程KEY
+     * @Return: {@link List<FlowProcessInstanceHistory>}
+     * @Author: MoJie
+     * @Date: 2024/11/3 21:18
+     * @Description: 根据流程KEY查询流程执行历史
+     */
+    default List<FlowProcessInstanceHistory> getFlowInstanceHistoryListByKey(String key) {
+        return getFlowInstanceHistoryList(key, false);
+    }
+
+    /**
+     * @param deploymentId 部署ID
+     * @Return: {@link List<FlowProcessInstanceHistory>}
+     * @Author: MoJie
+     * @Date: 2024/11/3 21:19
+     * @Description: 根据流程部署ID查询流程历史
+     */
+    default List<FlowProcessInstanceHistory> getFlowInstanceHistoryListByDeploymentId(String deploymentId) {
+        return getFlowInstanceHistoryList(deploymentId, true);
+    }
 }

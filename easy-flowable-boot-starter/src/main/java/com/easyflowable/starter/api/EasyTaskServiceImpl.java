@@ -280,19 +280,18 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     }
 
     @Override
-    public List<FlowExecutionHistory> getFlowExecutionHistoryList(String taskId, String assignee) {
+    public List<FlowExecutionHistory> getFlowExecutionHistoryList(String processInstanceId, String assignee) {
         List<FlowExecutionHistory> list = new ArrayList<>();
-        Task flowTask = this.getFlowTask(taskId);
         HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery();
         if (StringUtils.isNotBlank(assignee)) {
             historicActivityInstanceQuery.taskAssignee(assignee);
         }
         // 根据任务
         List<HistoricActivityInstance> historicTaskInstances = historicActivityInstanceQuery
-                .processInstanceId(flowTask.getProcessInstanceId())
+                .processInstanceId(processInstanceId)
                 .orderByHistoricActivityInstanceStartTime().asc().list();
         if (!historicTaskInstances.isEmpty()) {
-            List<Comment> taskComments = taskService.getTaskComments(taskId);
+            List<Comment> taskComments = taskService.getProcessInstanceComments(processInstanceId);
             for (HistoricActivityInstance instance : historicTaskInstances) {
                 if (!instance.getActivityType().equals(Constants.SEQUENCE_FLOW) && !instance.getActivityType().contains(Constants.GATEWAY)) {
                     list.add(this.getFlowExecutionHistory(instance, taskComments));

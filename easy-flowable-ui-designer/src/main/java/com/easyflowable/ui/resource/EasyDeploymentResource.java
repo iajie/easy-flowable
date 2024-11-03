@@ -116,4 +116,15 @@ public class EasyDeploymentResource {
         response.setContentType("image/png");
         ImageIO.write(ImageIO.read(inputStream), "png", response.getOutputStream());
     }
+
+    /**
+     * 流程部署的XML
+     * @param processDefinitionId 流程定义id
+     * @Author: MoJie
+     * @Date: 2024-10-09 16:21:50
+     */
+    @GetMapping(value = "deploymentXml/{processDefinitionId}")
+    public Result<String> deploymentXml(@PathVariable String processDefinitionId) {
+        return Result.success("获取成功", deploymentService.getFlowXml(processDefinitionId));
+    }
 }
