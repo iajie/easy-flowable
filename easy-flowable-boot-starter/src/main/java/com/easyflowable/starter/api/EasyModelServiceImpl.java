@@ -1,20 +1,19 @@
 package com.easyflowable.starter.api;
 
+import com.easyflowable.core.domain.dto.Page;
 import com.easyflowable.core.domain.entity.EasyModel;
-import com.easyflowable.core.domain.entity.EasyModelHistory;
-import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.exception.EasyFlowableException;
-import com.easyflowable.core.mapper.EasyModelHistoryMapper;
-import com.easyflowable.core.mapper.EasyModelMapper;
 import com.easyflowable.core.service.EasyModelService;
+import com.easyflowable.core.utils.BpmnUtils;
 import com.easyflowable.core.utils.StringUtils;
-import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryChain;
-import com.mybatisflex.core.query.QueryWrapper;
-import com.mybatisflex.core.update.UpdateChain;
-import org.springframework.transaction.annotation.Transactional;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ModelQuery;
+import org.flowable.engine.repository.ProcessDefinition;
 
 import javax.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,112 +23,130 @@ import java.util.List;
  * @Description:
  * @Author: MoJie
  */
-@Transactional(rollbackFor = Exception.class)
 public class EasyModelServiceImpl implements EasyModelService {
 
     @Resource
-    private EasyFlowEntityInterface entityInterface;
-    @Resource
-    private EasyModelHistoryMapper modelHistoryMapper;
-    @Resource
-    private EasyModelMapper modelMapper;
+    private RepositoryService repositoryService;
 
     @Override
-    public boolean insert(EasyModel model) {
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq(EasyModel::getKey, model.getKey());
-        // 模型版本
-        model.setPublishVersion(0);
-        if (modelMapper.selectCountByQuery(queryWrapper) > 0) {
+    public boolean insert(EasyModel easyModel) {
+        Model result = repositoryService.createModelQuery().modelKey(easyModel.getKey()).singleResult();
+        if (result != null) {
             throw new EasyFlowableException("当前模型标识已存在，无法创建!");
         }
-        model.setTenantId(entityInterface.getTenantId());
-        model.setOrganId(entityInterface.getOrganId());
-        return modelMapper.insert(model) > 0;
-    }
-
-    @Override
-    public boolean updateById(EasyModel model) {
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq(EasyModel::getKey, model.getKey());
-        queryWrapper.ne(EasyModel::getId, model.getId());
-        if (modelMapper.selectCountByQuery(queryWrapper) > 0) {
-            throw new EasyFlowableException("当前模型标识已存在，无法创建!");
-        }
-        return modelMapper.update(model) > 0;
-    }
-
-    @Override
-    public UpdateChain<EasyModel> updateChain() {
-        return UpdateChain.create(this.modelMapper);
-    }
-
-    @Override
-    public QueryChain<EasyModel> queryChain() {
-        return QueryChain.of(this.modelMapper);
-    }
-
-    @Override
-    public EasyModel getById(String id) {
-        return modelMapper.selectOneById(id);
-    }
-
-    @Override
-    public boolean removeById(String id) {
-        return modelMapper.deleteById(id) > 0;
-    }
-
-    @Override
-    public Page<EasyModel> queryPage(int current, int size, EasyModel model) {
-        String tenantId = entityInterface.getTenantId();
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.like(EasyModel::getName, model.getName(), StringUtils.isNotBlank(model.getName()));
-        queryWrapper.like(EasyModel::getKey, model.getKey(), StringUtils.isNotBlank(model.getKey()));
-        queryWrapper.eq(EasyModel::getModelType, model.getModelType(), model.getModelType() != null);
-        queryWrapper.eq(EasyModel::getTenantId, tenantId, tenantId != null);
-        queryWrapper.orderBy(EasyModel::getCreateTime).desc();
-        return modelMapper.paginate(current, size, queryWrapper);
-    }
-
-    @Override
-    public List<EasyModelHistory> listModelHistory(String modelId) {
-        List<EasyModelHistory> list = modelHistoryMapper.selectListByQuery(QueryWrapper.create()
-                .orderBy(EasyModelHistory::getCreateTime).desc()
-                .eq(EasyModelHistory::getModelId, modelId));
-        if (list.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return list;
-    }
-
-    @Override
-    public Page<EasyModelHistory> modelHistory(Page<EasyModelHistory> page, EasyModelHistory modelHistory) {
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq(EasyModelHistory::getModelId, modelHistory.getModelId());
-        queryWrapper.orderBy(EasyModelHistory::getCreateTime).desc();
-        return modelHistoryMapper.paginate(page, queryWrapper);
-    }
-
-    @Override
-    public void saveHistory(EasyModelHistory modelHistory) {
-        this.modelHistoryMapper.insert(modelHistory);
-    }
-
-    @Override
-    public boolean deleteHistoryByModelId(String modelId) {
-        this.modelHistoryMapper.deleteByQuery(QueryWrapper.create().eq(EasyModelHistory::getModelId, modelId));
+        Model model = repositoryService.newModel();
+        model.setKey(easyModel.getKey());
+        model.setName(easyModel.getName());
+        model.setVersion(0);
+        model.setCategory(easyModel.getModelType());
+        model.setMetaInfo(easyModel.getRemarks());
+        repositoryService.saveModel(model);
         return true;
     }
 
     @Override
-    public boolean modelHistoryRollback(String historyId) {
-        EasyModelHistory history = this.modelHistoryMapper.selectOneById(historyId);
-        if (history == null) {
-            throw new EasyFlowableException("流程历史信息不存在, 回滚失败！");
+    public boolean updateById(EasyModel model) {
+        Model result = repositoryService.createModelQuery().modelId(model.getId()).singleResult();
+        if (result == null) {
+            throw new EasyFlowableException("当前模型不存在，无法操作!");
         }
-        return UpdateChain.of(this.modelMapper).eq(EasyModel::getId, history.getModelId())
-                .set(EasyModel::getModelEditorXml, history.getModelEditorXml())
-                .set(EasyModel::getThumbnail, null)
-                .update();
+        if (StringUtils.isNotBlank(model.getModelEditorXml())) {
+            // 校验流程信息
+            BpmnUtils.validateModel(model.getModelEditorXml());
+            repositoryService.addModelEditorSource(model.getId(), model.getModelEditorXml()
+                    .getBytes(StandardCharsets.UTF_8));
+        }
+        if (StringUtils.isNotBlank(model.getPicture())) {
+            repositoryService.addModelEditorSourceExtra(model.getId(), model.getPicture()
+                    .getBytes(StandardCharsets.UTF_8));
+        }
+        if (StringUtils.isNotBlank(model.getModelType())) {
+            result.setCategory(model.getModelType());
+        }
+        if (StringUtils.isNotBlank(model.getName())) {
+            result.setName(model.getName());
+        }
+        if (StringUtils.isNotBlank(model.getRemarks())) {
+            result.setMetaInfo(model.getRemarks());
+        }
+        repositoryService.saveModel(result);
+        return true;
+    }
+
+    @Override
+    public EasyModel getById(String id) {
+        Model result = repositoryService.createModelQuery().modelId(id).latestVersion().singleResult();
+        if (result == null) {
+            throw new EasyFlowableException("模型不存在！");
+        }
+        ModelEntityImpl model = (ModelEntityImpl) result;
+        EasyModel easyModel = new EasyModel();
+        easyModel.setModelType(model.getCategory());
+        easyModel.setId(id);
+        easyModel.setName(model.getName());
+        easyModel.setKey(model.getKey());
+        easyModel.setTenantId(model.getTenantId());
+        easyModel.setCreateTime(model.getCreateTime());
+        easyModel.setUpdateTime(model.getLastUpdateTime());
+        easyModel.setPublishVersion(model.getVersion());
+        if (model.hasEditorSource()) {
+            byte[] modelEditorSource = repositoryService.getModelEditorSource(model.getId());
+            easyModel.setModelEditorXml(new String(modelEditorSource, StandardCharsets.UTF_8));
+        }
+        if (model.hasEditorSourceExtra()) {
+            byte[] modelEditorSourceExtra = repositoryService.getModelEditorSourceExtra(model.getId());
+            easyModel.setPicture(new String(modelEditorSourceExtra, StandardCharsets.UTF_8));
+        }
+        return easyModel;
+    }
+
+    @Override
+    public boolean removeById(String id) {
+        repositoryService.deleteModel(id);
+        return true;
+    }
+
+    @Override
+    public Page<EasyModel> queryPage(int current, int size, EasyModel easyModel) {
+        ModelQuery modelQuery = repositoryService.createModelQuery().orderByLastUpdateTime().desc();
+        if (StringUtils.isNotBlank(easyModel.getModelType())) {
+            modelQuery.modelCategory(easyModel.getModelType());
+        }
+        if (StringUtils.isNotBlank(easyModel.getKey())) {
+            modelQuery.modelKey(easyModel.getKey());
+        }
+        if (StringUtils.isNotBlank(easyModel.getName())) {
+            modelQuery.modelNameLike(easyModel.getName());
+        }
+        Page<EasyModel> page = new Page<>();
+        page.setTotal(modelQuery.count());
+        List<EasyModel> list = new ArrayList<>();
+        List<Model> models = modelQuery.listPage((current-1) * size, size);
+        for (Model model : models) {
+            EasyModel modelDo = new EasyModel()
+                    .setId(model.getId())
+                    .setName(model.getName())
+                    .setKey(model.getKey())
+                    .setModelType(model.getCategory())
+                    .setCreateTime(model.getCreateTime())
+                    .setUpdateTime(model.getLastUpdateTime())
+                    .setRemarks(model.getMetaInfo());
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionKey(model.getKey())
+                    .latestVersion().singleResult();
+            if (processDefinition != null) {
+                modelDo.setPublishVersion(processDefinition.getVersion());
+            }
+            if (model.hasEditorSourceExtra()) {
+                byte[] modelEditorSourceExtra = repositoryService.
+                        getModelEditorSourceExtra(model.getId());
+                if (modelEditorSourceExtra != null) {
+                    modelDo.setPicture(new String(modelEditorSourceExtra, StandardCharsets.UTF_8));
+                }
+            }
+            list.add(modelDo);
+        }
+        page.setRecords(list);
+        return page;
     }
 }

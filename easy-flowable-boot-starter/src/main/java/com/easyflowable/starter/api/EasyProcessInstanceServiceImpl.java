@@ -3,13 +3,11 @@ package com.easyflowable.starter.api;
 import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.*;
 import com.easyflowable.core.domain.enums.FlowCommentType;
-import com.easyflowable.core.domain.enums.FlowExecuteType;
-import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
+import com.easyflowable.core.service.EasyUserService;
 import com.easyflowable.core.domain.params.FlowStartParam;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyProcessInstanceService;
 import com.easyflowable.core.service.EasyTaskService;
-import com.easyflowable.core.utils.CommentUtils;
 import com.easyflowable.core.utils.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -30,7 +28,6 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -44,7 +41,6 @@ import java.util.Map;
  * @Description:
  * @Author: MoJie
  */
-@Transactional(rollbackFor = Exception.class)
 public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceService {
 
     @Resource
@@ -56,17 +52,16 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     @Resource
     private HistoryService historyService;
     @Resource
-    private EasyFlowEntityInterface entityInterface;
-    @Resource
     private EasyTaskService easyTaskService;
+    @Resource
+    private EasyUserService userInterface;
 
     @Override
     public List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow, boolean isProcessInstance) {
         if (StringUtils.isBlank(key)) {
             throw new EasyFlowableException((isProcessInstance ? "流程定义ID" : "流程标识") + "不能为空！");
         }
-        ProcessInstanceQuery instanceQuery = runtimeService.createProcessInstanceQuery()
-                .processInstanceTenantId(entityInterface.getTenantId());
+        ProcessInstanceQuery instanceQuery = runtimeService.createProcessInstanceQuery();
         if (isFlow) {
             if (isProcessInstance) {
                 instanceQuery.processDefinitionId(key);
@@ -115,7 +110,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         // 获取最新流程定义
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
         if (StringUtils.isBlank(flowKey)) {
-            processDefinitionQuery.processDefinitionKey(flowKey).latestVersion().processDefinitionTenantId(entityInterface.getTenantId());
+            processDefinitionQuery.processDefinitionKey(flowKey).latestVersion();
         } else {
             processDefinitionQuery.processDefinitionId(processDefinitionId);
         }
@@ -133,7 +128,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         }
         String startUserId = startParam.getStartUserId();
         if (StringUtils.isBlank(startUserId)) {
-            startUserId = entityInterface.getUserId();
+            startUserId = userInterface.getUserId();
         }
         // 启动流程变量(全局)
         Map<String, Object> variables = startParam.getVariables();
@@ -146,8 +141,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         ProcessInstance instance;
         if (isKey) {
             // 用流程定义的KEY启动，会自动选择KEY相同的流程定义中最新版本的那个(KEY为模型中的流程唯一标识)
-            instance = runtimeService
-                    .startProcessInstanceByKeyAndTenantId(flowKey, businessKey, variables, entityInterface.getTenantId());
+            instance = runtimeService.startProcessInstanceByKey(flowKey, businessKey, variables);
         } else {
             instance = runtimeService.startProcessInstanceById(processDefinitionId, businessKey, variables);
         }
@@ -167,7 +161,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
                 // 获取名称
                 String startUsername = startParam.getStartUsername();
                 if (StringUtils.isBlank(startUsername)) {
-                    startUsername = entityInterface.getUsername();
+                    startUsername = userInterface.getUsername();
                 }
                 FlowComment flowComment = new FlowComment();
                 flowComment.setAssignee(startUserId);
@@ -318,7 +312,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         if (isDeployment) {
             instanceQuery.deploymentId(key);
         } else {
-            instanceQuery.processDefinitionKey(key).processInstanceTenantId(entityInterface.getTenantId());
+            instanceQuery.processDefinitionKey(key);
         }
         List<FlowProcessInstanceHistory> list = new ArrayList<>();
         List<HistoricProcessInstance> instances = instanceQuery.finished().list();

@@ -1,10 +1,7 @@
 package com.easyflowable.core.domain.entity;
 
-import com.mybatisflex.annotation.Column;
-import com.mybatisflex.annotation.Id;
-import com.mybatisflex.annotation.KeyType;
-import com.mybatisflex.annotation.Table;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
@@ -15,13 +12,12 @@ import java.util.Date;
  * @Author: MoJie
  */
 @Data
-@Table("easy_model")
+@Accessors(chain = true)
 public class EasyModel {
 
     /**
      * 业务主键
      */
-    @Id(keyType = KeyType.Generator)
     private String id;
 
     /**
@@ -39,7 +35,10 @@ public class EasyModel {
      */
     private String modelEditorXml;
 
-    private String thumbnail;
+    /**
+     * 流程图片
+     */
+    private String picture;
 
     /**
      * 0: bpmn图形化模型
@@ -47,13 +46,8 @@ public class EasyModel {
      * 3：应用程序类型的流程模型
      * 4：决策表类型的流程模型
      */
-    private Integer modelType;
+    private String modelType;
 
-    /**
-     * 乐观锁
-     */
-    @Column(version = true)
-    private Integer version;
     /** 发布版本 */
     private Integer publishVersion;
 
@@ -63,19 +57,9 @@ public class EasyModel {
     private Date createTime;
 
     /**
-     * 创建人
-     */
-    private String createBy;
-
-    /**
      * 更新时间
      */
     private Date updateTime;
-
-    /**
-     * 更新人
-     */
-    private String updateBy;
 
     /**
      * 租户id
@@ -83,12 +67,8 @@ public class EasyModel {
     private String tenantId;
 
     /**
-     * 所属部门id：如果您有模型数据权限，可以实现接口达到数据权限控制
-     */
-    private String organId;
-
-    /**
      * 备注
      */
     private String remarks;
+
 }

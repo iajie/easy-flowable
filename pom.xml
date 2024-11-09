@@ -42,10 +42,6 @@
                 <artifactId>flowable-engine</artifactId>
                 <exclusions>
                     <exclusion>
-                        <groupId>org.mybatis</groupId>
-                        <artifactId>mybatis</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-beans</artifactId>
                     </exclusion>

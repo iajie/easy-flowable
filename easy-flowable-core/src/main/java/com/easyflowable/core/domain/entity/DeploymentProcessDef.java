@@ -1,6 +1,7 @@
-package com.easyflowable.core.domain.dto;
+package com.easyflowable.core.domain.entity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
@@ -11,6 +12,7 @@ import java.util.Date;
  * @Author: MoJie
  */
 @Data
+@Accessors(chain = true)
 public class DeploymentProcessDef {
 
     /**
@@ -36,7 +38,7 @@ public class DeploymentProcessDef {
     /**
      * 分类
      */
-    private Integer modelType;
+    private String modelType;
 
     /**
      * 租户id
@@ -51,12 +53,12 @@ public class DeploymentProcessDef {
     /**
      * 流程定义状态: 1:激活 , 2:中止
      */
-    private Integer suspensionState;
+    private boolean suspensionState;
 
     /**
      * 是否存在开始节点formKey: 0：否 ,1:是
      */
-    private Integer hasStartFormKey;
+    private boolean hasStartFormKey;
 
     /**
      * 部署时间

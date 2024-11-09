@@ -2,7 +2,6 @@ package com.easyflowable.starter;
 
 import com.easyflowable.core.config.EasyFlowableConfig;
 import com.easyflowable.core.config.EasyFlowableDataSourceConfig;
-import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.enums.HistoryLevelEnum;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyDeploymentService;
@@ -15,22 +14,20 @@ import com.easyflowable.starter.api.EasyModelServiceImpl;
 import com.easyflowable.starter.api.EasyProcessInstanceServiceImpl;
 import com.easyflowable.starter.api.EasyTaskServiceImpl;
 import com.easyflowable.starter.config.EasyFlowableConfigProperties;
-import com.mybatisflex.core.datasource.DataSourceBuilder;
-import liquibase.integration.spring.SpringLiquibase;
+import com.zaxxer.hikari.HikariDataSource;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.*;
 import org.flowable.image.ProcessDiagramGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @package: {@link com.easyflowable.starter}
@@ -39,31 +36,52 @@ import java.util.Map;
  * @Author: MoJie
  */
 @Configuration
-@EnableConfigurationProperties(value = {EasyFlowableConfigProperties.class})
 @ConditionalOnProperty(prefix = "easy-flowable", name = "enable", havingValue = "true", matchIfMissing = true)
 public class EasyFlowableAutoConfiguration {
 
     @Resource
     private EasyFlowableConfigProperties properties;
-    @Resource
+    @Autowired(required = false)
     private DataSourceProperties dataSourceProperties;
 
     @Bean
     public DataSource easyFlowableDatasource() {
-        Map<String, String> map = new HashMap<>();
-        map.put("type", "hikari");
+        DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.type(HikariDataSource.class);
         if (!properties.isProjectDatasource()) {
             EasyFlowableDataSourceConfig jdbc = properties.getDataSource();
-            map.put("url", jdbc.getUrl());
-            map.put("username", jdbc.getUsername());
-            map.put("password", jdbc.getPassword());
+            this.checkJdbc(jdbc);
+            dataSourceBuilder.url(jdbc.getUrl())
+                    .username(jdbc.getUsername())
+                    .driverClassName(jdbc.getDriver())
+                    .password(jdbc.getPassword());
         } else {
-            map.put("url", dataSourceProperties.getUrl());
-            map.put("username", dataSourceProperties.getUsername());
-            map.put("password", dataSourceProperties.getPassword());
+            if (this.dataSourceProperties == null) {
+                throw new EasyFlowableException("如果您不想使用项目中的数据源，" +
+                        "请设置easy-flowable.project-datasource为false, 否则请配置spring.datasource");
+            }
+            dataSourceBuilder
+                    .driverClassName(dataSourceProperties.getDriverClassName())
+                    .url(dataSourceProperties.getUrl())
+                    .username(dataSourceProperties.getUsername())
+                    .password(dataSourceProperties.getPassword());
         }
-        DataSourceBuilder builder = new DataSourceBuilder(map);
-        return builder.build();
+        return dataSourceBuilder.build();
+    }
+
+    private void checkJdbc(EasyFlowableDataSourceConfig jdbc) {
+        if (StringUtils.isBlank(jdbc.getDriver())) {
+            throw new EasyFlowableException("请配置数据库驱动");
+        }
+        if (StringUtils.isBlank(jdbc.getUrl())) {
+            throw new EasyFlowableException("请配置数据库连接地址");
+        }
+        if (StringUtils.isBlank(jdbc.getUsername())) {
+            throw new EasyFlowableException("请配置数据库用户名");
+        }
+        if (StringUtils.isBlank(jdbc.getPassword())) {
+            throw new EasyFlowableException("请配置数据库密码");
+        }
     }
 
     @Bean
@@ -76,18 +94,7 @@ public class EasyFlowableAutoConfiguration {
             engineConfiguration.setDataSource(dataSource);
         } else {
             EasyFlowableDataSourceConfig jdbc = properties.getDataSource();
-            if (StringUtils.isBlank(jdbc.getDriver())) {
-                throw new EasyFlowableException("请配置数据库驱动");
-            }
-            if (StringUtils.isBlank(jdbc.getUrl())) {
-                throw new EasyFlowableException("请配置数据库连接地址");
-            }
-            if (StringUtils.isBlank(jdbc.getUsername())) {
-                throw new EasyFlowableException("请配置数据库用户名");
-            }
-            if (StringUtils.isBlank(jdbc.getPassword())) {
-                throw new EasyFlowableException("请配置数据库密码");
-            }
+            this.checkJdbc(jdbc);
             engineConfiguration.setJdbcDriver(jdbc.getDriver());
             engineConfiguration.setJdbcUrl(jdbc.getUrl());
             engineConfiguration.setJdbcUsername(jdbc.getUsername());
@@ -156,15 +163,6 @@ public class EasyFlowableAutoConfiguration {
                                         |---- https://www.easy-flowable.online ----|\s
                     """);
         }
-    }
-
-    @Bean
-    public SpringLiquibase liquibase(DataSource dataSource) {
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setChangeLog(Constants.CHANGE_LOG);
-        liquibase.setDataSource(dataSource);
-        liquibase.setShouldRun(this.properties.getConfig().isTableSchema());
-        return liquibase;
     }
 
     @Bean

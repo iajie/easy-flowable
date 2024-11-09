@@ -24,6 +24,11 @@
             "type": "com.easyflowable.core.config.EasyFlowableDataSourceConfig"
         },
         {
+            "name": "easy-flowable.data-source.driver",
+            "description": "数据库驱动.",
+            "type": "java.sql.Driver"
+        },
+        {
             "name": "easy-flowable.config",
             "description": "easy-flowable全局配置.",
             "type": "com.easyflowable.core.config.EasyFlowableConfig"

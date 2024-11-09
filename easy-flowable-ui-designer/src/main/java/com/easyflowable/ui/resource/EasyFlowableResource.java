@@ -2,6 +2,7 @@ package com.easyflowable.ui.resource;
 
 import com.easyflowable.core.config.EasyFlowableUiConfig;
 import com.easyflowable.core.domain.dto.Option;
+import com.easyflowable.core.service.EasyUserService;
 import com.easyflowable.core.utils.StringUtils;
 import com.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.easyflowable.ui.model.Result;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -27,8 +29,10 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("easy-flowable")
 public class EasyFlowableResource {
 
-    @Autowired
+    @Autowired(required = false)
     private EasyFlowableConfigProperties properties;
+    @Autowired(required = false)
+    private EasyUserService userService;
 
     /**
      * 获取用户列表
@@ -38,6 +42,9 @@ public class EasyFlowableResource {
      */
     @GetMapping("/users")
     public Result<List<Option>> users() {
+        if (!userService.users().isEmpty()) {
+            return Result.success(userService.users());
+        }
         List<Option> list = new ArrayList<>();
         for (EasyFlowableUiConfig.User user : properties.getUi().getUsers()) {
             list.add(new Option(user.getUsername(), user.getId()));
@@ -53,6 +60,9 @@ public class EasyFlowableResource {
      */
     @GetMapping("/groups")
     public Result<List<Option>> groups() {
+        if (!userService.groups().isEmpty()) {
+            return Result.success(userService.groups());
+        }
         return Result.success(properties.getUi().getGroups());
     }
 

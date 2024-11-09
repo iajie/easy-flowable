@@ -1,12 +1,8 @@
 package com.easyflowable.core.service;
 
-import com.easyflowable.core.constans.Constants;
-import com.easyflowable.core.domain.dto.DeploymentProcessDef;
 import com.easyflowable.core.domain.dto.FlowUserTask;
-import com.easyflowable.core.domain.entity.ActReDeployment;
-import com.easyflowable.core.domain.entity.ActReProcessDef;
-import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryChain;
+import com.easyflowable.core.domain.dto.Page;
+import com.easyflowable.core.domain.entity.DeploymentProcessDef;
 
 import java.io.InputStream;
 import java.util.List;
@@ -20,14 +16,6 @@ import java.util.List;
 public interface EasyDeploymentService {
 
     /**
-     * @return {@link QueryChain} {@link ActReDeployment}
-     * @Author: MoJie
-     * @Date: 2024-10-24 17:45
-     * @Description: 使用Mybatis-Flex带有的链式查询
-     */
-    QueryChain<ActReDeployment> queryChain();
-
-    /**
      * @param current 页码
      * @param size 页大小
      * @param params 查询参数
@@ -36,17 +24,7 @@ public interface EasyDeploymentService {
      * @Date: 2024-10-24 17:42
      * @Description: 分页查询
      */
-    default Page<DeploymentProcessDef> page(long current, long size, ActReDeployment params) {
-        return this.queryChain()
-                .select(Constants.DEPLOYMENT_COLUMNS)
-                .from(ActReDeployment.class).as("rd")
-                .like(ActReDeployment::getName, params.getName())
-                .like(ActReDeployment::getFlowKey, params.getFlowKey())
-                .eq(ActReDeployment::getModelType, params.getModelType())
-                .eq(ActReDeployment::getTenantId, params.getTenantId())
-                .innerJoin(ActReProcessDef.class).as("rp").on(ActReDeployment::getId, ActReProcessDef::getDeploymentId)
-                .orderBy(ActReDeployment::getDeploymentTime).desc().pageAs(new Page<>(current, size), DeploymentProcessDef.class);
-    }
+    Page<DeploymentProcessDef> page(int current, int size, DeploymentProcessDef params);
 
     /**
      * 通过模型id部署流程

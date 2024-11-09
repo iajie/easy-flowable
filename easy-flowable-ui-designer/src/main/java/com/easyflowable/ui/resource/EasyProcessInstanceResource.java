@@ -11,6 +11,7 @@ import com.easyflowable.ui.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ import java.util.List;
 @RequestMapping("easy-flowable/processInstance")
 public class EasyProcessInstanceResource {
 
-    @Autowired
+    @Autowired(required = false)
     private EasyProcessInstanceService processInstanceService;
 
     /**

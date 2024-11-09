@@ -16,7 +16,6 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
  */
 @Data
 @ConfigurationProperties("easy-flowable")
-@ConditionalOnProperty(prefix = "easy-flowable", name = "enable", havingValue = "true", matchIfMissing = true)
 public class EasyFlowableConfigProperties {
 
     /** 是否开启easy-flowable， 默认开启 */

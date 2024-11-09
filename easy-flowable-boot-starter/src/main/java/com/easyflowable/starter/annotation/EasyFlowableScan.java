@@ -1,6 +1,5 @@
 package com.easyflowable.starter.annotation;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.ComponentScan;
 
 import java.lang.annotation.ElementType;
@@ -15,7 +14,6 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@MapperScan({"com.easyflowable.core.mapper"})
 @ComponentScan(basePackages = {"com.easyflowable.starter"})
 public @interface EasyFlowableScan {
 

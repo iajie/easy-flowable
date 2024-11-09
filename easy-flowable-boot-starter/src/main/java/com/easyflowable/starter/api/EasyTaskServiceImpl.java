@@ -4,12 +4,11 @@ import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.FlowComment;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
 import com.easyflowable.core.domain.enums.FlowCommentType;
-import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
+import com.easyflowable.core.service.EasyUserService;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
 import com.easyflowable.core.domain.params.FlowExecuteParam;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyTaskService;
-import com.easyflowable.core.utils.CommentUtils;
 import com.easyflowable.core.utils.StringUtils;
 import lombok.SneakyThrows;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -24,7 +23,6 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import java.util.List;
  * @Description:
  * @Author: MoJie
  */
-@Transactional(rollbackFor = Exception.class)
 public class EasyTaskServiceImpl implements EasyTaskService {
 
     @Resource
@@ -46,7 +43,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     @Resource
     private HistoryService historyService;
     @Resource
-    private EasyFlowEntityInterface entityInterface;
+    private EasyUserService userInterface;
 
     @Override
     public void executeNextStep(FlowExecuteParam executeParam) {
@@ -63,12 +60,12 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         }
         String assignee = executeParam.getAssignee();
         if (StringUtils.isBlank(assignee)) {
-            assignee = entityInterface.getUserId();
+            assignee = userInterface.getUserId();
             executeParam.setAssignee(assignee);
         }
         String assigneeName = executeParam.getAssigneeName();
         if (StringUtils.isBlank(assigneeName)) {
-            assigneeName = entityInterface.getUsername();
+            assigneeName = userInterface.getUsername();
             executeParam.setAssigneeName(assigneeName);
         }
         // 1.执行前检查流程

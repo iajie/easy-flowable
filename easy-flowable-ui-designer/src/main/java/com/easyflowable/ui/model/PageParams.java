@@ -1,6 +1,6 @@
 package com.easyflowable.ui.model;
 
-import com.mybatisflex.core.paginate.Page;
+import com.easyflowable.core.domain.dto.Page;
 import lombok.Data;
 
 /**
@@ -20,16 +20,5 @@ public class PageParams<T> {
 
     /** 查询参数 */
     private T params;
-
-    /** 分页对象 */
-    public Page<T> getPage() {
-        if (current == null) {
-            current = 1;
-        }
-        if (size == null) {
-            size = 10;
-        }
-        return new Page<>(current, size);
-    }
 
 }

@@ -9,6 +9,7 @@ import com.easyflowable.ui.model.Result;
 import lombok.SneakyThrows;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.task.Attachment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,9 +29,9 @@ import java.util.List;
 @RequestMapping("easy-flowable/task")
 public class EasyTaskResource {
 
-    @Resource
+    @Autowired(required = false)
     private EasyTaskService easyTaskService;
-    @Resource
+    @Autowired(required = false)
     private TaskService taskService;
 
     /**

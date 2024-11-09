@@ -2,16 +2,13 @@ package com.easyflowable.starter.api;
 
 import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.FlowUserTask;
-import com.easyflowable.core.domain.entity.ActReDeployment;
+import com.easyflowable.core.domain.dto.Page;
+import com.easyflowable.core.domain.entity.DeploymentProcessDef;
 import com.easyflowable.core.domain.entity.EasyModel;
-import com.easyflowable.core.domain.entity.EasyModelHistory;
-import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
 import com.easyflowable.core.exception.EasyFlowableException;
-import com.easyflowable.core.mapper.EasyDeploymentMapper;
 import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.core.service.EasyModelService;
 import com.easyflowable.core.utils.StringUtils;
-import com.mybatisflex.core.query.QueryChain;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.flowable.bpmn.model.BpmnModel;
@@ -20,9 +17,10 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
@@ -36,13 +34,8 @@ import java.util.*;
  * @Description:
  * @Author: MoJie
  */
-@Transactional(rollbackFor = Exception.class)
 public class EasyDeploymentServiceImpl implements EasyDeploymentService {
 
-    @Resource
-    private EasyDeploymentMapper deploymentMapper;
-    @Resource
-    private EasyFlowEntityInterface entityInterface;
     @Resource
     private EasyModelService modelService;
     @Resource
@@ -51,8 +44,39 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
     private RuntimeService runtimeService;
 
     @Override
-    public QueryChain<ActReDeployment> queryChain() {
-        return QueryChain.of(deploymentMapper);
+    public Page<DeploymentProcessDef> page(int current, int size, DeploymentProcessDef params) {
+        DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery().orderByDeploymentTime().desc();
+        if (StringUtils.isNotBlank(params.getKey())) {
+            deploymentQuery.deploymentKey(params.getKey());
+        }
+        if (StringUtils.isNotBlank(params.getName())) {
+            deploymentQuery.deploymentNameLike(params.getName());
+        }
+        if (StringUtils.isNotBlank(params.getModelType())) {
+            deploymentQuery.deploymentCategory(params.getModelType());
+        }
+
+        Page<DeploymentProcessDef> page = new Page<>();
+        page.setTotal(deploymentQuery.count());
+        List<DeploymentProcessDef> list = new ArrayList<>();
+        for (Deployment deployment : deploymentQuery.listPage((current-1) * size, size)) {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                    .deploymentId(deployment.getId()).latestVersion().singleResult();
+            list.add(new DeploymentProcessDef()
+                    .setId(deployment.getId())
+                    .setName(deployment.getName())
+                    .setKey(deployment.getKey())
+                    .setDeploymentTime(deployment.getDeploymentTime())
+                    .setModelType(deployment.getCategory())
+                    .setTenantId(deployment.getTenantId())
+                    .setProcessDefinitionId(processDefinition.getId())
+                    .setHasStartFormKey(processDefinition.hasStartFormKey())
+                    .setSuspensionState(processDefinition.isSuspended())
+                    .setVersion(processDefinition.getVersion())
+            );
+        }
+        page.setRecords(list);
+        return page;
     }
 
     @Override
@@ -72,32 +96,21 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
          * 2.添加模型部署历史
          * 3.更新流程模型发布版本
          */
-        byte[] decode = Base64.getDecoder().decode(model.getThumbnail().replace("data:image/png;base64,", ""));
-        ByteArrayInputStream flowImageStream = new ByteArrayInputStream(decode);
-        Deployment deployment = repositoryService.createDeployment()
+        DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
                 .name(model.getName())
                 .key(model.getKey())
-                .category(model.getModelType().toString())
+                .category(model.getModelType())
                 .tenantId(model.getTenantId())
-                .addString(Constants.BPMN20_XML(model.getName()), model.getModelEditorXml())
-                .addInputStream(Constants.DIAGRAM_PNG(model.getName(), model.getKey()), flowImageStream)
-                .deploy();
-
+                .addString(Constants.BPMN20_XML(model.getName()), model.getModelEditorXml());
+        if (StringUtils.isNotBlank(model.getPicture())) {
+            byte[] decode = Base64.getDecoder().decode(model.getPicture().replace("data:image/png;base64,", ""));
+            ByteArrayInputStream flowImageStream = new ByteArrayInputStream(decode);
+            deploymentBuilder.addInputStream(Constants.DIAGRAM_PNG(model.getName(), model.getKey()), flowImageStream);
+        }
+        Deployment deployment = deploymentBuilder.deploy();
         if (deployment == null) {
             throw new EasyFlowableException("流程模型部署异常");
         }
-        EasyModelHistory modelHistory = new EasyModelHistory();
-        modelHistory.setModelId(modelId);
-        modelHistory.setModelEditorXml(model.getModelEditorXml());
-        modelHistory.setRemarks(model.getRemarks());
-        modelHistory.setCreateTime(new Date());
-        modelHistory.setVersion(model.getPublishVersion() + 1);
-        modelHistory.setCreateBy(entityInterface.getUserId());
-        modelService.saveHistory(modelHistory);
-        modelService.updateChain()
-                .setRaw(EasyModel::getPublishVersion, "publish_version + 1")
-                .eq(EasyModel::getId, modelId)
-                .update();
         return deployment.getId();
     }
 
@@ -119,8 +132,7 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
     public String deploymentState(String processDefinitionId) {
         // 1.查询流程定义
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(processDefinitionId).processDefinitionTenantId(entityInterface.getTenantId())
-                .singleResult();
+                .processDefinitionId(processDefinitionId).singleResult();
         if (processDefinition == null) {
             throw new EasyFlowableException("未查询到流程定义，无法操作");
         }
@@ -140,11 +152,8 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
      * @Date: 2024-10-09 13:12:09
      */
     private Deployment getDeployment(String flowKey) {
-        String tenantId = entityInterface.getTenantId();
         List<Deployment> list = repositoryService.createDeploymentQuery()
-                .deploymentKey(flowKey)
-                .deploymentTenantId(tenantId)
-                .orderByDeploymentTime().desc()
+                .deploymentKey(flowKey).orderByDeploymentTime().desc()
                 .list();
         if (list.isEmpty()) {
             throw new EasyFlowableException(String.format("当前流程[%s]未部署，操作终止", flowKey));
@@ -173,10 +182,7 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
         Deployment deployment = this.getDeployment(flowKey);
         // 获取部署在引擎中流程定义
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey(flowKey)
-                .deploymentId(deployment.getId())
-                .processDefinitionTenantId(entityInterface.getTenantId())
-                .singleResult();
+                .processDefinitionKey(flowKey).deploymentId(deployment.getId()).singleResult();
         if (processDefinition == null) {
             throw new EasyFlowableException("该流程定义不存在，请部署后再试！");
         }

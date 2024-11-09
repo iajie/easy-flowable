@@ -1,10 +1,8 @@
 package com.easyflowable.ui.config;
 
 import com.easyflowable.core.config.EasyFlowableUiConfig;
-import com.easyflowable.core.domain.interfaces.EasyFlowEntityInterface;
-import com.easyflowable.core.utils.StringUtils;
+import com.easyflowable.core.service.EasyUserService;
 import com.easyflowable.ui.context.EasyFlowableContext;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,23 +11,8 @@ import org.springframework.stereotype.Component;
  * @Description: 自定义实现信息获取
  * @Author: MoJie
  */
-@Primary
 @Component
-public class EasyFlowableInterfaceImpl implements EasyFlowEntityInterface {
-
-    @Override
-    public String getTenantId() {
-        return EasyFlowableContext.getTenantId();
-    }
-
-    @Override
-    public String getOrganId() {
-        EasyFlowableUiConfig.User user = EasyFlowableContext.getUser();
-        if (user != null && StringUtils.isNotBlank(user.getOrganId())) {
-            return user.getOrganId();
-        }
-        return EasyFlowableContext.getOrganId();
-    }
+public class EasyFlowableInterfaceImpl implements EasyUserService {
 
     @Override
     public String getUserId() {

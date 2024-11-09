@@ -1,22 +1,16 @@
 package com.easyflowable.ui.resource;
 
-import com.easyflowable.core.domain.dto.DeploymentProcessDef;
 import com.easyflowable.core.domain.dto.FlowUserTask;
-import com.easyflowable.core.domain.entity.ActReDeployment;
+import com.easyflowable.core.domain.dto.Page;
+import com.easyflowable.core.domain.entity.DeploymentProcessDef;
 import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.ui.model.PageParams;
 import com.easyflowable.ui.model.Result;
-import com.mybatisflex.core.paginate.Page;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
@@ -32,7 +26,7 @@ import java.util.List;
 @RequestMapping("easy-flowable/deployment")
 public class EasyDeploymentResource {
 
-    @Autowired
+    @Autowired(required = false)
     private EasyDeploymentService deploymentService;
 
     /**
@@ -43,10 +37,8 @@ public class EasyDeploymentResource {
      * @Date: 2024-10-09 16:15:19
      */
     @PostMapping("page")
-    public Result<Page<DeploymentProcessDef>> page(@RequestBody PageParams<ActReDeployment> pageParams) {
-        ActReDeployment params = pageParams.getParams();
-        Page<ActReDeployment> page = pageParams.getPage();
-        return Result.success(deploymentService.page(page.getPageNumber(), page.getPageSize(), params));
+    public Result<Page<DeploymentProcessDef>> page(@RequestBody PageParams<DeploymentProcessDef> pageParams) {
+        return Result.success(deploymentService.page(pageParams.getCurrent(), pageParams.getSize(), pageParams.getParams()));
     }
 
     /**
