@@ -86,7 +86,7 @@ public class EasyFlowableResource {
         }
         List<EasyFlowableUiConfig.User> users = properties.getUi().getUsers();
         Optional<EasyFlowableUiConfig.User> first = users.stream().filter(i -> i.getUsername().equals(username)).findFirst();
-        if (first.isEmpty()) {
+        if (!first.isPresent()) {
             return Result.error("账号/密码错误");
         }
         EasyFlowableUiConfig.User user1 = first.get();

@@ -2,6 +2,7 @@ package com.easyflowable.core.service;
 
 import com.easyflowable.core.domain.dto.FlowComment;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
+import com.easyflowable.core.domain.dto.Option;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
 import com.easyflowable.core.domain.params.FlowExecuteParam;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -10,6 +11,7 @@ import org.flowable.task.api.Task;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @package: {@link com.easyflowable.core.service}
@@ -117,7 +119,7 @@ public interface EasyTaskService {
      * @Date: 2024-10-09 10:53:21
      */
     default void cancellationProcessInstance(FlowCancellationParam...cancellations) {
-        cancellationProcessInstance(Arrays.stream(cancellations).toList());
+        cancellationProcessInstance(Arrays.stream(cancellations).collect(Collectors.toList()));
     }
 
     /**
@@ -156,11 +158,19 @@ public interface EasyTaskService {
     /**
      * @param instance 运行实例
      * @param commentList 意见列表
-     * @Return: {@link FlowExecutionHistory}
+     * @return: {@link FlowExecutionHistory}
      * @Author: MoJie
      * @Date: 2024/10/31 19:39
      * @Description: 获取流程实例
      */
     FlowExecutionHistory getFlowExecutionHistory(HistoricActivityInstance instance, List<Comment> commentList);
 
+    /**
+     * @param taskId 任务ID
+     * @return: {@link List} {@link Option}
+     * @Author: MoJie
+     * @Date: 2024/11/9 16:43
+     * @Description: 根据任务节点获取下一节点的流程变量
+     */
+    List<Option> nextNodeVariables(String taskId);
 }

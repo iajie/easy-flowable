@@ -2,6 +2,7 @@ package com.easyflowable.starter;
 
 import com.easyflowable.core.config.EasyFlowableConfig;
 import com.easyflowable.core.config.EasyFlowableDataSourceConfig;
+import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.enums.HistoryLevelEnum;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyDeploymentService;
@@ -153,15 +154,7 @@ public class EasyFlowableAutoConfiguration {
      */
     private void printBanner(boolean isBanner) {
         if (isBanner) {
-            System.out.println("""
-                        ______                       ________                    __    __  \s
-                       / ____/___ ________  __      / ____/ /___ _      ______ _/ /_  / /__\s
-                      / __/ / __ `/ ___/ / / /_____/ /_  / / __ \\ | /| / / __ `/ __ \\/ / _ \\
-                     / /___/ /_/ (__  ) /_/ /_____/ __/ / / /_/ / |/ |/ / /_/ / /_/ / /  __/
-                    /_____/\\__,_/____/\\__, /     /_/   /_/\\____/|__/|__/\\__,_/_.___/_/\\___/\s
-                                     /____/                                                \s
-                                        |---- https://www.easy-flowable.online ----|\s
-                    """);
+            System.out.println(Constants.BANNER);
         }
     }
 

@@ -3,6 +3,7 @@ package com.easyflowable.starter.api;
 import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.FlowComment;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
+import com.easyflowable.core.domain.dto.Option;
 import com.easyflowable.core.domain.enums.FlowCommentType;
 import com.easyflowable.core.service.EasyUserService;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
@@ -11,8 +12,10 @@ import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyTaskService;
 import com.easyflowable.core.utils.StringUtils;
 import lombok.SneakyThrows;
+import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -43,6 +46,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     @Resource
     private HistoryService historyService;
     @Resource
+    private RepositoryService repositoryService;
+    @Resource
     private EasyUserService userInterface;
 
     @Override
@@ -72,7 +77,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         this.checkFlowable(task.getProcessInstanceId());
         if (executeParam.getFlowCommentType() != FlowCommentType.CANCELLATION &&
                 executeParam.getFlowCommentType() != FlowCommentType.RESUBMIT &&
-                executeParam.getFlowCommentType() != FlowCommentType.AGREE) {
+                executeParam.getFlowCommentType() != FlowCommentType.AGREE &&
+                executeParam.getFlowCommentType() != FlowCommentType.DEL_COMMENT) {
             // 保存流程审批意见
             this.saveFlowComment(task, executeParam);
         }
@@ -83,13 +89,11 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 this.complete(task, executeParam);
                 break;
             case REJECT:
-                // 保存流程审批意见
-                this.saveFlowComment(task, executeParam);
-                this.reject(task);
+                this.reject(task, executeParam);
                 break;
             case REBUT:
             case REVOCATION:
-                this.revocation(task);
+                this.revocation(task, executeParam);
                 break;
             case REJECT_TO_TASK:
                 this.rejectToTask(task, executeParam);
@@ -102,10 +106,20 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 // TODO 前加签/后加签
                 break;
             case DELEGATE:
-                this.taskService.delegateTask(taskId, executeParam.getUserId());
+                try {
+                    this.taskService.delegateTask(taskId, executeParam.getUserId());
+                } catch (Exception e) {
+                    this.taskService.deleteComment(executeParam.getCommentId());
+                    throw new EasyFlowableException("任务委派异常", e);
+                }
                 break;
             case ASSIGN:
-                taskService.setAssignee(task.getId(), executeParam.getUserId());
+                try {
+                    taskService.setAssignee(task.getId(), executeParam.getUserId());
+                } catch (Exception e) {
+                    this.taskService.deleteComment(executeParam.getCommentId());
+                    throw new EasyFlowableException("任务转办异常", e);
+                }
                 break;
             case DEL_COMMENT:
                 Comment comment = taskService.getComment(executeParam.getCommentId());
@@ -168,6 +182,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         }
         if (param.isComment()) {
             this.addComment(flowComment);
+            param.setCommentId(flowComment.getCommentId());
         }
     }
 
@@ -186,6 +201,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 this.saveFlowComment(task, param);
                 taskService.resolveTask(task.getId(), param.getVariables());
             } else {
+                taskService.deleteComment(param.getCommentId());
                 throw new EasyFlowableException("当前任务已被委派，您不是被委派的人，无法执行任务！");
             }
         } else {
@@ -197,45 +213,65 @@ public class EasyTaskServiceImpl implements EasyTaskService {
             }
             // 保存流程审批意见
             this.saveFlowComment(task, param);
-            // 执行任务
-            taskService.complete(task.getId(), param.getVariables());
+            try {
+                // 执行任务
+                taskService.complete(task.getId(), param.getVariables());
+            } catch (Exception e) {
+                taskService.deleteComment(param.getCommentId());
+                throw new EasyFlowableException("任务执行异常", e);
+            }
         }
     }
 
     /**
      * 撤回到初始节点
      * 发起人撤回申请/驳回到初始节点
-     * @param task 任务信息
+     *
+     * @param task         任务信息
+     * @param executeParam 执行参数
      * @Author: MoJie
      * @Date: 2024-10-09 15:15:37
      */
-    private void revocation(Task task) {
-        // 获取所有任务节点
-        List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).orderByHistoricTaskInstanceStartTime().asc().list();
-        // 发起申请任务节点
-        String startTaskKey = taskInstances.get(0).getTaskDefinitionKey();
-        // 撤回任务到初始节点
-        runtimeService.createChangeActivityStateBuilder()
-                // 流程实例
-                .processInstanceId(task.getProcessInstanceId())
-                // 当前任务节点-->指定任务节点
-                .moveActivityIdTo(task.getTaskDefinitionKey(), startTaskKey)
-                .changeState();
+    private void revocation(Task task, FlowExecuteParam executeParam) {
+        try {
+            // 获取所有任务节点
+            List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).orderByHistoricTaskInstanceStartTime().asc().list();
+            // 发起申请任务节点
+            String startTaskKey = taskInstances.get(0).getTaskDefinitionKey();
+            // 撤回任务到初始节点
+            runtimeService.createChangeActivityStateBuilder()
+                    // 流程实例
+                    .processInstanceId(task.getProcessInstanceId())
+                    // 当前任务节点-->指定任务节点
+                    .moveActivityIdTo(task.getTaskDefinitionKey(), startTaskKey)
+                    .changeState();
+        } catch (Exception e) {
+            this.taskService.deleteComment(executeParam.getCommentId());
+            throw new EasyFlowableException("任务撤回异常", e);
+        }
+
     }
 
     /**
      * 驳回任务-回退到上一节点
-     * @param task 任务
+     *
+     * @param task         任务
+     * @param executeParam 执行参数
      * @Author: MoJie
      * @Date: 2024-10-09 15:17:30
      */
-    private void reject(Task task) {
-        // 获取上次执行节点
-        String upNodeKey = this.getUpNodeKey(task.getId());
-        runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(task.getProcessInstanceId())
-                .moveActivityIdTo(task.getTaskDefinitionKey(), upNodeKey)
-                .changeState();
+    private void reject(Task task, FlowExecuteParam executeParam) {
+        try {
+            // 获取上次执行节点
+            String upNodeKey = this.getUpNodeKey(task.getId());
+            runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .moveActivityIdTo(task.getTaskDefinitionKey(), upNodeKey)
+                    .changeState();
+        } catch (Exception e) {
+            this.taskService.deleteComment(executeParam.getCommentId());
+            throw new EasyFlowableException("驳回任务异常", e);
+        }
     }
 
     /**
@@ -246,13 +282,19 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      * @Date: 2024-10-09 15:18:12
      */
     private void rejectToTask(Task task, FlowExecuteParam param) {
-        if (StringUtils.isBlank(param.getRejectToTaskId())) {
-            throw new EasyFlowableException("未指定驳回的任务ID，操作失败！");
+        try {
+            if (StringUtils.isBlank(param.getRejectToTaskId())) {
+                throw new EasyFlowableException("未指定驳回的任务ID，操作失败！");
+            }
+            runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .moveActivityIdTo(task.getTaskDefinitionKey(), param.getRejectToTaskId())
+                    .changeState();
+        } catch (Exception e) {
+            this.taskService.deleteComment(param.getCommentId());
+            throw new EasyFlowableException("驳回到指定任务异常", e);
         }
-        runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(task.getProcessInstanceId())
-                .moveActivityIdTo(task.getTaskDefinitionKey(), param.getRejectToTaskId())
-                .changeState();
+
     }
 
     @Override
@@ -261,8 +303,9 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         // 流程全局线程信息
         Authentication.setAuthenticatedUserId(flowComment.getAssignee());
         // 将审批意见转json存
-        taskService.addComment(flowComment.getTaskId(), flowComment.getProcessInstanceId(),
+        Comment comment = taskService.addComment(flowComment.getTaskId(), flowComment.getProcessInstanceId(),
                 flowComment.getFlowCommentType(), StringUtils.toJson(flowComment));
+        flowComment.setCommentId(comment.getId());
         // 清除线程数据
         Authentication.setAuthenticatedUserId(null);
     }
@@ -345,7 +388,12 @@ public class EasyTaskServiceImpl implements EasyTaskService {
             flowComment.setCommentContent(cancellation.getCancellationCause());
             flowComment.setFlowCommentType(FlowCommentType.CANCELLATION.getCode());
             this.addComment(flowComment);
-            runtimeService.deleteProcessInstance(cancellation.getProcessInstanceId(), cancellation.getCancellationCause());
+            try {
+                runtimeService.deleteProcessInstance(cancellation.getProcessInstanceId(), cancellation.getCancellationCause());
+            } catch (Exception e) {
+                taskService.deleteComment(flowComment.getCommentId());
+                throw new EasyFlowableException("流程作废异常", e);
+            }
         }
     }
 
@@ -357,7 +405,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 .finished()
                 .orderByHistoricTaskInstanceEndTime().desc()
                 .list();
-        HistoricTaskInstance instance = list.get(0);
+        HistoricTaskInstance instance = list.get(1);
         return instance.getTaskDefinitionKey();
     }
 
@@ -396,5 +444,29 @@ public class EasyTaskServiceImpl implements EasyTaskService {
             }
         }
         return executionHistory;
+    }
+
+    @Override
+    public List<Option> nextNodeVariables(String taskId) {
+        List<Option> list = new ArrayList<>();
+        Task task = this.getFlowTask(taskId);
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(task.getProcessDefinitionId());
+        // 当前任务节点
+        FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
+        List<SequenceFlow> outgoingFlows = ((FlowNode)flowElement).getOutgoingFlows();
+        for (SequenceFlow outgoingFlow : outgoingFlows) {
+            FlowElement targetElement = outgoingFlow.getTargetFlowElement();
+            if (targetElement instanceof ExclusiveGateway) {
+                ExclusiveGateway gateway = (ExclusiveGateway) targetElement;
+                List<SequenceFlow> outgoingFlows1 = gateway.getOutgoingFlows();
+                if (outgoingFlows1.size() > 1) {
+                    for (SequenceFlow sequenceFlow : outgoingFlows1) {
+                        FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
+                        list.add(new Option(targetFlowElement.getName(), sequenceFlow.getConditionExpression()));
+                    }
+                }
+            }
+        }
+        return list;
     }
 }

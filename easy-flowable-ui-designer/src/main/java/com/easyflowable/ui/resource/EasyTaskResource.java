@@ -2,6 +2,7 @@ package com.easyflowable.ui.resource;
 
 import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.FlowUserTask;
+import com.easyflowable.core.domain.dto.Option;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
 import com.easyflowable.core.domain.params.FlowExecuteParam;
 import com.easyflowable.core.service.EasyTaskService;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
@@ -134,4 +134,8 @@ public class EasyTaskResource {
         return Result.success(easyTaskService.getUserTaskOrganIds(taskId));
     }
 
+    @GetMapping(value = "nextNodeVariables/{taskId}")
+    public Result<List<Option>> nextNodeVariables(@PathVariable String taskId) {
+        return Result.success(easyTaskService.nextNodeVariables(taskId));
+    }
 }
