@@ -462,8 +462,28 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 if (outgoingFlows1.size() > 1) {
                     for (SequenceFlow sequenceFlow : outgoingFlows1) {
                         FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
-                        list.add(new Option(targetFlowElement.getName(), sequenceFlow.getConditionExpression()));
+                        if (StringUtils.isNotBlank(sequenceFlow.getSkipExpression())) {
+                            list.add(new Option(targetFlowElement.getName() + "(跳过表达式)", sequenceFlow.getSkipExpression()));
+                        }
+                        if (StringUtils.isNotBlank(sequenceFlow.getConditionExpression())) {
+                            list.add(new Option(targetFlowElement.getName(), sequenceFlow.getConditionExpression()));
+                        }
                     }
+                }
+            } else if (targetElement instanceof UserTask) {
+                UserTask userTask = (UserTask) targetElement;
+                if (StringUtils.isNotBlank(userTask.getSkipExpression())) {
+                    list.add(new Option(userTask.getName(), userTask.getSkipExpression()));
+                }
+            } else if (targetElement instanceof ScriptTask) {
+                ScriptTask scriptTask = (ScriptTask) targetElement;
+                if (StringUtils.isNotBlank(scriptTask.getSkipExpression())) {
+                    list.add(new Option(scriptTask.getName(), scriptTask.getSkipExpression()));
+                }
+            } else if (targetElement instanceof ServiceTask) {
+                ServiceTask serviceTask = (ServiceTask) targetElement;
+                if (StringUtils.isNotBlank(serviceTask.getSkipExpression())) {
+                    list.add(new Option(serviceTask.getName(), serviceTask.getSkipExpression()));
                 }
             }
         }
