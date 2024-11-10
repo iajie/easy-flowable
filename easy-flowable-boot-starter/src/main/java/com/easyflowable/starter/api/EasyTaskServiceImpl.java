@@ -462,9 +462,6 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 if (outgoingFlows1.size() > 1) {
                     for (SequenceFlow sequenceFlow : outgoingFlows1) {
                         FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
-                        if (StringUtils.isNotBlank(sequenceFlow.getSkipExpression())) {
-                            list.add(new Option(targetFlowElement.getName() + "(跳过表达式)", sequenceFlow.getSkipExpression()));
-                        }
                         if (StringUtils.isNotBlank(sequenceFlow.getConditionExpression())) {
                             list.add(new Option(targetFlowElement.getName(), sequenceFlow.getConditionExpression()));
                         }
@@ -473,17 +470,17 @@ public class EasyTaskServiceImpl implements EasyTaskService {
             } else if (targetElement instanceof UserTask) {
                 UserTask userTask = (UserTask) targetElement;
                 if (StringUtils.isNotBlank(userTask.getSkipExpression())) {
-                    list.add(new Option(userTask.getName(), userTask.getSkipExpression()));
+                    list.add(new Option(userTask.getName() + "(跳过表达式)", userTask.getSkipExpression()));
                 }
             } else if (targetElement instanceof ScriptTask) {
                 ScriptTask scriptTask = (ScriptTask) targetElement;
                 if (StringUtils.isNotBlank(scriptTask.getSkipExpression())) {
-                    list.add(new Option(scriptTask.getName(), scriptTask.getSkipExpression()));
+                    list.add(new Option(scriptTask.getName() + "(跳过表达式)", scriptTask.getSkipExpression()));
                 }
             } else if (targetElement instanceof ServiceTask) {
                 ServiceTask serviceTask = (ServiceTask) targetElement;
                 if (StringUtils.isNotBlank(serviceTask.getSkipExpression())) {
-                    list.add(new Option(serviceTask.getName(), serviceTask.getSkipExpression()));
+                    list.add(new Option(serviceTask.getName() + "(跳过表达式)", serviceTask.getSkipExpression()));
                 }
             }
         }
