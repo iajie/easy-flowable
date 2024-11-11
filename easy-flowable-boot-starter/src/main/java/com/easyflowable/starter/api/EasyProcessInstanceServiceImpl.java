@@ -27,13 +27,13 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.history.HistoricTaskInstance;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @package: {@link com.easyflowable.starter.api}
@@ -245,14 +245,16 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
                 .orderByHistoricActivityInstanceEndTime().asc() // 按执行结束时间排序
                 .list();
         if (userTask.size() > 0) {
-            // 排除网关 存在并行网关 执行会签完成--返回上一节点时，为网关
+            Task task = this.taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+            // 排除网关 存在并行网关 执行会签完成--返回上一节点时，为网关,且不是当前节点
             for (HistoricActivityInstance historicActivityInstance : userTask) {
-                if (!checkTaskGateway(historicActivityInstance)) {
-                    list.add(new Option(historicActivityInstance.getActivityId(), historicActivityInstance.getActivityName()));
+                if (!checkTaskGateway(historicActivityInstance) &&
+                        !task.getTaskDefinitionKey().equals(historicActivityInstance.getActivityId())) {
+                    list.add(new Option(historicActivityInstance.getActivityName(), historicActivityInstance.getActivityId()));
                 }
             }
         }
-        return list;
+        return list.stream().distinct().collect(Collectors.toList());
     }
 
     @Override
@@ -297,13 +299,14 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     @Override
     public String getUpNodeKey(String processInstanceId) {
         // 获取历史任务节点
-        List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
+        List<HistoricActivityInstance> userTask = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstanceId)
-                .finished()
-                .orderByHistoricTaskInstanceEndTime().desc()
+                .activityType("userTask")
+                .finished() // 已经执行结束的节点
+                .orderByHistoricActivityInstanceEndTime().desc() // 按执行结束时间排序
                 .list();
-        HistoricTaskInstance instance = list.get(0);
-        return instance.getTaskDefinitionKey();
+        HistoricActivityInstance instance = userTask.get(0);
+        return instance.getActivityId();
     }
 
     public List<FlowProcessInstanceHistory> getFlowInstanceHistoryList(String key, boolean isDeployment) {

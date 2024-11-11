@@ -399,14 +399,16 @@ public class EasyTaskServiceImpl implements EasyTaskService {
 
     @Override
     public String getUpNodeKey(String taskId) {
+        Task flowTask = this.getFlowTask(taskId);
         // 获取历史任务节点
-        List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
-                .taskId(taskId)
-                .finished()
-                .orderByHistoricTaskInstanceEndTime().desc()
+        List<HistoricActivityInstance> userTask = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(flowTask.getProcessInstanceId())
+                .activityType("userTask")
+                .finished() // 已经执行结束的节点
+                .orderByHistoricActivityInstanceEndTime().desc() // 按执行结束时间排序
                 .list();
-        HistoricTaskInstance instance = list.get(1);
-        return instance.getTaskDefinitionKey();
+        HistoricActivityInstance instance = userTask.get(0);
+        return instance.getActivityId();
     }
 
     @Override
