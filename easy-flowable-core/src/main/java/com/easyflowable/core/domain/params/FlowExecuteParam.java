@@ -58,7 +58,7 @@ public class FlowExecuteParam {
     /**
      * 审批意见
      */
-    private String commentContent;
+    private Object commentContent;
 
     /**
      * 变量参数

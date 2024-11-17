@@ -1,5 +1,6 @@
 package com.easyflowable.ui.resource;
 
+import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.FlowUserTask;
 import com.easyflowable.core.domain.dto.Page;
 import com.easyflowable.core.domain.entity.DeploymentProcessDef;
@@ -10,7 +11,6 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
@@ -23,7 +23,6 @@ import java.util.List;
  * @Author: MoJie
  */
 @RestController
-@RequestMapping("easy-flowable/deployment")
 public class EasyDeploymentResource {
 
     @Autowired(required = false)
@@ -36,7 +35,7 @@ public class EasyDeploymentResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:15:19
      */
-    @PostMapping("page")
+    @PostMapping(Constants.EASY_FLOWABLE + "/deployment/page")
     public Result<Page<DeploymentProcessDef>> page(@RequestBody PageParams<DeploymentProcessDef> pageParams) {
         return Result.success(deploymentService.page(pageParams.getCurrent(), pageParams.getSize(), pageParams.getParams()));
     }
@@ -48,7 +47,7 @@ public class EasyDeploymentResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:19:05
      */
-    @GetMapping(value = "/{modelId}")
+    @GetMapping(Constants.EASY_FLOWABLE + "/deployment/{modelId}")
     public Result<String> deploymentModel(@PathVariable String modelId) {
         return Result.success("流程部署成功！", deploymentService.deploymentModel(modelId));
     }
@@ -61,7 +60,7 @@ public class EasyDeploymentResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:20:04
      */
-    @GetMapping(value = "deleteDeployment")
+    @GetMapping(Constants.EASY_FLOWABLE + "/deployment/deleteDeployment")
     public Result<String> deleteDeployment(@RequestParam String deploymentId, @RequestParam Boolean cascade) {
         if (cascade == null) {
             cascade = false;
@@ -78,7 +77,7 @@ public class EasyDeploymentResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:21:06
      */
-    @GetMapping(value = "deploymentState/{processDefinitionId}")
+    @GetMapping(Constants.EASY_FLOWABLE + "/deployment/deploymentState/{processDefinitionId}")
     public Result<String> deploymentState(@PathVariable String processDefinitionId) {
         return Result.success("流程定义状态设置成功！", deploymentService.deploymentState(processDefinitionId));
     }
@@ -90,7 +89,7 @@ public class EasyDeploymentResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:21:50
      */
-    @GetMapping(value = "flowUserList/{flowKey}")
+    @GetMapping(Constants.EASY_FLOWABLE + "/deployment/flowUserList/{flowKey}")
     public Result<List<FlowUserTask>> getFlowUserTaskList(@PathVariable String flowKey) {
         return Result.success(deploymentService.getAllFlowUserTask(flowKey));
     }
@@ -102,7 +101,7 @@ public class EasyDeploymentResource {
      * @Date: 2024-10-09 16:21:50
      */
     @SneakyThrows
-    @GetMapping(value = "deploymentImage/{processDefinitionId}")
+    @GetMapping(Constants.EASY_FLOWABLE + "/deployment/deploymentImage/{processDefinitionId}")
     public void deploymentImage(@PathVariable String processDefinitionId, HttpServletResponse response) {
         InputStream inputStream = deploymentService.getFlowImage(processDefinitionId);
         response.setContentType("image/png");
@@ -115,7 +114,7 @@ public class EasyDeploymentResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:21:50
      */
-    @GetMapping(value = "deploymentXml/{processDefinitionId}")
+    @GetMapping(Constants.EASY_FLOWABLE + "/deployment/deploymentXml/{processDefinitionId}")
     public Result<String> deploymentXml(@PathVariable String processDefinitionId) {
         return Result.success("获取成功", deploymentService.getFlowXml(processDefinitionId));
     }

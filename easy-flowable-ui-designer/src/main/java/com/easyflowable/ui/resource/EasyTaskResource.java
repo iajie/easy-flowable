@@ -2,7 +2,6 @@ package com.easyflowable.ui.resource;
 
 import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.FlowUserTask;
-import com.easyflowable.core.domain.dto.Option;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
 import com.easyflowable.core.domain.params.FlowExecuteParam;
 import com.easyflowable.core.service.EasyTaskService;
@@ -18,6 +17,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @package: {@link com.easyflowable.ui.resource}
@@ -26,7 +26,6 @@ import java.util.List;
  * @Author: MoJie
  */
 @RestController
-@RequestMapping("easy-flowable/task")
 public class EasyTaskResource {
 
     @Autowired(required = false)
@@ -41,7 +40,7 @@ public class EasyTaskResource {
      * @Author: MoJie
      * @Date: 2024-10-09 17:05:06
      */
-    @PostMapping(value = "execute")
+    @PostMapping(value = Constants.EASY_FLOWABLE + "/task/execute")
     public Result<?> execute(@RequestBody FlowExecuteParam param) {
         easyTaskService.executeNextStep(param);
         return Result.success();
@@ -57,7 +56,7 @@ public class EasyTaskResource {
      * @Description: 上传附件,返回附件ID
      */
     @SneakyThrows
-    @PostMapping(value = "addAttachment")
+    @PostMapping(value = Constants.EASY_FLOWABLE + "/task/addAttachment")
     public Result<String> addAttachment(@RequestBody MultipartFile file, String taskId, String processInstanceId) {
         Attachment attachment = taskService.createAttachment(Constants.FILE, taskId, processInstanceId,
                 file.getOriginalFilename(), null, file.getInputStream());
@@ -71,7 +70,7 @@ public class EasyTaskResource {
      * @Date: 2024/10/29 19:28
      * @Description: 删除附件
      */
-    @GetMapping(value = "delAttachment/{attachmentId}")
+    @GetMapping(value = Constants.EASY_FLOWABLE + "/task/delAttachment/{attachmentId}")
     public Result<String> delAttachment(@PathVariable String attachmentId) {
         this.taskService.deleteAttachment(attachmentId);
         return Result.success();
@@ -85,7 +84,7 @@ public class EasyTaskResource {
      * @Description: 获取附件
      */
     @SneakyThrows
-    @GetMapping(value = "getAttachment/{attachmentId}")
+    @GetMapping(value = Constants.EASY_FLOWABLE + "/task/getAttachment/{attachmentId}")
     public void getAttachment(@PathVariable String attachmentId, HttpServletResponse response) {
         try (ServletOutputStream out = response.getOutputStream();
              InputStream in = taskService.getAttachmentContent(attachmentId)) {
@@ -104,7 +103,7 @@ public class EasyTaskResource {
      * @Author: MoJie
      * @Date: 2024-10-09 17:06:15
      */
-    @PostMapping(value = "cancellation")
+    @PostMapping(value = Constants.EASY_FLOWABLE + "/task/cancellation")
     public Result<?> cancellation(@RequestBody FlowCancellationParam cancellation) {
         easyTaskService.cancellationProcessInstance(cancellation);
         return Result.success();
@@ -117,7 +116,7 @@ public class EasyTaskResource {
      * @Author: MoJie
      * @Date: 2024-10-09 17:06:59
      */
-    @GetMapping(value = "executors/{taskId}")
+    @GetMapping(value = Constants.EASY_FLOWABLE + "/task/executors/{taskId}")
     public Result<List<String>> getUserTaskExecutors(@PathVariable String taskId) {
         return Result.success(easyTaskService.getUserTaskExecutors(taskId, false));
     }
@@ -129,13 +128,13 @@ public class EasyTaskResource {
      * @Author: MoJie
      * @Date: 2024-10-09 17:08:34
      */
-    @GetMapping(value = "executeOrgan/{taskId}")
+    @GetMapping(value = Constants.EASY_FLOWABLE + "/task/executeOrgan/{taskId}")
     public Result<List<String>> executeOrgan(@PathVariable String taskId) {
         return Result.success(easyTaskService.getUserTaskOrganIds(taskId));
     }
 
-    @GetMapping(value = "nextNodeVariables/{taskId}")
-    public Result<List<Option>> nextNodeVariables(@PathVariable String taskId) {
+    @GetMapping(value = Constants.EASY_FLOWABLE + "/task/nextNodeVariables/{taskId}")
+    public Result<Map<String, Object>> nextNodeVariables(@PathVariable String taskId) {
         return Result.success(easyTaskService.nextNodeVariables(taskId));
     }
 }

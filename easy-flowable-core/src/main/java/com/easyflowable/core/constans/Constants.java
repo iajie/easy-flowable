@@ -11,6 +11,7 @@ public class Constants {
     public static final String EASY_FLOWABLE = "easy-flowable";
 
     public final static String SEQUENCE_FLOW = "sequenceFlow";
+    public final static String USER_TASK = "userTask";
     public final static String GATEWAY = "Gateway";
     public final static String EVENT = "Event";
 

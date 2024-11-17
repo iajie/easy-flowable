@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
  * @Description: 自定义实现信息获取
  * @Author: MoJie
  */
-@Component
 public class EasyFlowableInterfaceImpl implements EasyUserService {
 
     @Override

@@ -1,11 +1,9 @@
 package com.easyflowable.ui;
 
 import com.easyflowable.core.service.EasyUserService;
-import com.easyflowable.starter.EasyFlowableAutoConfiguration;
 import com.easyflowable.ui.config.EasyFlowableInterfaceImpl;
-import com.easyflowable.ui.config.MvConfiguration;
 import com.easyflowable.ui.resource.*;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +18,7 @@ import org.springframework.context.annotation.Configuration;
 public class EasyFlowableUiAutoConfiguration {
 
     @Bean
-    public MvConfiguration mvConfiguration() {
-        return new MvConfiguration();
-    }
-
-    @Bean
+    @ConditionalOnMissingBean
     public EasyUserService easyUserService() {
         return new EasyFlowableInterfaceImpl();
     }

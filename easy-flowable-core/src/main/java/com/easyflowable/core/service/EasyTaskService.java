@@ -11,6 +11,7 @@ import org.flowable.task.api.Task;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +45,11 @@ public interface EasyTaskService {
      * @Author: MoJie
      * @Date: 2024-10-09 10:49:49
      */
-    Task getFlowTask(String taskId);
+    Task getFlowTask(String taskId, boolean exception);
+
+    default Task getFlowTask(String taskId) {
+        return getFlowTask(taskId, true);
+    }
 
     /**
      * 根据实例ID获取流程执行历史记录
@@ -130,7 +135,7 @@ public interface EasyTaskService {
      */
     default void cancellationProcessInstance(FlowExecuteParam executeParam) {
         FlowCancellationParam cancellationParam = new FlowCancellationParam();
-        cancellationParam.setCancellationCause(executeParam.getCommentContent());
+        cancellationParam.setCancellationCause(executeParam.getCommentContent().toString());
         cancellationParam.setTaskId(executeParam.getTaskId());
         cancellationParam.setProcessInstanceId(executeParam.getProcessInstanceId());
         cancellationParam.setAssignee(executeParam.getAssignee());
@@ -170,7 +175,8 @@ public interface EasyTaskService {
      * @return: {@link List} {@link Option}
      * @Author: MoJie
      * @Date: 2024/11/9 16:43
-     * @Description: 根据任务节点获取下一节点的流程变量
+     * @Description: 根据任务节点获取下一节点的流程变量和当前节点的拓展参数
      */
-    List<Option> nextNodeVariables(String taskId);
+    Map<String, Object> nextNodeVariables(String taskId);
+
 }

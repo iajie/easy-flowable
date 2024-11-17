@@ -1,28 +1,25 @@
 package com.easyflowable.ui.config;
 
 import com.easyflowable.core.config.EasyFlowableUiConfig;
-import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.utils.StringUtils;
 import com.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.easyflowable.ui.context.EasyFlowableContext;
 import com.easyflowable.ui.model.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.common.engine.api.FlowableException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Optional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @package: {@link com.easyflowable.ui.config}
@@ -30,7 +27,9 @@ import javax.servlet.http.HttpServletResponse;
  * @Description: 配置静态资源访问
  * @Author: MoJie
  */
+@EnableWebMvc
 @Configuration
+@ConditionalOnProperty(prefix = "easy-flowable", name = "enable", havingValue = "true", matchIfMissing = true)
 public class MvConfiguration implements WebMvcConfigurer {
 
     @Resource
@@ -39,15 +38,17 @@ public class MvConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler(properties.getUi().getPath() + "/**")
-                .addResourceLocations("classpath:/static/", "classpath:/static/flowable/");
+                .addResourceLocations("classpath:/META-INF/resources/easy-flowable/");
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/easy-flowable")
-                .setViewName("redirect:/" + properties.getUi().getPath() + "/index.html");
+        registry.addViewController(properties.getUi().getPath())
+                .setViewName("redirect:" + properties.getUi().getPath() + "/index.html");
         registry.addViewController("/flowable/index.html")
-                .setViewName("redirect:/" + properties.getUi().getPath() + "/index.html");
+                .setViewName("redirect:" + properties.getUi().getPath() + "/index.html");
+        registry.addViewController("/flowable")
+                .setViewName("redirect:" + properties.getUi().getPath() + "/index.html");
     }
 
     @Override
@@ -63,7 +64,7 @@ public class MvConfiguration implements WebMvcConfigurer {
                 if (StringUtils.isNotBlank(organId)) {
                     EasyFlowableContext.setLocal(EasyFlowableContext.ORGAN_ID, organId);
                 }
-                if (properties.getUi().isLogin() && !"/easy-flowable/login".equals(request.getRequestURI())) {
+                if (properties.getUi().isLogin() && !(properties.getUi().getPath() + "/login").equals(request.getRequestURI())) {
                     Object username = request.getSession().getAttribute("username");
                     if (username == null) {
                         response.setStatus(401);

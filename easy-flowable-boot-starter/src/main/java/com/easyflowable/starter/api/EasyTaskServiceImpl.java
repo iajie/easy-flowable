@@ -10,6 +10,7 @@ import com.easyflowable.core.domain.params.FlowCancellationParam;
 import com.easyflowable.core.domain.params.FlowExecuteParam;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyTaskService;
+import com.easyflowable.core.utils.BpmnUtils;
 import com.easyflowable.core.utils.StringUtils;
 import lombok.SneakyThrows;
 import org.flowable.bpmn.model.*;
@@ -28,8 +29,8 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @package: {@link com.easyflowable.starter.api}
@@ -76,7 +77,6 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         // 1.执行前检查流程
         this.checkFlowable(task.getProcessInstanceId());
         if (executeParam.getFlowCommentType() != FlowCommentType.CANCELLATION &&
-                executeParam.getFlowCommentType() != FlowCommentType.RESUBMIT &&
                 executeParam.getFlowCommentType() != FlowCommentType.AGREE &&
                 executeParam.getFlowCommentType() != FlowCommentType.DEL_COMMENT) {
             // 保存流程审批意见
@@ -84,10 +84,10 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         }
         // 3.执行(暂存没有操作，就单纯添加审批意见)
         switch (executeParam.getFlowCommentType()) {
-            case RESUBMIT:
             case AGREE:
                 this.complete(task, executeParam);
                 break;
+            case RESUBMIT: // 重新提交回到上次驳回节点
             case REJECT:
                 this.reject(task, executeParam);
                 break;
@@ -170,15 +170,35 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         flowComment.setAssignee(param.getAssignee());
         flowComment.setAssigneeName(param.getAssigneeName());
         flowComment.setProcessInstanceId(task.getProcessInstanceId());
-        flowComment.setCommentContent(param.getCommentContent());
         flowComment.setFlowCommentType(param.getFlowCommentType().getCode());
         flowComment.setVariables(param.getVariables());
         flowComment.setAttachmentId(param.getAttachmentId());
         flowComment.setUserId(param.getUserId());
-        if (param.isForm()) {
-            flowComment.setExt(param.getCommentContent());
-            flowComment.setForm(true);
-            flowComment.setCommentContent(param.getAssigneeName() + "重新提交了信息。");
+        Object commentContent = param.getCommentContent();
+        if (FlowCommentType.RESUBMIT == param.getFlowCommentType()) {
+            // 上次提交信息
+            Object upSubmitForm = this.upNodeSubmitForm(task);
+            if (upSubmitForm != null) {
+                if (commentContent instanceof String) {
+                    if (!StringUtils.isJson((String) commentContent)) {
+                        throw new EasyFlowableException("流程表单数据需要JSON字符串或被@EasyItem注解所标记的实体");
+                    }
+                    flowComment.setExt(commentContent.toString());
+                } else if (StringUtils.isAnnotationEasyItem(commentContent)) {
+                    Object upForm = StringUtils.toJava((String) upSubmitForm, commentContent.getClass());
+                    // 获取上次提交信息
+                    Map<String, Object> map = StringUtils.screenTwoProperty(commentContent, upForm);
+                    flowComment.setExt(StringUtils.toJson(map));
+                    flowComment.setForm(true);
+                } else {
+                    flowComment.setExt(StringUtils.toJson(commentContent));
+                }
+                flowComment.setCommentContent(param.getAssigneeName() + "重新提交了信息。");
+            } else {
+                flowComment.setCommentContent(commentContent.toString());
+            }
+        } else {
+            flowComment.setCommentContent(commentContent.toString());
         }
         if (param.isComment()) {
             this.addComment(flowComment);
@@ -235,7 +255,9 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     private void revocation(Task task, FlowExecuteParam executeParam) {
         try {
             // 获取所有任务节点
-            List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).orderByHistoricTaskInstanceStartTime().asc().list();
+            List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .orderByHistoricTaskInstanceStartTime().asc().list();
             // 发起申请任务节点
             String startTaskKey = taskInstances.get(0).getTaskDefinitionKey();
             // 撤回任务到初始节点
@@ -310,10 +332,42 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         Authentication.setAuthenticatedUserId(null);
     }
 
+    /**
+     * @param task 任务对象
+     * @return: {@link Object}
+     * @Author: MoJie
+     * @Date: 2024/11/17 12:18
+     * @Description: 获取上次提交的表单信息
+     */
+    private Object upNodeSubmitForm(Task task) {
+        // 重新提交的实例
+        List<Comment> resubmitComments = this.taskService.getProcessInstanceComments(task.getProcessInstanceId(),
+                FlowCommentType.RESUBMIT.getCode());
+        if (resubmitComments.size() > 0) {
+            // 按时间倒序
+            List<Comment> collect = resubmitComments.stream()
+                    .sorted(Comparator.comparing(Comment::getTime).reversed())
+                    .collect(Collectors.toList());
+            // 获取最新的信息
+            String fullMessage = collect.get(0).getFullMessage();
+            Map<String, Object> map = StringUtils.toMap(fullMessage);
+            if (map.containsKey("ext")) {
+                return map.get("ext");
+            }
+        }
+        List<Comment> startCommit = this.taskService.getProcessInstanceComments(task.getProcessInstanceId(), FlowCommentType.START.getCode());
+        String fullMessage = startCommit.get(0).getFullMessage();
+        Map<String, Object> map = StringUtils.toMap(fullMessage);
+        if (map.containsKey("ext")) {
+            return map.get("ext");
+        }
+        return null;
+    }
+
     @Override
-    public Task getFlowTask(String taskId) {
+    public Task getFlowTask(String taskId, boolean exception) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        if (task == null) {
+        if (task == null && exception) {
             throw new EasyFlowableException("未查询到任务信息，操作中断！");
         }
         return task;
@@ -344,30 +398,32 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     @Override
     public List<String> getUserTaskExecutorList(String taskId, boolean isMainer, boolean isGroup) {
         List<String> list = new ArrayList<>();
-        Task flowTask = this.getFlowTask(taskId);
-        if (isMainer) {
-            list.add(flowTask.getAssignee());
-        } else {
-            // 获取候选人信息
-            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-            if (!identityLinks.isEmpty()) {
-                for (IdentityLink identityLink : identityLinks) {
-                    // 不为候选都跳过
-                    if (!IdentityLinkType.CANDIDATE.equalsIgnoreCase(identityLink.getType())) {
-                        continue;
-                    }
-                    if (isGroup) {
-                        // candidate候选人类型 用户id不为空
-                        if (StringUtils.isNotBlank(identityLink.getGroupId()) && !list.contains(identityLink.getGroupId())) {
-                            list.add(identityLink.getGroupId());
+        Task flowTask = this.getFlowTask(taskId, false);
+        if (flowTask != null) {
+            if (isMainer) {
+                list.add(flowTask.getAssignee());
+            } else {
+                // 获取候选人信息
+                List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+                if (!identityLinks.isEmpty()) {
+                    for (IdentityLink identityLink : identityLinks) {
+                        // 不为候选都跳过
+                        if (!IdentityLinkType.CANDIDATE.equalsIgnoreCase(identityLink.getType())) {
+                            continue;
                         }
-                    } else {
-                        // candidate候选人类型 用户id不为空
-                        if (StringUtils.isNotBlank(identityLink.getUserId()) && !list.contains(identityLink.getUserId())) {
-                            list.add(identityLink.getUserId());
+                        if (isGroup) {
+                            // candidate候选人类型 用户id不为空
+                            if (StringUtils.isNotBlank(identityLink.getGroupId()) && !list.contains(identityLink.getGroupId())) {
+                                list.add(identityLink.getGroupId());
+                            }
+                        } else {
+                            // candidate候选人类型 用户id不为空
+                            if (StringUtils.isNotBlank(identityLink.getUserId()) && !list.contains(identityLink.getUserId())) {
+                                list.add(identityLink.getUserId());
+                            }
                         }
-                    }
 
+                    }
                 }
             }
         }
@@ -403,7 +459,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         // 获取历史任务节点
         List<HistoricActivityInstance> userTask = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(flowTask.getProcessInstanceId())
-                .activityType("userTask")
+                .activityType(Constants.USER_TASK)
                 .finished() // 已经执行结束的节点
                 .orderByHistoricActivityInstanceEndTime().desc() // 按执行结束时间排序
                 .list();
@@ -449,23 +505,51 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     }
 
     @Override
-    public List<Option> nextNodeVariables(String taskId) {
+    public Map<String, Object> nextNodeVariables(String taskId) {
         List<Option> list = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
         Task task = this.getFlowTask(taskId);
         BpmnModel bpmnModel = repositoryService.getBpmnModel(task.getProcessDefinitionId());
         // 当前任务节点
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
+        if (flowElement instanceof UserTask) {
+            UserTask userTask = (UserTask) flowElement;
+            Map<String, Object> taskAttributes = BpmnUtils.getTaskAttributes(userTask.getAttributes());
+            if (taskAttributes.containsKey("actions")) {
+                String actions = taskAttributes.get("actions").toString();
+                taskAttributes.put("actions", Arrays.asList(actions.split(",")));
+            }
+            map.put("attributes", taskAttributes);
+            List<SequenceFlow> outgoingFlows = userTask.getOutgoingFlows();
+            for (SequenceFlow outgoingFlow : outgoingFlows) {
+                FlowElement targetFlowElement = outgoingFlow.getTargetFlowElement();
+                if (targetFlowElement instanceof UserTask) {
+                    UserTask targetUserTask = (UserTask) targetFlowElement;
+                    String assignee = targetUserTask.getAssignee();
+                    if (assignee.startsWith("${") && assignee.endsWith("}")) {
+                        list.add(new Option(targetUserTask.getName() + "(下节点执行人)", assignee));
+                    }
+                }
+            }
+        }
         List<SequenceFlow> outgoingFlows = ((FlowNode)flowElement).getOutgoingFlows();
         for (SequenceFlow outgoingFlow : outgoingFlows) {
             FlowElement targetElement = outgoingFlow.getTargetFlowElement();
-            if (targetElement instanceof ExclusiveGateway) {
-                ExclusiveGateway gateway = (ExclusiveGateway) targetElement;
+            if (targetElement instanceof Gateway) {
+                Gateway gateway = (Gateway) targetElement;
                 List<SequenceFlow> outgoingFlows1 = gateway.getOutgoingFlows();
                 if (outgoingFlows1.size() > 1) {
                     for (SequenceFlow sequenceFlow : outgoingFlows1) {
                         FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
                         if (StringUtils.isNotBlank(sequenceFlow.getConditionExpression())) {
                             list.add(new Option(targetFlowElement.getName(), sequenceFlow.getConditionExpression()));
+                        }
+                        if (targetFlowElement instanceof UserTask) {
+                            UserTask userTask = (UserTask) targetFlowElement;
+                            String assignee = userTask.getAssignee();
+                            if (assignee.startsWith("${") && assignee.endsWith("}")) {
+                                list.add(new Option(userTask.getName() + "(下节点执行人)", assignee));
+                            }
                         }
                     }
                 }
@@ -486,6 +570,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 }
             }
         }
-        return list;
+        map.put("sequenceFlow", list);
+        return map;
     }
 }

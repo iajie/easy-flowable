@@ -1,12 +1,10 @@
 package com.easyflowable.core.service;
 
-import com.easyflowable.core.domain.dto.FlowExecutionHistory;
-import com.easyflowable.core.domain.dto.FlowProcessInstance;
-import com.easyflowable.core.domain.dto.FlowProcessInstanceHistory;
-import com.easyflowable.core.domain.dto.Option;
+import com.easyflowable.core.domain.dto.*;
 import com.easyflowable.core.domain.params.FlowStartParam;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @package: {@link com.easyflowable.core.service}
@@ -144,4 +142,59 @@ public interface EasyProcessInstanceService {
     default List<FlowProcessInstanceHistory> getFlowInstanceHistoryListByDeploymentId(String deploymentId) {
         return getFlowInstanceHistoryList(deploymentId, true);
     }
+
+    /**
+     * @param keywords 关键字
+     * @param current 页码
+     * @param size 页大小
+     * @return: {@link List} {@link TodoTask}
+     * @Author: MoJie
+     * @Date: 2024/11/17 14:06
+     * @Description: 任务待办列表
+     */
+    default Page<DoneTask> todoTasks(String keywords, int current, int size) {
+        return this.todoTasks(keywords, current, size, false, false);
+    }
+
+    /**
+     * @param keywords 关键字
+     * @param current 页码
+     * @param size 页大小
+     * @return: {@link List} {@link TodoTask}
+     * @Author: MoJie
+     * @Date: 2024/11/17 14:06
+     * @Description: 任务待办列表
+     */
+    default Page<DoneTask> doneTasks(String keywords, int current, int size) {
+        return this.todoTasks(keywords, current, size, true, false);
+    }
+
+    default Page<DoneTask> todoTasksByUser(String userId, int current, int size) {
+        return this.todoTasks(userId, current, size, false, true);
+    }
+
+    default Page<DoneTask> doneTasksByUser(String userId, int current, int size) {
+        return this.todoTasks(userId, current, size, true, true);
+    }
+
+    /**
+     * @param keywords 关键字
+     * @param current 页码
+     * @param size 页大小
+     * @param finished 是否已结束
+     * @param isMe 办理人
+     * @return: {@link List} {@link TodoTask}
+     * @Author: MoJie
+     * @Date: 2024/11/17 14:06
+     * @Description: 任务待办列表
+     */
+    Page<DoneTask> todoTasks(String keywords, int current, int size, Boolean finished, boolean isMe);
+
+    /**
+     * @return: {@link Map} {@link Object}
+     * @Author: MoJie
+     * @Date: 2024/11/17 15:06
+     * @Description: 统计
+     */
+    Map<String, Object> statics();
 }

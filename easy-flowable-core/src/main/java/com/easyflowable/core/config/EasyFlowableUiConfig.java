@@ -74,7 +74,7 @@ public class EasyFlowableUiConfig {
     public List<User> getUsers() {
         if (users.isEmpty()) {
             users = new ArrayList<>();
-            users.add(User.defaultUser());
+            users.add(new User("easy-flowable", "01", "easy-flowable", "222"));
             users.add(new User("甲", "123", "123456", "220"));
             users.add(new User("乙", "124", "123456", "220"));
             users.add(new User("丙", "125", "123456", "221"));

@@ -8,6 +8,7 @@ import com.easyflowable.core.domain.entity.EasyModel;
 import com.easyflowable.core.exception.EasyFlowableException;
 import com.easyflowable.core.service.EasyDeploymentService;
 import com.easyflowable.core.service.EasyModelService;
+import com.easyflowable.core.utils.BpmnUtils;
 import com.easyflowable.core.utils.StringUtils;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
@@ -162,21 +163,6 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
         return list.get(0);
     }
 
-    /**
-     * 获取任务变量
-     * @param attributes 流程变量
-     * @return {@link Map}
-     * @Author: MoJie
-     * @Date: 2024-10-09 13:26:35
-     */
-    private Map<String, Object> getTaskAttributes(Map<String, List<ExtensionAttribute>> attributes) {
-        Map<String, Object> map = new HashMap<>();
-        for (String key : attributes.keySet()) {
-            map.put(key, attributes.get(key).get(0).getValue());
-        }
-        return map;
-    }
-
     @Override
     public List<FlowUserTask> getAllFlowUserTask(String flowKey) {
         Deployment deployment = this.getDeployment(flowKey);
@@ -202,7 +188,7 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
             flowUserTask.setAssignee(userTask.getAssignee());
             flowUserTask.setCandidateUsers(userTask.getCandidateUsers());
             flowUserTask.setCandidateGroups(userTask.getCandidateGroups());
-            flowUserTask.setFlowCustomProps(this.getTaskAttributes(userTask.getAttributes()));
+            flowUserTask.setFlowCustomProps(BpmnUtils.getTaskAttributes(userTask.getAttributes()));
             list.add(flowUserTask);
         }
         return list;

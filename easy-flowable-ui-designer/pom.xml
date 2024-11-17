@@ -24,5 +24,12 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
+    <build>
+        <resources>
+            <resource>
+                <targetPath>META-INF/resources/</targetPath>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
 </project>

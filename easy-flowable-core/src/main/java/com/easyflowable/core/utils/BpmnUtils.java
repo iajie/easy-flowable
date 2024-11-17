@@ -4,7 +4,12 @@ import com.easyflowable.core.exception.EasyFlowableException;
 import lombok.SneakyThrows;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.common.engine.impl.util.io.StringStreamSource;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: MoJie
@@ -41,4 +46,18 @@ public class BpmnUtils {
         }
     }
 
+    /**
+     * 获取任务变量
+     * @param attributes 节点额外变量
+     * @return {@link Map}
+     * @Author: MoJie
+     * @Date: 2024-10-09 13:26:35
+     */
+    public static Map<String, Object> getTaskAttributes(Map<String, List<ExtensionAttribute>> attributes) {
+        Map<String, Object> map = new HashMap<>();
+        for (String key : attributes.keySet()) {
+            map.put(key, attributes.get(key).get(0).getValue());
+        }
+        return map;
+    }
 }

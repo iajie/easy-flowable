@@ -59,7 +59,7 @@ public class FlowStartParam {
     private boolean startFormData = false;
 
     /**
-     * 表单信息：为JSON字符串-后续会使用到
+     * 表单信息：为JSON字符串/由@EasyItem-后续会使用到
      */
-    private String formData;
+    private Object formData;
 }

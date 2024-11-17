@@ -1,20 +1,14 @@
 package com.easyflowable.ui.resource;
 
+import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.Page;
-import com.easyflowable.core.utils.StringUtils;
 import com.easyflowable.core.domain.entity.EasyModel;
 import com.easyflowable.core.service.EasyModelService;
+import com.easyflowable.core.utils.StringUtils;
 import com.easyflowable.ui.model.PageParams;
 import com.easyflowable.ui.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @package: {@link com.easyflowable.ui.resource}
@@ -23,7 +17,6 @@ import javax.annotation.Resource;
  * @Author: MoJie
  */
 @RestController
-@RequestMapping("easy-flowable/model")
 public class EasyModelResource {
 
     @Autowired(required = false)
@@ -36,7 +29,7 @@ public class EasyModelResource {
      * @Date: 2024-10-12 11:09
      * @Description: 模型分页查询
      */
-    @PostMapping("pageQuery")
+    @PostMapping(Constants.EASY_FLOWABLE + "/model/pageQuery")
     public Result<Page<EasyModel>> page(@RequestBody PageParams<EasyModel> pageParams) {
         EasyModel params = pageParams.getParams();
         return Result.success(modelService.queryPage(pageParams.getCurrent(), pageParams.getSize(), params));
@@ -49,7 +42,7 @@ public class EasyModelResource {
      * @Date: 2024-10-12 10:37
      * @Description: 保存模型
      */
-    @PostMapping("save")
+    @PostMapping(Constants.EASY_FLOWABLE + "/model/save")
     public Result<Boolean> save(@RequestBody EasyModel model) {
         if (StringUtils.isNotBlank(model.getId())) {
             return Result.success(modelService.updateById(model));
@@ -64,7 +57,7 @@ public class EasyModelResource {
      * @Date: 2024-10-12 10:41
      * @Description: 根据ID删除流程模型
      */
-    @GetMapping("remove/{id}")
+    @GetMapping(Constants.EASY_FLOWABLE + "/model/remove/{id}")
     public Result<Boolean> remove(@PathVariable String id) {
         if (modelService.removeById(id)) {
             return Result.success();
@@ -79,7 +72,7 @@ public class EasyModelResource {
      * @Date: 2024-10-12 10:42
      * @Description: 根据ID获取模型信息
      */
-    @GetMapping("info/{id}")
+    @GetMapping(Constants.EASY_FLOWABLE + "/model/info/{id}")
     public Result<EasyModel> getInfo(@PathVariable String id) {
         return Result.success(modelService.getById(id));
     }

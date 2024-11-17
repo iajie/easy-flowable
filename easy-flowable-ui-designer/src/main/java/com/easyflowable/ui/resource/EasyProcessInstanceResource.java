@@ -1,18 +1,18 @@
 package com.easyflowable.ui.resource;
 
 import com.easyflowable.core.config.EasyFlowableUiConfig;
-import com.easyflowable.core.domain.dto.FlowExecutionHistory;
-import com.easyflowable.core.domain.dto.FlowProcessInstance;
-import com.easyflowable.core.domain.dto.Option;
+import com.easyflowable.core.constans.Constants;
+import com.easyflowable.core.domain.dto.*;
 import com.easyflowable.core.domain.params.FlowStartParam;
 import com.easyflowable.core.service.EasyProcessInstanceService;
 import com.easyflowable.ui.context.EasyFlowableContext;
+import com.easyflowable.ui.model.PageParams;
 import com.easyflowable.ui.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @package: {@link com.easyflowable.ui.resource}
@@ -21,7 +21,6 @@ import java.util.List;
  * @Author: MoJie
  */
 @RestController
-@RequestMapping("easy-flowable/processInstance")
 public class EasyProcessInstanceResource {
 
     @Autowired(required = false)
@@ -34,7 +33,7 @@ public class EasyProcessInstanceResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:26:52
      */
-    @GetMapping(value = "list/{processDefinitionId}")
+    @GetMapping(value = Constants.EASY_FLOWABLE + "/processInstance/list/{processDefinitionId}")
     public Result<List<FlowProcessInstance>> list(@PathVariable String processDefinitionId) {
         return Result.success(processInstanceService.getFlowInstanceListById(processDefinitionId));
     }
@@ -46,7 +45,7 @@ public class EasyProcessInstanceResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:27:37
      */
-    @GetMapping(value = "stateSet/{processInstanceId}")
+    @GetMapping(value = Constants.EASY_FLOWABLE + "/processInstance/stateSet/{processInstanceId}")
     public Result<Boolean> stateSet(@PathVariable String processInstanceId) {
         return Result.success(processInstanceService.updateProcessInstanceState(processInstanceId));
     }
@@ -58,7 +57,7 @@ public class EasyProcessInstanceResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:28:20
      */
-    @GetMapping(value = "backUserTasks/{processInstanceId}")
+    @GetMapping(value = Constants.EASY_FLOWABLE + "/processInstance/backUserTasks/{processInstanceId}")
     public Result<List<Option>> backUserTasks(@PathVariable String processInstanceId) {
         return Result.success(processInstanceService.getFlowBackUserTasks(processInstanceId));
     }
@@ -70,7 +69,7 @@ public class EasyProcessInstanceResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:28:55
      */
-    @GetMapping(value = "executionHistory/{processInstanceId}")
+    @GetMapping(value = Constants.EASY_FLOWABLE + "/processInstance/executionHistory/{processInstanceId}")
     public Result<List<FlowExecutionHistory>> executionHistory(@PathVariable String processInstanceId) {
         return Result.success(processInstanceService.getFlowExecutionHistoryList(processInstanceId));
     }
@@ -82,7 +81,7 @@ public class EasyProcessInstanceResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:32:43
      */
-    @PostMapping("start")
+    @PostMapping(Constants.EASY_FLOWABLE + "/processInstance/start")
     public Result<String> start(@RequestBody FlowStartParam param) {
         EasyFlowableUiConfig.User user = EasyFlowableContext.getUser();
         param.setStartUserId(user.getId());
@@ -98,10 +97,41 @@ public class EasyProcessInstanceResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:32:43
      */
-    @GetMapping("businessStatus")
+    @GetMapping(Constants.EASY_FLOWABLE + "/processInstance/businessStatus")
     public Result<String> start(@RequestParam String processInstanceId, @RequestParam String status) {
         processInstanceService.updateProcessInstanceBusinessStatus(processInstanceId, status);
         return Result.success();
     }
 
+    @GetMapping(Constants.EASY_FLOWABLE + "/processInstance/statics")
+    public Result<Map<String, Object>> statics() {
+        return Result.success(processInstanceService.statics());
+    }
+
+    /**
+     * @param pageParams 分页查询参数
+     * @return: {@link Result} {@link Page} {@link TodoTask}
+     * @Author: MoJie
+     * @Date: 2024/11/17 14:20
+     * @Description: 待办任务分页查询
+     */
+    @PostMapping(Constants.EASY_FLOWABLE + "/processInstance/todoTaskPage")
+    public Result<Page<DoneTask>> todoTaskPage(@RequestBody PageParams<String> pageParams) {
+        String param = pageParams.getParams();
+        Page<DoneTask> doneTaskPage = null;
+        if ("todo".equals(param)) {
+            doneTaskPage = processInstanceService.todoTasks(
+                    null, pageParams.getCurrent(), pageParams.getSize());
+        } else if ("done".equals(param)) {
+            doneTaskPage = processInstanceService.doneTasks(
+                    null, pageParams.getCurrent(), pageParams.getSize());
+        } else if ("meTodo".equals(param)) {
+            doneTaskPage = processInstanceService.todoTasksByUser(
+                    null, pageParams.getCurrent(), pageParams.getSize());
+        } else if ("meDone".equals(param)){
+            doneTaskPage = processInstanceService.doneTasksByUser(
+                    null, pageParams.getCurrent(), pageParams.getSize());
+        }
+        return Result.success(doneTaskPage);
+    }
 }

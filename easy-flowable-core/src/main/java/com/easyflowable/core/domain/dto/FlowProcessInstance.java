@@ -73,4 +73,9 @@ public class FlowProcessInstance {
      */
     private String taskId;
 
+    /**
+     * 当前运行的任务ID
+     */
+    private String taskIds;
+
 }

@@ -19,6 +19,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -27,6 +28,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -54,7 +56,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     @Resource
     private EasyTaskService easyTaskService;
     @Resource
-    private EasyUserService userInterface;
+    private EasyUserService userService;
 
     @Override
     public List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow, boolean isProcessInstance) {
@@ -89,11 +91,15 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             flowProcessInstance.setDeploymentId(processInstance.getDeploymentId());
             flowProcessInstance.setProcessInstanceVersion(processInstance.getProcessDefinitionVersion());
             flowProcessInstance.setStatus(processInstance.isSuspended());
-            Task task = this.taskService.createTaskQuery()
+            List<Task> tasks = this.taskService.createTaskQuery()
                     .processInstanceId(processInstance.getProcessInstanceId())
-                    .active().singleResult();
-            if (task != null) {
-                flowProcessInstance.setTaskId(task.getId());
+                    .active().list();
+            if (tasks != null) {
+                if (tasks.size() > 1) {
+                    flowProcessInstance.setTaskIds(tasks.stream().map(Task::getId).collect(Collectors.joining(",")));
+                } else {
+                    flowProcessInstance.setTaskId(tasks.get(0).getId());
+                }
             }
             list.add(flowProcessInstance);
         }
@@ -109,7 +115,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         String processDefinitionId = startParam.getProcessDefinitionId();
         // 获取最新流程定义
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
-        if (StringUtils.isBlank(flowKey)) {
+        if (StringUtils.isNotBlank(flowKey)) {
             processDefinitionQuery.processDefinitionKey(flowKey).latestVersion();
         } else {
             processDefinitionQuery.processDefinitionId(processDefinitionId);
@@ -122,13 +128,20 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             throw new EasyFlowableException("当前流程【" + processDefinition.getName() + "】已终止，无法启动流程实例");
         }
         // 获取当前业务住建是否已存在运行实例
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey).singleResult();
+        ProcessInstanceQuery processInstanceQuery = runtimeService
+                .createProcessInstanceQuery().processInstanceBusinessKey(businessKey);
+        if (StringUtils.isNotBlank(flowKey)) {
+            processInstanceQuery.processDefinitionKey(flowKey);
+        } else {
+            processInstanceQuery.processDefinitionId(processDefinitionId);
+        }
+        ProcessInstance processInstance = processInstanceQuery.singleResult();
         if (processInstance != null) {
             throw new EasyFlowableException("当前业务主键已启动流程，无法再次启动流程!");
         }
         String startUserId = startParam.getStartUserId();
         if (StringUtils.isBlank(startUserId)) {
-            startUserId = userInterface.getUserId();
+            startUserId = userService.getUserId();
         }
         // 启动流程变量(全局)
         Map<String, Object> variables = startParam.getVariables();
@@ -161,14 +174,15 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
                 // 获取名称
                 String startUsername = startParam.getStartUsername();
                 if (StringUtils.isBlank(startUsername)) {
-                    startUsername = userInterface.getUsername();
+                    startUsername = userService.getUsername();
                 }
                 FlowComment flowComment = new FlowComment();
                 flowComment.setAssignee(startUserId);
                 flowComment.setAssigneeName(startUsername);
                 flowComment.setTaskId(task.getId());
                 flowComment.setProcessInstanceId(task.getProcessInstanceId());
-                flowComment.setExt(startParam.getFormData());
+                flowComment.setForm(true);
+                flowComment.setExt(StringUtils.toJson(startParam.getFormData()));
                 flowComment.setCommentContent(startUsername + "发起流程申请");
                 flowComment.setFlowCommentType(FlowCommentType.START.getCode());
                 // 当前任务添加备注
@@ -192,7 +206,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     private boolean checkStartParam(FlowStartParam startParam) {
         String flowKey = startParam.getFlowKey();
         boolean isKey = false;
-        if (StringUtils.isBlank(startParam.getProcessDefinitionId()) || StringUtils.isBlank(flowKey)) {
+        if (StringUtils.isBlank(startParam.getProcessDefinitionId()) && StringUtils.isBlank(flowKey)) {
             throw new EasyFlowableException("流程启动标识或流程定义ID不能为空！");
         } else {
             if (StringUtils.isNotBlank(flowKey)) {
@@ -203,11 +217,19 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             throw new EasyFlowableException("流程启动业务主键不能为空！");
         }
         if (startParam.isStartFormData()) {
-            if (StringUtils.isBlank(startParam.getFormData())) {
+            Object formData = startParam.getFormData();
+            if (formData == null) {
                 throw new EasyFlowableException("流程表单流程不能为空！");
             }
-            if (!StringUtils.isJson(startParam.getFormData())) {
-                throw new EasyFlowableException("流程表单数据需要JSON字符串");
+            if (formData instanceof String) {
+                if (StringUtils.isBlank(formData.toString())) {
+                    throw new EasyFlowableException("流程表单流程不能为空！");
+                }
+                if (!StringUtils.isJson((String) formData)) {
+                    throw new EasyFlowableException("流程表单数据需要JSON字符串或被@EasyItem注解所标记的实体");
+                }
+            } else if (StringUtils.isAnnotationEasyItem(formData)){
+                startParam.setFormData(StringUtils.screenTwoProperty(formData, null));
             }
         }
         return isKey;
@@ -240,7 +262,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         List<Option> list = new ArrayList<>();
         List<HistoricActivityInstance> userTask = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstanceId)
-                .activityType("userTask")
+                .activityType(Constants.USER_TASK)
                 .finished() // 已经执行结束的节点
                 .orderByHistoricActivityInstanceEndTime().asc() // 按执行结束时间排序
                 .list();
@@ -301,7 +323,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         // 获取历史任务节点
         List<HistoricActivityInstance> userTask = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processInstanceId)
-                .activityType("userTask")
+                .activityType(Constants.USER_TASK)
                 .finished() // 已经执行结束的节点
                 .orderByHistoricActivityInstanceEndTime().desc() // 按执行结束时间排序
                 .list();
@@ -336,5 +358,78 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             list.add(flowProcessInstance);
         }
         return list;
+    }
+
+    @Override
+    public Map<String, Object> statics() {
+        Map<String, Object> map = new HashMap<>();
+        HistoricActivityInstanceQuery query = this.historyService
+                .createHistoricActivityInstanceQuery()
+                .activityType(Constants.USER_TASK);
+        // 待办
+        map.put("todo", query.unfinished().count());
+        // 已办
+        map.put("done", query.finished().count());
+        // 我的待办
+        map.put("meTodo", query.taskAssignee(userService.getUserId()).unfinished().count());
+        // 我的已办
+        map.put("meDone", query.taskAssignee(userService.getUserId()).finished().count());
+        return map;
+    }
+
+    @Override
+    public Page<DoneTask> todoTasks(String keywords, int current, int size, Boolean finished, boolean isMe) {
+        HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery()
+                .activityType(Constants.USER_TASK)
+                .orderByHistoricActivityInstanceStartTime().desc();
+        if (finished != null) {
+            if (finished) {
+                query.finished();
+            } else {
+                query.unfinished();
+            }
+        }
+        if (isMe) {
+            if (StringUtils.isNotBlank(keywords)) {
+                query.taskAssignee(keywords);
+            } else {
+                query.taskAssignee(userService.getUserId());
+            }
+        }
+        Page<DoneTask> page = new Page<>();
+        page.setTotal(query.count());
+        List<HistoricActivityInstance> tasks = query.listPage((current - 1) * size, size);
+        List<DoneTask> list = new ArrayList<>();
+        for (HistoricActivityInstance activityInstance : tasks) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(activityInstance.getProcessInstanceId()).singleResult();
+            int status = 0;
+            if (historicProcessInstance.getEndTime() != null) {
+                if (StringUtils.isNotBlank(historicProcessInstance.getDeleteReason())) {
+                    status = 2;
+                } else {
+                    status = 1;
+                }
+            }
+            DoneTask doneTask = new DoneTask();
+            doneTask.setId(activityInstance.getId());
+            doneTask.setStatus(status).setEndTime(activityInstance.getEndTime());
+            doneTask.setStartUserId(historicProcessInstance.getStartUserId())
+                    .setNodeName(activityInstance.getActivityName())
+                    .setStartTime(activityInstance.getStartTime())
+                    .setAssignee(activityInstance.getAssignee())
+                    .setProcessName(historicProcessInstance.getName());
+            if (isMe && Boolean.FALSE.equals(finished)) {
+                doneTask.setTaskId(activityInstance.getTaskId());
+                doneTask.setProcessInstanceId(activityInstance.getProcessInstanceId());
+            }
+            // 获取历史审批材料
+            List<Comment> commentList = taskService.getProcessInstanceComments(activityInstance.getProcessInstanceId());
+            FlowExecutionHistory history = easyTaskService.getFlowExecutionHistory(activityInstance, commentList);
+            doneTask.setComments(history.getComments());
+            list.add(doneTask);
+        }
+        page.setRecords(list);
+        return page;
     }
 }

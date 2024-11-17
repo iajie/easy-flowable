@@ -1,6 +1,7 @@
 package com.easyflowable.ui.resource;
 
 import com.easyflowable.core.config.EasyFlowableUiConfig;
+import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.Option;
 import com.easyflowable.core.service.EasyUserService;
 import com.easyflowable.core.utils.StringUtils;
@@ -26,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
  * @Author: MoJie
  */
 @RestController
-@RequestMapping("easy-flowable")
 public class EasyFlowableResource {
 
     @Autowired(required = false)
@@ -40,7 +40,7 @@ public class EasyFlowableResource {
      * @Author: MoJie
      * @Date: 2024-10-09 17:51:30
      */
-    @GetMapping("/users")
+    @GetMapping(Constants.EASY_FLOWABLE + "/users")
     public Result<List<Option>> users() {
         if (!userService.users().isEmpty()) {
             return Result.success(userService.users());
@@ -58,7 +58,7 @@ public class EasyFlowableResource {
      * @Author: MoJie
      * @Date: 2024-10-09 17:51:30
      */
-    @GetMapping("/groups")
+    @GetMapping(Constants.EASY_FLOWABLE + "/groups")
     public Result<List<Option>> groups() {
         if (!userService.groups().isEmpty()) {
             return Result.success(userService.groups());
@@ -72,12 +72,12 @@ public class EasyFlowableResource {
      * @Author: MoJie
      * @Date: 2024-10-09 18:02:58
      */
-    @GetMapping("isLogin")
+    @GetMapping(Constants.EASY_FLOWABLE + "/isLogin")
     public Result<Boolean> isLogin() {
         return Result.success(properties.getUi().isLogin());
     }
 
-    @PostMapping("login")
+    @PostMapping(Constants.EASY_FLOWABLE + "/login")
     public Result<?> login(@RequestBody EasyFlowableUiConfig.User user, HttpServletRequest request) {
         String username = user.getUsername();
         String password = user.getPassword();
@@ -96,6 +96,5 @@ public class EasyFlowableResource {
         }
         return Result.error("账号/密码错误");
     }
-
 
 }
