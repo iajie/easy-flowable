@@ -1,5 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.easyflowable.ui.EasyFlowableUiAutoConfiguration,\
-  com.easyflowable.ui.config.MvConfiguration
+  com.superb.ui.EasyFlowableUiAutoConfiguration,\
+  com.superb.ui.config.MvConfiguration
 
 
