@@ -1,11 +1,11 @@
 package com.easyflowable.ui.resource;
 
-import com.easyflowable.core.config.EasyFlowableUiConfig;
 import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.dto.*;
+import com.easyflowable.core.domain.entity.EasyFlowableUser;
 import com.easyflowable.core.domain.params.FlowStartParam;
 import com.easyflowable.core.service.EasyProcessInstanceService;
-import com.easyflowable.ui.context.EasyFlowableContext;
+import com.easyflowable.core.constans.EasyFlowableContext;
 import com.easyflowable.ui.model.PageParams;
 import com.easyflowable.ui.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,8 +83,8 @@ public class EasyProcessInstanceResource {
      */
     @PostMapping(Constants.EASY_FLOWABLE + "/processInstance/start")
     public Result<String> start(@RequestBody FlowStartParam param) {
-        EasyFlowableUiConfig.User user = EasyFlowableContext.getUser();
-        param.setStartUserId(user.getId());
+        EasyFlowableUser user = EasyFlowableContext.getUser();
+        param.setStartUserId(user.getUserId().toString());
         param.setStartUsername(user.getUsername());
         return Result.success(processInstanceService.startProcessInstanceByKey(param));
     }
@@ -121,16 +121,16 @@ public class EasyProcessInstanceResource {
         Page<DoneTask> doneTaskPage = null;
         if ("todo".equals(param)) {
             doneTaskPage = processInstanceService.todoTasks(
-                    null, pageParams.getCurrent(), pageParams.getSize());
+                    null, pageParams.getCurrent(), pageParams.getPageSize());
         } else if ("done".equals(param)) {
             doneTaskPage = processInstanceService.doneTasks(
-                    null, pageParams.getCurrent(), pageParams.getSize());
+                    null, pageParams.getCurrent(), pageParams.getPageSize());
         } else if ("meTodo".equals(param)) {
             doneTaskPage = processInstanceService.todoTasksByUser(
-                    null, pageParams.getCurrent(), pageParams.getSize());
+                    null, pageParams.getCurrent(), pageParams.getPageSize());
         } else if ("meDone".equals(param)){
             doneTaskPage = processInstanceService.doneTasksByUser(
-                    null, pageParams.getCurrent(), pageParams.getSize());
+                    null, pageParams.getCurrent(), pageParams.getPageSize());
         }
         return Result.success(doneTaskPage);
     }

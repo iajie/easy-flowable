@@ -32,7 +32,7 @@ public class EasyModelResource {
     @PostMapping(Constants.EASY_FLOWABLE + "/model/pageQuery")
     public Result<Page<EasyModel>> page(@RequestBody PageParams<EasyModel> pageParams) {
         EasyModel params = pageParams.getParams();
-        return Result.success(modelService.queryPage(pageParams.getCurrent(), pageParams.getSize(), params));
+        return Result.success(modelService.queryPage(pageParams.getCurrent(), pageParams.getPageSize(), params));
     }
 
     /**

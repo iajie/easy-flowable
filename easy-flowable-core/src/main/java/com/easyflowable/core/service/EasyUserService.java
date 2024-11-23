@@ -1,6 +1,7 @@
 package com.easyflowable.core.service;
 
 import com.easyflowable.core.domain.dto.Option;
+import com.easyflowable.core.domain.entity.EasyFlowableUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +14,24 @@ import java.util.List;
  */
 public interface EasyUserService {
 
-    /** 当前用户 */
-    String getUserId();
+    /**
+     * @param userId 用户会话ID-用户ID
+     * @return: {@link EasyFlowableUser}
+     * @Author: MoJie
+     * @Date: 2024/11/23 17:04
+     * @Description: 当前用户信息
+     */
+    EasyFlowableUser getCurrentUser(Object userId);
 
-    /** 当前用户昵称 */
-    String getUsername();
+    /**
+     * @param username 登陆账号
+     * @param password 密码
+     * @return: {@link Object}
+     * @Author: MoJie
+     * @Date: 2024/11/23 16:03
+     * @Description: 自定义登陆-返回用户ID
+     */
+    Object login(String username, String password);
 
     /**
      * @return: {@link List} {@link Option}

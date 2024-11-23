@@ -1,7 +1,9 @@
 package com.easyflowable.starter.api;
 
 import com.easyflowable.core.constans.Constants;
+import com.easyflowable.core.constans.EasyFlowableContext;
 import com.easyflowable.core.domain.dto.*;
+import com.easyflowable.core.domain.entity.EasyFlowableUser;
 import com.easyflowable.core.domain.enums.FlowCommentType;
 import com.easyflowable.core.service.EasyUserService;
 import com.easyflowable.core.domain.params.FlowStartParam;
@@ -28,7 +30,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.TaskQuery;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -140,8 +141,9 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             throw new EasyFlowableException("当前业务主键已启动流程，无法再次启动流程!");
         }
         String startUserId = startParam.getStartUserId();
+        EasyFlowableUser user = EasyFlowableContext.getUser();
         if (StringUtils.isBlank(startUserId)) {
-            startUserId = userService.getUserId();
+            startUserId = user.getUserId();
         }
         // 启动流程变量(全局)
         Map<String, Object> variables = startParam.getVariables();
@@ -174,7 +176,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
                 // 获取名称
                 String startUsername = startParam.getStartUsername();
                 if (StringUtils.isBlank(startUsername)) {
-                    startUsername = userService.getUsername();
+                    startUsername = user.getUsername();
                 }
                 FlowComment flowComment = new FlowComment();
                 flowComment.setAssignee(startUserId);
@@ -366,14 +368,15 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
         HistoricActivityInstanceQuery query = this.historyService
                 .createHistoricActivityInstanceQuery()
                 .activityType(Constants.USER_TASK);
+        EasyFlowableUser user = EasyFlowableContext.getUser();
         // 待办
         map.put("todo", query.unfinished().count());
         // 已办
         map.put("done", query.finished().count());
         // 我的待办
-        map.put("meTodo", query.taskAssignee(userService.getUserId()).unfinished().count());
+        map.put("meTodo", query.taskAssignee(user.getUserId()).unfinished().count());
         // 我的已办
-        map.put("meDone", query.taskAssignee(userService.getUserId()).finished().count());
+        map.put("meDone", query.taskAssignee(user.getUserId()).finished().count());
         return map;
     }
 
@@ -393,7 +396,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             if (StringUtils.isNotBlank(keywords)) {
                 query.taskAssignee(keywords);
             } else {
-                query.taskAssignee(userService.getUserId());
+                query.taskAssignee(EasyFlowableContext.getUser().getUserId());
             }
         }
         Page<DoneTask> page = new Page<>();

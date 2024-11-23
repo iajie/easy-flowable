@@ -12,6 +12,7 @@
         <module>easy-flowable-core</module>
         <module>easy-flowable-boot-starter</module>
         <module>easy-flowable-ui-designer</module>
+        <module>easy-flowable-solon-plugin</module>
     </modules>
 
     <properties>

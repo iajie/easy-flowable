@@ -19,11 +19,6 @@ import java.util.List;
 public class EasyFlowableUiConfig {
 
     /**
-     * admin默认访问路径
-     */
-    private String path = "/easy-flowable";
-
-    /**
      * 是否需要登录
      */
     private boolean isLogin = false;
@@ -91,13 +86,6 @@ public class EasyFlowableUiConfig {
             groups.add(new Option("easy-flowable研发部", "222"));
         }
         return groups;
-    }
-
-    public String getPath() {
-        if (!path.startsWith("/")) {
-            path = "/" + path;
-        }
-        return path;
     }
 
 }

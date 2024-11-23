@@ -37,7 +37,7 @@ public class EasyDeploymentResource {
      */
     @PostMapping(Constants.EASY_FLOWABLE + "/deployment/page")
     public Result<Page<DeploymentProcessDef>> page(@RequestBody PageParams<DeploymentProcessDef> pageParams) {
-        return Result.success(deploymentService.page(pageParams.getCurrent(), pageParams.getSize(), pageParams.getParams()));
+        return Result.success(deploymentService.page(pageParams.getCurrent(), pageParams.getPageSize(), pageParams.getParams()));
     }
 
     /**

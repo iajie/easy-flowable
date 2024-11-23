@@ -16,7 +16,7 @@ public class PageParams<T> {
     private Integer current;
 
     /** 页大小 */
-    private Integer size;
+    private Integer pageSize;
 
     /** 查询参数 */
     private T params;

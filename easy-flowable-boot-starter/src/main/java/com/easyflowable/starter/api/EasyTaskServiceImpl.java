@@ -1,9 +1,11 @@
 package com.easyflowable.starter.api;
 
 import com.easyflowable.core.constans.Constants;
+import com.easyflowable.core.constans.EasyFlowableContext;
 import com.easyflowable.core.domain.dto.FlowComment;
 import com.easyflowable.core.domain.dto.FlowExecutionHistory;
 import com.easyflowable.core.domain.dto.Option;
+import com.easyflowable.core.domain.entity.EasyFlowableUser;
 import com.easyflowable.core.domain.enums.FlowCommentType;
 import com.easyflowable.core.service.EasyUserService;
 import com.easyflowable.core.domain.params.FlowCancellationParam;
@@ -64,15 +66,14 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         if (task == null) {
             throw new EasyFlowableException("任务不存在或已被处理！");
         }
+        EasyFlowableUser user = EasyFlowableContext.getUser();
         String assignee = executeParam.getAssignee();
         if (StringUtils.isBlank(assignee)) {
-            assignee = userInterface.getUserId();
-            executeParam.setAssignee(assignee);
+            executeParam.setAssignee(user.getUserId().toString());
         }
         String assigneeName = executeParam.getAssigneeName();
         if (StringUtils.isBlank(assigneeName)) {
-            assigneeName = userInterface.getUsername();
-            executeParam.setAssigneeName(assigneeName);
+            executeParam.setAssigneeName(user.getUsername());
         }
         // 1.执行前检查流程
         this.checkFlowable(task.getProcessInstanceId());

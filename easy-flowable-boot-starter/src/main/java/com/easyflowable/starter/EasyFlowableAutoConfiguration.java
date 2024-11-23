@@ -5,15 +5,9 @@ import com.easyflowable.core.config.EasyFlowableDataSourceConfig;
 import com.easyflowable.core.constans.Constants;
 import com.easyflowable.core.domain.enums.HistoryLevelEnum;
 import com.easyflowable.core.exception.EasyFlowableException;
-import com.easyflowable.core.service.EasyDeploymentService;
-import com.easyflowable.core.service.EasyModelService;
-import com.easyflowable.core.service.EasyProcessInstanceService;
-import com.easyflowable.core.service.EasyTaskService;
+import com.easyflowable.core.service.*;
 import com.easyflowable.core.utils.StringUtils;
-import com.easyflowable.starter.api.EasyDeploymentServiceImpl;
-import com.easyflowable.starter.api.EasyModelServiceImpl;
-import com.easyflowable.starter.api.EasyProcessInstanceServiceImpl;
-import com.easyflowable.starter.api.EasyTaskServiceImpl;
+import com.easyflowable.starter.api.*;
 import com.easyflowable.starter.config.EasyFlowableConfigProperties;
 import com.zaxxer.hikari.HikariDataSource;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -21,6 +15,7 @@ import org.flowable.engine.*;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -156,6 +151,12 @@ public class EasyFlowableAutoConfiguration {
         if (isBanner) {
             System.out.println(Constants.BANNER);
         }
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public EasyUserService easyUserService() {
+        return new DefaultEasyUserServiceImpl(properties.getUi());
     }
 
     @Bean

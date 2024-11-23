@@ -9,19 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>easy-flowable-ui-designer</artifactId>
-    <packaging>jar</packaging>
-    <description>流程设计器可视化界面</description>
+    <artifactId>easy-flowable-solon-plugin</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.easy-flowable</groupId>
-            <artifactId>easy-flowable-boot-starter</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
 </project>

@@ -1,6 +1,6 @@
-package com.easyflowable.ui.context;
+package com.easyflowable.core.constans;
 
-import com.easyflowable.core.config.EasyFlowableUiConfig;
+import com.easyflowable.core.domain.entity.EasyFlowableUser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,6 @@ public class EasyFlowableContext {
 
     public static final String TENANT_ID = "tenantId";
     public static final String USER = "user";
-    public static final String ORGAN_ID = "organId";
 
     public static ThreadLocal<Map<String, Object>> local = new ThreadLocal<>();
 
@@ -34,20 +33,16 @@ public class EasyFlowableContext {
         return value;
     }
 
-    public static void setUser(EasyFlowableUiConfig.User user) {
+    public static void setUser(EasyFlowableUser user) {
         setLocal(USER, user);
     }
 
-    public static EasyFlowableUiConfig.User getUser() {
-        return (EasyFlowableUiConfig.User)getLocal(USER);
+    public static EasyFlowableUser getUser() {
+        return (EasyFlowableUser)getLocal(USER);
     }
 
     public static String getTenantId() {
         return (String)getLocal(TENANT_ID);
-    }
-
-    public static String getOrganId() {
-        return (String)getLocal(ORGAN_ID);
     }
 
     public static void clear() {
