@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @package: {@link com.superb.ui.context}
+ * @package: {@link com.superb.core.constans}
  * @Date: 2024-10-11-9:47
  * @Description:
  * @Author: MoJie
@@ -15,6 +15,7 @@ public class EasyFlowableContext {
 
     public static final String TENANT_ID = "tenantId";
     public static final String USER = "user";
+    public static final String USER_ID = "userId";
 
     public static ThreadLocal<Map<String, Object>> local = new ThreadLocal<>();
 

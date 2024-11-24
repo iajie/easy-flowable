@@ -1,4 +1,4 @@
-package com.superb.starter.api;
+package com.superb.solon.api;
 
 import com.superb.core.constans.Constants;
 import com.superb.core.domain.dto.FlowUserTask;
@@ -20,14 +20,18 @@ import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.noear.solon.Utils;
+import org.noear.solon.annotation.Component;
+import org.noear.solon.annotation.Inject;
+import org.noear.solon.core.util.IoUtil;
+import sun.misc.IOUtils;
 
-import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * @package: {@link com.superb.starter.api}
@@ -35,13 +39,14 @@ import java.util.Scanner;
  * @Description:
  * @Author: MoJie
  */
+@Component
 public class EasyDeploymentServiceImpl implements EasyDeploymentService {
 
-    @Resource
+    @Inject
     private EasyModelService modelService;
-    @Resource
+    @Inject
     private RepositoryService repositoryService;
-    @Resource
+    @Inject
     private RuntimeService runtimeService;
 
     @Override
@@ -213,7 +218,6 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
     public String getFlowXml(String processDefinitionId) {
         this.checkProcessDefinition(processDefinitionId);
         InputStream processModel = repositoryService.getProcessModel(processDefinitionId);
-        Scanner scanner = new Scanner(processModel, "UTF-8").useDelimiter("\\A");
-        return scanner.hasNext() ? scanner.next() : "";
+        return IoUtil.transferToString(processModel, "UTF-8");
     }
 }

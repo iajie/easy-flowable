@@ -1,4 +1,4 @@
-package com.superb.starter.api;
+package com.superb.solon.api;
 
 import com.superb.core.constans.Constants;
 import com.superb.core.constans.EasyFlowableContext;
@@ -7,11 +7,11 @@ import com.superb.core.domain.dto.FlowExecutionHistory;
 import com.superb.core.domain.dto.Option;
 import com.superb.core.domain.entity.EasyFlowableUser;
 import com.superb.core.domain.enums.FlowCommentType;
-import com.superb.core.service.EasyUserService;
 import com.superb.core.domain.params.FlowCancellationParam;
 import com.superb.core.domain.params.FlowExecuteParam;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyTaskService;
+import com.superb.core.service.EasyUserService;
 import com.superb.core.utils.BpmnUtils;
 import com.superb.core.utils.EasyFlowableStringUtils;
 import lombok.SneakyThrows;
@@ -29,8 +29,9 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.noear.solon.annotation.Component;
+import org.noear.solon.annotation.Inject;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,17 +41,18 @@ import java.util.stream.Collectors;
  * @Description:
  * @Author: MoJie
  */
+@Component
 public class EasyTaskServiceImpl implements EasyTaskService {
 
-    @Resource
+    @Inject
     private RuntimeService runtimeService;
-    @Resource
+    @Inject
     private TaskService taskService;
-    @Resource
+    @Inject
     private HistoryService historyService;
-    @Resource
+    @Inject
     private RepositoryService repositoryService;
-    @Resource
+    @Inject
     private EasyUserService userInterface;
 
     @Override

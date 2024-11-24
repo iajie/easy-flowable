@@ -1,17 +1,17 @@
-package com.superb.starter.api;
+package com.superb.solon.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.superb.core.constans.Constants;
 import com.superb.core.constans.EasyFlowableContext;
 import com.superb.core.domain.dto.*;
 import com.superb.core.domain.entity.EasyFlowableUser;
 import com.superb.core.domain.enums.FlowCommentType;
-import com.superb.core.service.EasyUserService;
 import com.superb.core.domain.params.FlowStartParam;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyProcessInstanceService;
 import com.superb.core.service.EasyTaskService;
+import com.superb.core.service.EasyUserService;
 import com.superb.core.utils.EasyFlowableStringUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -30,8 +30,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
+import org.noear.solon.annotation.Component;
+import org.noear.solon.annotation.Inject;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,19 +45,20 @@ import java.util.stream.Collectors;
  * @Description:
  * @Author: MoJie
  */
+@Component
 public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceService {
 
-    @Resource
+    @Inject
     private RepositoryService repositoryService;
-    @Resource
+    @Inject
     private RuntimeService runtimeService;
-    @Resource
+    @Inject
     private TaskService taskService;
-    @Resource
+    @Inject
     private HistoryService historyService;
-    @Resource
+    @Inject
     private EasyTaskService easyTaskService;
-    @Resource
+    @Inject
     private EasyUserService userService;
 
     @Override
@@ -382,7 +384,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
 
     @Override
     public Page<DoneTask> todoTasks(String keywords, int current, int size, Boolean finished, boolean isMe) {
-        HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery()
+         HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery()
                 .activityType(Constants.USER_TASK)
                 .orderByHistoricActivityInstanceStartTime().desc();
         if (finished != null) {

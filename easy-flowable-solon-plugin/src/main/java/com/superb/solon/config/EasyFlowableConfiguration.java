@@ -1,4 +1,4 @@
-package com.superb.starter;
+package com.superb.solon.config;
 
 import com.superb.core.config.EasyFlowableConfig;
 import com.superb.core.config.EasyFlowableDataSourceConfig;
@@ -7,64 +7,40 @@ import com.superb.core.domain.enums.HistoryLevelEnum;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.*;
 import com.superb.core.utils.EasyFlowableStringUtils;
-import com.superb.starter.api.*;
-import com.superb.starter.config.DataSourceProperties;
-import com.superb.starter.config.EasyFlowableConfigProperties;
-import com.zaxxer.hikari.HikariDataSource;
+import com.superb.solon.api.*;
+import com.superb.solon.properties.EasyFlowableConfigProperties;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.*;
 import org.flowable.image.ProcessDiagramGenerator;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.noear.solon.Solon;
+import org.noear.solon.annotation.Bean;
+import org.noear.solon.annotation.Condition;
+import org.noear.solon.annotation.Configuration;
+import org.noear.solon.annotation.Inject;
+import org.noear.solon.data.dynamicds.DynamicDataSource;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 /**
- * @package: {@link com.superb.starter}
- * @Date: 2024-09-26-13:00
- * @Description:
  * @Author: MoJie
+ * @Date: 2024-11-23 20:17
+ * @Description:
  */
 @Configuration
-@ConditionalOnProperty(prefix = "easy-flowable", name = "enable", havingValue = "true", matchIfMissing = true)
-public class EasyFlowableAutoConfiguration {
+public class EasyFlowableConfiguration {
 
-    @Resource
+    @Inject
     private EasyFlowableConfigProperties properties;
-    @Resource
-    private DataSourceProperties dataSourceProperties;
+    private DataSource dataSource;
 
-    @Bean
-    public DataSource easyFlowableDatasource() {
-        DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.type(HikariDataSource.class);
-        if (!properties.isProjectDatasource()) {
-            EasyFlowableDataSourceConfig jdbc = properties.getDataSource();
-            this.checkJdbc(jdbc);
-            dataSourceBuilder.url(jdbc.getUrl())
-                    .username(jdbc.getUsername())
-                    .driverClassName(jdbc.getDriver())
-                    .password(jdbc.getPassword());
-        } else {
-            if (this.dataSourceProperties == null) {
-                throw new EasyFlowableException("如果您不想使用项目中的数据源，" +
-                        "请设置easy-flowable.project-datasource为false, 否则请配置spring.datasource");
-            }
-            dataSourceBuilder
-                    .driverClassName(dataSourceProperties.getDriverClassName())
-                    .url(dataSourceProperties.getUrl())
-                    .username(dataSourceProperties.getUsername())
-                    .password(dataSourceProperties.getPassword());
-        }
-        return dataSourceBuilder.build();
+    public EasyFlowableConfiguration() {
+        Solon.context().getBeanAsync(DataSource.class, bw -> this.dataSource = bw);
     }
 
     private void checkJdbc(EasyFlowableDataSourceConfig jdbc) {
+        if (jdbc == null) {
+            throw new EasyFlowableException("请配置数据库相关信息(easy-flowable.data-source)");
+        }
         if (EasyFlowableStringUtils.isBlank(jdbc.getDriver())) {
             throw new EasyFlowableException("请配置数据库驱动");
         }
@@ -80,12 +56,23 @@ public class EasyFlowableAutoConfiguration {
     }
 
     @Bean
-    public ProcessEngine processEngine(DataSource dataSource) {
+    @Condition(onProperty = "${easy-flowable.project-datasource} = true", onBean = DataSource.class)
+    public ProcessEngine projectDataSourceProcessEngine() {
+        return this.processEngine();
+    }
+
+    @Bean
+    @Condition(onProperty = "${easy-flowable.project-datasource} = false")
+    public ProcessEngine processEngine() {
         // 打印banner
         this.printBanner(properties.isBanner());
         ProcessEngineConfiguration engineConfiguration = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
         // 数据源配置
         if (properties.isProjectDatasource()) {
+            if (dataSource == null) {
+                throw new EasyFlowableException("如果您不想使用项目中的数据源，" +
+                        "请设置easy-flowable.project-datasource为false, 否则请配置solon.dataSources");
+            }
             engineConfiguration.setDataSource(dataSource);
         } else {
             EasyFlowableDataSourceConfig jdbc = properties.getDataSource();
@@ -116,26 +103,31 @@ public class EasyFlowableAutoConfiguration {
     }
 
     @Bean
+    @Condition(onBean = ProcessEngine.class)
     public RuntimeService runtimeService(ProcessEngine processEngine) {
         return processEngine.getRuntimeService();
     }
 
     @Bean
+    @Condition(onBean = ProcessEngine.class)
     public RepositoryService repositoryService(ProcessEngine processEngine) {
         return processEngine.getRepositoryService();
     }
 
     @Bean
+    @Condition(onBean = ProcessEngine.class)
     public HistoryService historyService(ProcessEngine processEngine) {
         return processEngine.getHistoryService();
     }
 
     @Bean
+    @Condition(onBean = ProcessEngine.class)
     public TaskService taskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
     }
 
     @Bean
+    @Condition(onBean = ProcessEngine.class)
     public ProcessDiagramGenerator processDiagramGenerator(ProcessEngine processEngine) {
         return processEngine.getProcessEngineConfiguration().getProcessDiagramGenerator();
     }
@@ -153,30 +145,31 @@ public class EasyFlowableAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
+    @Condition(onMissingBean = EasyUserService.class)
     public EasyUserService easyUserService() {
         return new DefaultEasyUserServiceImpl(properties.getUi());
     }
 
     @Bean
+    @Condition(onBean = ProcessEngine.class)
     public EasyModelService easyModelService() {
         return new EasyModelServiceImpl();
     }
 
     @Bean
-    @ConditionalOnClass({RepositoryService.class, RuntimeService.class})
+    @Condition(onBean = ProcessEngine.class)
     public EasyDeploymentService easyFlowDeploymentService() {
         return new EasyDeploymentServiceImpl();
     }
 
     @Bean
-    @ConditionalOnClass({RepositoryService.class, RuntimeService.class, TaskService.class, HistoryService.class})
+    @Condition(onBean = ProcessEngine.class)
     public EasyProcessInstanceService easyFlowProcessInstanceService() {
         return new EasyProcessInstanceServiceImpl();
     }
 
     @Bean
-    @ConditionalOnClass({RuntimeService.class, TaskService.class, HistoryService.class})
+    @Condition(onBean = ProcessEngine.class)
     public EasyTaskService easyFlowTaskService() {
         return new EasyTaskServiceImpl();
     }

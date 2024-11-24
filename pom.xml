@@ -8,43 +8,52 @@
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>
+    <url>https://github.com/iajie/easy-flowable</url>
+    <developers>
+        <developer>
+            <id>iajie</id>
+            <email>ajie20999@163.com</email>
+            <name>MoJie</name>
+            <url>https://github.com/iajie</url>
+        </developer>
+    </developers>
+
     <modules>
         <module>easy-flowable-core</module>
         <module>easy-flowable-boot-starter</module>
-        <module>easy-flowable-ui-designer</module>
+        <module>easy-flowable-ui-api</module>
         <module>easy-flowable-solon-plugin</module>
+        <module>easy-flowable-ui-console</module>
     </modules>
 
     <properties>
+        <easy.flowable.version>1.0.0</easy.flowable.version>
         <flowable.version>6.8.1</flowable.version>
         <lombok.version>1.18.28</lombok.version>
         <spring.version>5.3.27</spring.version>
         <spring.boot.version>2.7.11</spring.boot.version>
-        <mybatis.flex.version>1.9.7</mybatis.flex.version>
-        <HikariCP.version>6.0.0</HikariCP.version>
+        <HikariCP.version>4.0.3</HikariCP.version>
         <hutool.version>5.8.31</hutool.version>
+        <solon.version>3.0.3</solon.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-    </dependencies>
-
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-engine</artifactId>
                 <exclusions>
                     <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-beans</artifactId>
+                        <groupId>commons-io</groupId>
+                        <artifactId>commons-io</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -56,17 +65,27 @@
             <dependency>
                 <groupId>com.easy-flowable</groupId>
                 <artifactId>easy-flowable-core</artifactId>
-                <version>${project.version}</version>
+                <version>${easy.flowable.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.easy-flowable</groupId>
                 <artifactId>easy-flowable-boot-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${easy.flowable.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.easy-flowable</groupId>
-                <artifactId>easy-flowable-ui-designer</artifactId>
-                <version>${project.version}</version>
+                <artifactId>easy-flowable-ui-console</artifactId>
+                <version>${easy.flowable.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.easy-flowable</groupId>
+                <artifactId>easy-flowable-ui-api</artifactId>
+                <version>${easy.flowable.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.easy-flowable</groupId>
+                <artifactId>easy-flowable-solon-plugin</artifactId>
+                <version>${easy.flowable.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>

@@ -1,5 +1,8 @@
 package com.superb.core.constans;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @package: {@link com.superb.core.constans}
  * @Date: 2024-10-25-9:19
@@ -29,6 +32,12 @@ public class Constants {
             "/_____/\\__,_/____/\\__, /     /_/   /_/\\____/|__/|__/\\__,_/_.___/_/\\___/\n" +
             "                 /____/                                                \n" +
             "         |---- https://www.easy-flowable.online ----|";
+
+    public static final String BASE_URL = "/easy-flowable/**";
+
+    public static final String[] IGNORE_URLS = { "/easy-flowable/index.html",
+            "/easy-flowable/login", "/easy-flowable/favicon.ico", "/easy-flowable/*.css",
+            "/easy-flowable/*.js", "/easy-flowable/static/**" };
 
 
     /**

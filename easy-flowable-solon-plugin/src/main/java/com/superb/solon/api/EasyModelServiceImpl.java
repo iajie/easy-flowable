@@ -1,4 +1,4 @@
-package com.superb.starter.api;
+package com.superb.solon.api;
 
 import com.superb.core.domain.dto.Page;
 import com.superb.core.domain.entity.EasyModel;
@@ -11,8 +11,9 @@ import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.noear.solon.annotation.Component;
+import org.noear.solon.annotation.Inject;
 
-import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,10 @@ import java.util.List;
  * @Description:
  * @Author: MoJie
  */
+@Component
 public class EasyModelServiceImpl implements EasyModelService {
 
-    @Resource
+    @Inject
     private RepositoryService repositoryService;
 
     @Override

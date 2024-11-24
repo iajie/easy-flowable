@@ -1,0 +1,42 @@
+{
+  "properties": [
+    {
+      "defaultValue": true,
+      "name": "easy-flowable.enable",
+      "description": "是否开启easy-flowable， 默认开启.",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "defaultValue": true,
+      "name": "easy-flowable.banner",
+      "description": "是否启动时打印banner.",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "defaultValue": true,
+      "name": "easy-flowable.project-datasource",
+      "description": "是否使用项目中的数据源.",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "name": "easy-flowable.data-source",
+      "description": "数据源配置.",
+      "type": "com.superb.core.config.EasyFlowableDataSourceConfig"
+    },
+    {
+      "name": "easy-flowable.data-source.driver",
+      "description": "数据库驱动.",
+      "type": "java.sql.Driver"
+    },
+    {
+      "name": "easy-flowable.config",
+      "description": "easy-flowable全局配置.",
+      "type": "com.superb.core.config.EasyFlowableConfig"
+    },
+    {
+      "name": "easy-flowable.ui",
+      "description": "easy-flowable-ui可选配置.",
+      "type": "com.superb.core.config.EasyFlowableUiConfig"
+    }
+  ]
+}

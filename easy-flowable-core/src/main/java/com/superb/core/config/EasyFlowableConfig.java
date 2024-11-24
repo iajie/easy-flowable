@@ -1,6 +1,6 @@
 package com.superb.core.config;
 
-import com.superb.core.utils.StringUtils;
+import com.superb.core.utils.EasyFlowableStringUtils;
 import lombok.Data;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -32,26 +32,26 @@ public class EasyFlowableConfig {
 
     /** 流程历史级别 */
     private String historyLevel = HistoryLevel.AUDIT.getKey();
-
-    /** 邮件配置开关，默认关闭 */
-    private boolean isMail = false;
-
-    /** easy-flowable邮件配置 */
-    private Map<String, MailConfig> mailConfig = Collections.singletonMap("easy-flowable", new MailConfig());
-
-    /**
-     * 获取邮件配置
-     * @return {@link MailServerInfo}
-     * @Author MoJie
-     * @Date 2024-09-26 15:26:16
-     */
-    public Map<String, MailServerInfo> getMailConfig() {
-        Map<String, MailServerInfo> map = new HashMap<String, MailServerInfo>();
-        for (String key : this.mailConfig.keySet()) {
-            map.put(key, this.mailConfig.get(key).getMail());
-        }
-        return map;
-    }
+//
+//    /** 邮件配置开关，默认关闭 */
+//    private boolean isMail = false;
+//
+//    /** easy-flowable邮件配置 */
+//    private Map<String, MailConfig> mailConfig = Collections.singletonMap("easy-flowable", new MailConfig());
+//
+//    /**
+//     * 获取邮件配置
+//     * @return {@link MailServerInfo}
+//     * @Author MoJie
+//     * @Date 2024-09-26 15:26:16
+//     */
+//    public Map<String, MailServerInfo> getMailConfig() {
+//        Map<String, MailServerInfo> map = new HashMap<String, MailServerInfo>();
+//        for (String key : this.mailConfig.keySet()) {
+//            map.put(key, this.mailConfig.get(key).getMail());
+//        }
+//        return map;
+//    }
 
     /**
      * easy-flowable邮件配置
@@ -90,7 +90,7 @@ public class EasyFlowableConfig {
 
         public MailServerInfo getMail() {
             MailServerInfo info = new MailServerInfo();
-            if (StringUtils.isBlank(this.username)) {
+            if (EasyFlowableStringUtils.isBlank(this.username)) {
                 MailConfig config = this.defaultMail();
                 info.setMailServerHost(config.host);
                 info.setMailServerPort(config.port);
