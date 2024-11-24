@@ -145,6 +145,15 @@ public interface EasyProcessInstanceService {
     }
 
     /**
+     * @param processInstanceId 流程实例ID
+     * @return: {@link Map} {@link Object}
+     * @Author: MoJie
+     * @Date: 2024/11/24 22:56
+     * @Description: 当前流程动态
+     */
+    Map<String, Object> processDynamics(String processInstanceId);
+
+    /**
      * @param keywords 关键字
      * @param current 页码
      * @param size 页大小

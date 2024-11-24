@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
  * @Author: MoJie
  */
 @RestController
+@RequestMapping(Constants.EASY_FLOWABLE + "/model")
 public class EasyModelResource {
 
     @Autowired(required = false)
@@ -24,12 +25,12 @@ public class EasyModelResource {
 
     /**
      * @param pageParams 分页查询
-     * @return {@link Result} {@link Page} {@link EasyModel} 
+     * @return {@link Result} {@link Page} {@link EasyModel}
      * @Author: MoJie
      * @Date: 2024-10-12 11:09
      * @Description: 模型分页查询
      */
-    @PostMapping(Constants.EASY_FLOWABLE + "/model/pageQuery")
+    @PostMapping("/pageQuery")
     public Result<Page<EasyModel>> page(@RequestBody PageParams<EasyModel> pageParams) {
         EasyModel params = pageParams.getParams();
         return Result.success(modelService.queryPage(pageParams.getCurrent(), pageParams.getPageSize(), params));
@@ -42,7 +43,7 @@ public class EasyModelResource {
      * @Date: 2024-10-12 10:37
      * @Description: 保存模型
      */
-    @PostMapping(Constants.EASY_FLOWABLE + "/model/save")
+    @PostMapping("/save")
     public Result<Boolean> save(@RequestBody EasyModel model) {
         if (EasyFlowableStringUtils.isNotBlank(model.getId())) {
             return Result.success(modelService.updateById(model));
@@ -57,7 +58,7 @@ public class EasyModelResource {
      * @Date: 2024-10-12 10:41
      * @Description: 根据ID删除流程模型
      */
-    @GetMapping(Constants.EASY_FLOWABLE + "/model/remove/{id}")
+    @GetMapping("/remove/{id}")
     public Result<Boolean> remove(@PathVariable String id) {
         if (modelService.removeById(id)) {
             return Result.success();
@@ -72,7 +73,7 @@ public class EasyModelResource {
      * @Date: 2024-10-12 10:42
      * @Description: 根据ID获取模型信息
      */
-    @GetMapping(Constants.EASY_FLOWABLE + "/model/info/{id}")
+    @GetMapping("/info/{id}")
     public Result<EasyModel> getInfo(@PathVariable String id) {
         return Result.success(modelService.getById(id));
     }

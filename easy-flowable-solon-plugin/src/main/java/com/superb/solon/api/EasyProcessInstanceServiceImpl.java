@@ -33,10 +33,8 @@ import org.flowable.task.api.Task;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,8 +56,6 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     private HistoryService historyService;
     @Inject
     private EasyTaskService easyTaskService;
-    @Inject
-    private EasyUserService userService;
 
     @Override
     public List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow, boolean isProcessInstance) {
@@ -362,6 +358,31 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             list.add(flowProcessInstance);
         }
         return list;
+    }
+
+    @Override
+    public Map<String, Object> processDynamics(String processInstanceId) {
+        Map<String, Object> map = new HashMap<>();
+        Task task = this.taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        InputStream processModel = repositoryService.getProcessModel(task.getProcessDefinitionId());
+        Scanner scanner = new Scanner(processModel, "UTF-8").useDelimiter("\\A");
+        map.put("data", scanner.hasNext() ? scanner.next() : "");
+        List<HistoricActivityInstance> list = this.historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstanceId).unfinished().list();
+        if (list != null && list.size() > 0) {
+            List<String> activeNode = new ArrayList<>();
+            List<String> executeNode = new ArrayList<>();
+            for (HistoricActivityInstance activityInstance : list) {
+                if (activityInstance.getEndTime() != null) {
+                    executeNode.add(activityInstance.getActivityId());
+                } else {
+                    activeNode.add(activityInstance.getActivityId());
+                }
+            }
+            map.put("activeNode", activeNode);
+            map.put("executeNode", executeNode);
+        }
+        return map;
     }
 
     @Override
