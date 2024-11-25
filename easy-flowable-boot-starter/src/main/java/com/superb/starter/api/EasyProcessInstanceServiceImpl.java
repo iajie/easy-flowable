@@ -361,14 +361,41 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     }
 
     @Override
-    public Map<String, Object> processDynamics(String processInstanceId) {
+    public Map<String, Object> nodeInfo(String nodeId) {
         Map<String, Object> map = new HashMap<>();
-        Task task = this.taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        InputStream processModel = repositoryService.getProcessModel(task.getProcessDefinitionId());
+        List<HistoricActivityInstance> list = this.historyService.createHistoricActivityInstanceQuery()
+                .activityId(nodeId)
+                .orderByHistoricActivityInstanceStartTime().desc().list();
+        if (list.size() > 0) {
+            HistoricActivityInstance activityInstance = list.get(0);
+            map.put("startTime", activityInstance.getStartTime());
+            map.put("endTime", activityInstance.getEndTime());
+            map.put("duration", activityInstance.getDurationInMillis());
+            String assignee = activityInstance.getAssignee();
+            List<EasyFlowableUser> users = new ArrayList<>();
+            if (activityInstance.getActivityType().equals(Constants.USER_TASK)) {
+                if (EasyFlowableStringUtils.isNotBlank(assignee)) {
+                    users.add(userService.getCurrentUser(assignee));
+                } else {
+                    List<String> executors = this.easyTaskService.getUserTaskExecutors(activityInstance.getTaskId(), false);
+                    for (String executor : executors) {
+                        users.add(userService.getCurrentUser(executor));
+                    }
+                }
+                map.put("users", users);
+            }
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> processDynamics(String processInstanceId, String processDefinitionId) {
+        Map<String, Object> map = new HashMap<>();
+        InputStream processModel = repositoryService.getProcessModel(processDefinitionId);
         Scanner scanner = new Scanner(processModel, "UTF-8").useDelimiter("\\A");
         map.put("data", scanner.hasNext() ? scanner.next() : "");
         List<HistoricActivityInstance> list = this.historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstanceId).unfinished().list();
+                .processInstanceId(processInstanceId).list();
         if (list != null && list.size() > 0) {
             List<String> activeNode = new ArrayList<>();
             List<String> executeNode = new ArrayList<>();

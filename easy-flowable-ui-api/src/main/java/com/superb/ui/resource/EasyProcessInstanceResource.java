@@ -110,6 +110,30 @@ public class EasyProcessInstanceResource {
         return Result.success();
     }
 
+    /**
+     * @param processInstanceId 流程实例ID
+     * @return: {@link Result} {@link Map} {@link Object}
+     * @Author: MoJie
+     * @Date: 2024/11/25 18:43
+     * @Description: 流程动态
+     */
+    @GetMapping("processDynamics")
+    public Result<Map<String, Object>> processDynamics(@RequestParam String processInstanceId, @RequestParam String processDefinitionId) {
+        return Result.success(processInstanceService.processDynamics(processInstanceId, processDefinitionId));
+    }
+
+    /**
+     * @param nodeId 流程实例ID
+     * @return: {@link Result} {@link Map} {@link Object}
+     * @Author: MoJie
+     * @Date: 2024/11/25 18:43
+     * @Description: 流程动态
+     */
+    @GetMapping("nodeInfo/{nodeId}")
+    public Result<Map<String, Object>> nodeInfo(@PathVariable String nodeId) {
+        return Result.success(processInstanceService.nodeInfo(nodeId));
+    }
+
     @GetMapping("/statics")
     public Result<Map<String, Object>> statics() {
         return Result.success(processInstanceService.statics());

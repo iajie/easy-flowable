@@ -27,6 +27,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Comment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
@@ -405,9 +406,9 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                 list.add(flowTask.getAssignee());
             } else {
                 // 获取候选人信息
-                List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+                List<HistoricIdentityLink> identityLinks = this.historyService.getHistoricIdentityLinksForTask(taskId);
                 if (!identityLinks.isEmpty()) {
-                    for (IdentityLink identityLink : identityLinks) {
+                    for (HistoricIdentityLink identityLink : identityLinks) {
                         // 不为候选都跳过
                         if (!IdentityLinkType.CANDIDATE.equalsIgnoreCase(identityLink.getType())) {
                             continue;
@@ -423,7 +424,6 @@ public class EasyTaskServiceImpl implements EasyTaskService {
                                 list.add(identityLink.getUserId());
                             }
                         }
-
                     }
                 }
             }

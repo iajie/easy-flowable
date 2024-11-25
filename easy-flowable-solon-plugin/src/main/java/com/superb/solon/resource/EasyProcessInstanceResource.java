@@ -35,7 +35,7 @@ public class EasyProcessInstanceResource {
      * @Date: 2024-10-09 16:26:52
      */
     @Mapping(value = "/list/{processDefinitionId}", method = MethodType.GET)
-    public Result<List<FlowProcessInstance>> list(@Param String processDefinitionId) {
+    public Result<List<FlowProcessInstance>> list(@Path("processDefinitionId") String processDefinitionId) {
         return Result.success(processInstanceService.getFlowInstanceListById(processDefinitionId));
     }
 
@@ -102,6 +102,32 @@ public class EasyProcessInstanceResource {
     public Result<String> start(@Param String processInstanceId, @Param String status) {
         processInstanceService.updateProcessInstanceBusinessStatus(processInstanceId, status);
         return Result.success();
+    }
+
+    /**
+     * @param processInstanceId 流程实例ID
+     * @return: {@link Result} {@link Map} {@link Object}
+     * @Author: MoJie
+     * @Date: 2024/11/25 18:43
+     * @Description: 流程动态
+     */
+    @Get
+    @Mapping("processDynamics")
+    public Result<Map<String, Object>> processDynamics(@Param String processInstanceId, @Param String processDefinitionId) {
+        return Result.success(processInstanceService.processDynamics(processInstanceId, processDefinitionId));
+    }
+
+    /**
+     * @param nodeId 流程实例ID
+     * @return: {@link Result} {@link Map} {@link Object}
+     * @Author: MoJie
+     * @Date: 2024/11/25 18:43
+     * @Description: 流程动态
+     */
+    @Get
+    @Mapping("nodeInfo/{nodeId}")
+    public Result<Map<String, Object>> nodeInfo(@Path String nodeId) {
+        return Result.success(processInstanceService.nodeInfo(nodeId));
     }
 
     @Mapping(value = "/statics", method = MethodType.GET)

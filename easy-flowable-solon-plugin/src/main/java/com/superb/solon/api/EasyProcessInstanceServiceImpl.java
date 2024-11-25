@@ -13,6 +13,7 @@ import com.superb.core.service.EasyTaskService;
 import com.superb.core.service.EasyUserService;
 import com.superb.core.utils.EasyFlowableStringUtils;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -32,6 +33,7 @@ import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
+import org.noear.solon.core.util.IoUtil;
 
 import java.io.InputStream;
 import java.util.*;
@@ -56,6 +58,8 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     private HistoryService historyService;
     @Inject
     private EasyTaskService easyTaskService;
+    @Inject
+    private EasyUserService userService;
 
     @Override
     public List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow, boolean isProcessInstance) {
@@ -361,14 +365,13 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     }
 
     @Override
-    public Map<String, Object> processDynamics(String processInstanceId) {
+    @SneakyThrows
+    public Map<String, Object> processDynamics(String processInstanceId, String processDefinitionId) {
         Map<String, Object> map = new HashMap<>();
-        Task task = this.taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        InputStream processModel = repositoryService.getProcessModel(task.getProcessDefinitionId());
-        Scanner scanner = new Scanner(processModel, "UTF-8").useDelimiter("\\A");
-        map.put("data", scanner.hasNext() ? scanner.next() : "");
+        InputStream processModel = repositoryService.getProcessModel(processDefinitionId);
+        map.put("data", IoUtil.transferToString(processModel, "UTF-8"));
         List<HistoricActivityInstance> list = this.historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstanceId).unfinished().list();
+                .processInstanceId(processInstanceId).list();
         if (list != null && list.size() > 0) {
             List<String> activeNode = new ArrayList<>();
             List<String> executeNode = new ArrayList<>();
@@ -381,6 +384,38 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             }
             map.put("activeNode", activeNode);
             map.put("executeNode", executeNode);
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> nodeInfo(String nodeId) {
+        Map<String, Object> map = new HashMap<>();
+        List<HistoricActivityInstance> list = this.historyService.createHistoricActivityInstanceQuery()
+                .activityId(nodeId)
+                .orderByHistoricActivityInstanceStartTime().desc().list();
+        if (list.size() > 0) {
+            HistoricActivityInstance activityInstance = list.get(0);
+            String startTime = DateFormatUtils.format(activityInstance.getStartTime(), "yyyy-MM-dd HH:mm:ss");
+            if (activityInstance.getEndTime() != null) {
+                String endTime = DateFormatUtils.format(activityInstance.getEndTime(), "yyyy-MM-dd HH:mm:ss");
+                map.put("endTime", endTime);
+            }
+            map.put("startTime", startTime);
+            map.put("duration", activityInstance.getDurationInMillis());
+            String assignee = activityInstance.getAssignee();
+            List<EasyFlowableUser> users = new ArrayList<>();
+            if (activityInstance.getActivityType().equals(Constants.USER_TASK)) {
+                if (EasyFlowableStringUtils.isNotBlank(assignee)) {
+                    users.add(userService.getCurrentUser(assignee));
+                } else {
+                    List<String> executors = this.easyTaskService.getUserTaskExecutors(activityInstance.getTaskId(), false);
+                    for (String executor : executors) {
+                        users.add(userService.getCurrentUser(executor));
+                    }
+                }
+                map.put("users", users);
+            }
         }
         return map;
     }

@@ -146,12 +146,22 @@ public interface EasyProcessInstanceService {
 
     /**
      * @param processInstanceId 流程实例ID
+     * @param processDefinitionId 流程定义ID
      * @return: {@link Map} {@link Object}
      * @Author: MoJie
      * @Date: 2024/11/24 22:56
      * @Description: 当前流程动态
      */
-    Map<String, Object> processDynamics(String processInstanceId);
+    Map<String, Object> processDynamics(String processInstanceId, String processDefinitionId);
+
+    /**
+     * @param nodeId 节点ID
+     * @return: {@link Map} {@link Object}
+     * @Author: MoJie
+     * @Date: 2024/11/25 19:31
+     * @Description: 根据节点ID获取节点执行信息(最新一条)
+     */
+    Map<String, Object> nodeInfo(String nodeId);
 
     /**
      * @param keywords 关键字

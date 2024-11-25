@@ -92,7 +92,7 @@ public interface EasyTaskService {
      * @Date: 2024-10-09 10:51:02
      */
     default List<String> getUserTaskExecutors(String taskId, boolean isMainer) {
-        return getUserTaskExecutorList(taskId, false, false);
+        return getUserTaskExecutorList(taskId, isMainer, false);
     }
 
     /**
