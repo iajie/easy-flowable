@@ -82,7 +82,7 @@ public class EasyDeploymentResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:21:06
      */
-    @GetMapping("State/{processDefinitionId}")
+    @GetMapping("deploymentState/{processDefinitionId}")
     public Result<String> deploymentState(@PathVariable String processDefinitionId) {
         return Result.success("流程定义状态设置成功！", deploymentService.deploymentState(processDefinitionId));
     }
@@ -108,7 +108,7 @@ public class EasyDeploymentResource {
      * @Date: 2024-10-09 16:21:50
      */
     @SneakyThrows
-    @GetMapping("Image/{processDefinitionId}")
+    @GetMapping("deploymentImage/{processDefinitionId}")
     public void deploymentImage(@PathVariable String processDefinitionId, HttpServletResponse response) {
         InputStream inputStream = deploymentService.getFlowImage(processDefinitionId);
         response.setContentType("image/png");
@@ -122,7 +122,7 @@ public class EasyDeploymentResource {
      * @Author: MoJie
      * @Date: 2024-10-09 16:21:50
      */
-    @GetMapping("Xml/{processDefinitionId}")
+    @GetMapping("deploymentXml/{processDefinitionId}")
     public Result<String> deploymentXml(@PathVariable String processDefinitionId) {
         return Result.success("获取成功", deploymentService.getFlowXml(processDefinitionId));
     }

@@ -139,10 +139,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgument>-parameters</compilerArgument>
-                    <encoding>UTF-8</encoding>
-                </configuration>
             </plugin>
             <!-- maven Source插件 -->
             <plugin>
@@ -171,36 +167,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <!-- gpg插件 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- 发布插件 -->
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.5.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <publishingServerId>central</publishingServerId>
-                    <!--<tokenAuth>true</tokenAuth>-->
-                    <!-- 若要自动发布，添加以下配置 -->
-                    <!--<autoPublish>true</autoPublish>-->
-                    <!-- 一直等到发布完成 -->
-                    <waitUntil>published</waitUntil>
-                </configuration>
             </plugin>
         </plugins>
     </build>

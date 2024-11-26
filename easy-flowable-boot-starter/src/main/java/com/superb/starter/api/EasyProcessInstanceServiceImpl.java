@@ -93,7 +93,7 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
             List<Task> tasks = this.taskService.createTaskQuery()
                     .processInstanceId(processInstance.getProcessInstanceId())
                     .active().list();
-            if (tasks != null) {
+            if (tasks != null && tasks.size() > 0) {
                 if (tasks.size() > 1) {
                     flowProcessInstance.setTaskIds(tasks.stream().map(Task::getId).collect(Collectors.joining(",")));
                 } else {
