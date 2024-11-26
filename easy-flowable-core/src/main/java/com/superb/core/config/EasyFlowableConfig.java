@@ -10,10 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @package: {@link com.superb.core.config}
- * @Date: 2024-09-26-10:46
- * @Description: es-flowable全局配置
- * @Author: MoJie
+ * es-flowable全局配置
+ * @since 1.0  2024-09-26-10:46
+ * @author MoJie
  */
 @Data
 public class EasyFlowableConfig {
@@ -42,8 +41,8 @@ public class EasyFlowableConfig {
 //    /**
 //     * 获取邮件配置
 //     * @return {@link MailServerInfo}
-//     * @Author MoJie
-//     * @Date 2024-09-26 15:26:16
+//     * @author MoJie
+//     * @since 1.0  2024-09-26 15:26:16
 //     */
 //    public Map<String, MailServerInfo> getMailConfig() {
 //        Map<String, MailServerInfo> map = new HashMap<String, MailServerInfo>();
@@ -77,36 +76,36 @@ public class EasyFlowableConfig {
         /** 是否开启TLS通信 */
         private boolean useTls = false;
 
-        private MailConfig defaultMail() {
-            MailConfig config = new MailConfig();
-            config.setHost("smtp.yeah.net");
-            config.setUsername("easyflowable@yeah.net");
-            config.setPort(465);
-            config.setPassword("ZQcYwePNF3jcbaKA");
-            config.setUseSSL(true);
-            config.setUseTls(false);
-            return config;
-        }
+//        private MailConfig defaultMail() {
+//            MailConfig config = new MailConfig();
+//            config.setHost("smtp.yeah.net");
+//            config.setUsername("easyflowable@yeah.net");
+//            config.setPort(465);
+//            config.setPassword("ZQcYwePNF3jcbaKA");
+//            config.setUseSSL(true);
+//            config.setUseTls(false);
+//            return config;
+//        }
 
-        public MailServerInfo getMail() {
-            MailServerInfo info = new MailServerInfo();
-            if (EasyFlowableStringUtils.isBlank(this.username)) {
-                MailConfig config = this.defaultMail();
-                info.setMailServerHost(config.host);
-                info.setMailServerPort(config.port);
-                info.setMailServerUsername(config.username);
-                info.setMailServerPassword(config.password);
-                info.setMailServerUseSSL(config.useSSL);
-                info.setMailServerUseTLS(config.useTls);
-                return info;
-            }
-            info.setMailServerHost(this.host);
-            info.setMailServerPort(this.port);
-            info.setMailServerPassword(this.password);
-            info.setMailServerUseSSL(this.useSSL);
-            info.setMailServerUseTLS(this.useTls);
-            info.setMailServerUsername(this.username);
-            return info;
-        }
+//        public MailServerInfo getMail() {
+//            MailServerInfo info = new MailServerInfo();
+//            if (EasyFlowableStringUtils.isBlank(this.username)) {
+//                MailConfig config = this.defaultMail();
+//                info.setMailServerHost(config.host);
+//                info.setMailServerPort(config.port);
+//                info.setMailServerUsername(config.username);
+//                info.setMailServerPassword(config.password);
+//                info.setMailServerUseSSL(config.useSSL);
+//                info.setMailServerUseTLS(config.useTls);
+//                return info;
+//            }
+//            info.setMailServerHost(this.host);
+//            info.setMailServerPort(this.port);
+//            info.setMailServerPassword(this.password);
+//            info.setMailServerUseSSL(this.useSSL);
+//            info.setMailServerUseTLS(this.useTls);
+//            info.setMailServerUsername(this.username);
+//            return info;
+//        }
     }
 }

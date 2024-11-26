@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-22 21:15
- * @Description:
+ * @author MoJie
+ * @since 1.0  2024-11-22 21:15
+ * 默认对用户的实现
  */
 @AllArgsConstructor
 public class DefaultEasyUserServiceImpl implements EasyUserService {

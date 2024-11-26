@@ -7,9 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-17 13:56
- * @Description: 待办
+ * 待办
+ * @author MoJie
+ * @since 1.0  2024-11-17 13:56
  */
 @Data
 @Accessors(chain = true)

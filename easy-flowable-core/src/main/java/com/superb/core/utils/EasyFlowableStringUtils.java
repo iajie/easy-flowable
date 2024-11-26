@@ -15,19 +15,27 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @package: {@link com.superb.core.utils}
- * @Date: 2024-09-26-13:58
- * @Description:
- * @Author: MoJie
+ * {@link com.superb.core.utils}
+ * @since 1.0  2024-09-26-13:58
+ * @author MoJie
  */
 public class EasyFlowableStringUtils {
 
+    /**
+     * jackson对象
+     */
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     static {
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    /**
+     * 字符串是否为空判断
+     * @param cs 字符串
+     * @return {@link boolean}
+     * @author MoJie
+     */
     public static boolean isEmpty(final CharSequence cs) {
         int strLen;
         if (cs == null || (strLen = cs.length()) == 0) {
@@ -41,10 +49,22 @@ public class EasyFlowableStringUtils {
         return true;
     }
 
+    /**
+     * 不为空判断
+     * @param cs 字符串
+     * @return {@link boolean}
+     * @author MoJie
+     */
     public static boolean isNotEmpty(final CharSequence cs) {
         return !isEmpty(cs);
     }
 
+    /**
+     * 字符串为空
+     * @param cs 字符串
+     * @return {@link boolean}
+     * @author MoJie
+     */
     public static boolean isBlank(CharSequence cs) {
         if (cs != null) {
             int length = cs.length();
@@ -57,16 +77,22 @@ public class EasyFlowableStringUtils {
         return true;
     }
 
+    /**
+     * 字符串不为空判断
+     * @param cs 字符串
+     * @return {@link boolean}
+     * @author MoJie
+     */
     public static boolean isNotBlank(CharSequence cs) {
         return !isBlank(cs);
     }
 
     /**
+     * 判断字符串是否为json
      * @param str 字符串
-     * @Return: {@link boolean}
-     * @Author: MoJie
-     * @Date: 2024/10/28 20:32
-     * @Description: 判断字符串是否为json
+     * @return {@link boolean}
+     * @author MoJie
+     * @since 1.0  2024/10/28 20:32
      */
     public static boolean isJson(String str) {
         try {
@@ -78,11 +104,11 @@ public class EasyFlowableStringUtils {
     }
 
     /**
+     * @param <T> 泛型
      * @param value 实体
-     * @Return: {@link String}
-     * @Author: MoJie
-     * @Date: 2024/10/29 19:20
-     * @Description: 将实体转为json
+     * @return {@link String} 将实体转为json
+     * @author MoJie
+     * @since 1.0  2024/10/29 19:20
      */
     @SneakyThrows
     public static <T> String toJson(T value) {
@@ -90,12 +116,12 @@ public class EasyFlowableStringUtils {
     }
 
     /**
+     * @param <T> 泛型
      * @param jsonStr json字符串
      * @param clazz 转换类
-     * @Return: {@link T}
-     * @Author: MoJie
-     * @Date: 2024/10/29 19:21
-     * @Description: 将json字符串转为实体
+     * @return {@link T} 将json字符串转为实体
+     * @author MoJie
+     * @since 1.0  2024/10/29 19:21
      */
     @SneakyThrows
     public static <T> T toJava(String jsonStr, Class<T> clazz) {
@@ -103,12 +129,12 @@ public class EasyFlowableStringUtils {
     }
 
     /**
+     * @param <T> 泛型
      * @param jsonStr 字符串
      * @param valueTypeRef 泛型
-     * @return: {@link T}
-     * @Author: MoJie
-     * @Date: 2024/11/17 12:36
-     * @Description: 将字符串转实体
+     * @return {@link T} 将字符串转实体
+     * @author MoJie
+     * @since 1.0  2024/11/17 12:36
      */
     @SneakyThrows
     public static <T> T toJava(String jsonStr, TypeReference<T> valueTypeRef) {
@@ -117,10 +143,9 @@ public class EasyFlowableStringUtils {
 
     /**
      * @param jsonStr json字符串
-     * @return: {@link Map} {@link Object}
-     * @Author: MoJie
-     * @Date: 2024/11/17 12:37
-     * @Description: 将json字符串转为map对象
+     * @return {@link Map} {@link Object} 将json字符串转为map对象
+     * @author MoJie
+     * @since 1.0  2024/11/17 12:37
      */
     @SneakyThrows
     public static Map<String, Object> toMap(String jsonStr) {
@@ -130,10 +155,9 @@ public class EasyFlowableStringUtils {
     /**
      * @param tarClass 变化实体
      * @param scrClass 旧实体
-     * @return: {@link Map} {@link Object}
-     * @Author: MoJie
-     * @Date: 2024/11/16 15:28
-     * @Description: 记录两个实体字段发生的变化
+     * @return {@link Map} {@link Object} 记录两个实体字段发生的变化
+     * @author MoJie
+     * @since 1.0  2024/11/16 15:28
      */
     @SneakyThrows
     public static Map<String, Object> screenTwoProperty(Object tarClass, Object scrClass) {
@@ -176,10 +200,9 @@ public class EasyFlowableStringUtils {
 
     /**
      * @param obj 实体
-     * @return: {@link boolean}
-     * @Author: MoJie
-     * @Date: 2024/11/17 12:28
-     * @Description: 字段是否存在@EasyItem注解
+     * @return {@link boolean} 字段是否存在@EasyItem注解
+     * @author MoJie
+     * @since 1.0  2024/11/17 12:28
      */
     public static boolean isAnnotationEasyItem(Object obj) {
         List<Field> list = new ArrayList<>();

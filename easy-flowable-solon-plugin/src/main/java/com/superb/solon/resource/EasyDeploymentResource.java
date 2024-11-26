@@ -17,10 +17,9 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.ui.resource}
- * @Date: 2024-10-09-9:18
- * @Description: 流程部署管理
- * @Author: MoJie
+ * 流程部署管理
+ * @since 1.0  2024-10-09-9:18
+ * @author MoJie
  */
 @Controller
 @Mapping(Constants.EASY_FLOWABLE + "/deployment")
@@ -33,8 +32,8 @@ public class EasyDeploymentResource {
      * 流程部署定义分页查询
      * @param pageParams 分页参数
      * @return {@link Page<DeploymentProcessDef>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:15:19
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:15:19
      */
     @Mapping(value = "/page", method = MethodType.POST)
     public Result<Page<DeploymentProcessDef>> page(@Body PageParams<DeploymentProcessDef> pageParams) {
@@ -45,8 +44,8 @@ public class EasyDeploymentResource {
      * 通过ModelId部署流程
      * @param modelId 流程模型ID
      * @return {@link Result<String>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:19:05
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:19:05
      */
     @Mapping(value = "/{modelId}", method = MethodType.GET)
     public Result<String> deploymentModel(@Param String modelId) {
@@ -58,8 +57,8 @@ public class EasyDeploymentResource {
      * @param deploymentId 实例id
      * @param cascade 是否级联删除
      * @return {@link Result}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:20:04
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:20:04
      */
     @Mapping(value = "/deleteDeployment", method = MethodType.GET)
     public Result<String> deleteDeployment(@Param String deploymentId, @Param Boolean cascade) {
@@ -75,8 +74,8 @@ public class EasyDeploymentResource {
      * 设置流程状态（当流程为：1激活（默认设置为终止流程）2：中止（挂起）（默认设置为激活流程））
      * @param processDefinitionId 流程定义id
      * @return {@link Result<String>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:21:06
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:21:06
      */
     @Mapping(value = "deploymentState/{processDefinitionId}", method = MethodType.GET)
     public Result<String> deploymentState(@Param String processDefinitionId) {
@@ -86,9 +85,8 @@ public class EasyDeploymentResource {
     /**
      * 流程定义用户任务节点 当前流程定义中存在用户任务的节点列表
      * @param flowKey 流程定义key
-     * @return {@link List<FlowUserTask>>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:21:50
+     * @return {@link Result} {@link List} {@link FlowUserTask}
+     * @author MoJie
      */
     @Mapping(value = "/flowUserList/{flowKey}", method = MethodType.GET)
     public Result<List<FlowUserTask>> getFlowUserTaskList(@Param String flowKey) {
@@ -97,9 +95,10 @@ public class EasyDeploymentResource {
 
     /**
      * 流程部署图片
+     * @param ctx 上下文对象
      * @param processDefinitionId 流程定义id
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:21:50
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:21:50
      */
     @SneakyThrows
     @Get
@@ -113,8 +112,8 @@ public class EasyDeploymentResource {
     /**
      * 流程部署的XML
      * @param processDefinitionId 流程定义id
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:21:50
+     * @return {@link Result} {@link String}
+     * @author MoJie
      */
     @Get
     @Mapping("deploymentXml/{processDefinitionId}")

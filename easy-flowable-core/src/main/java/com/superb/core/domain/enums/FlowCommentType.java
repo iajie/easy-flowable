@@ -4,10 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * @package: {@link com.superb.core.domain.enums}
- * @Date: 2024-10-09-10:47
- * @Description: 审批意见
- * @Author: MoJie
+ * 审批意见
+ * @since 1.0  2024-10-09-10:47
+ * @author MoJie
  */
 @Getter
 @AllArgsConstructor
@@ -15,14 +14,17 @@ public enum FlowCommentType {
 
     /** 正常进入下一节点 */
     START("0", "启动流程"),
+    /** 正常进入下一节点 */
     AGREE("1", "同意"),
 
     /** 回到发起节点 */
     REBUT("2", "拒绝"),
+    /** 回到发起节点 */
     REVOCATION("3", "撤回"),
 
-    /** 回到 上一节点/指定节点 */
+    /** 回到 上一节点 */
     REJECT("4", "驳回"),
+    /** 回到 指定节点 */
     REJECT_TO_TASK("5", "驳回到指定节点"),
 
     /** 重新指定节点执行人 */
@@ -40,9 +42,11 @@ public enum FlowCommentType {
 
     /** 流程作废 */
     CANCELLATION("11", "作废"),
-
+    /** 只对当前任务评论，不会操作流程 */
     ADD_COMMENT("12", "添加评论"),
+    /** 删除评论 */
     DEL_COMMENT("13", "删除评论"),
+    /** 回到起始节点 */
     RESUBMIT("14", "重新提交"),
 
     ;

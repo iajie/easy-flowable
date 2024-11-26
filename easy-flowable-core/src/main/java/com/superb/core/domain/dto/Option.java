@@ -5,10 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @package: {@link com.superb.core.domain.dto}
- * @Date: 2024-10-09-10:33
- * @Description:
- * @Author: MoJie
+ * @since 1.0  2024-10-09-10:33
+ * @author MoJie
  */
 @Data
 @NoArgsConstructor

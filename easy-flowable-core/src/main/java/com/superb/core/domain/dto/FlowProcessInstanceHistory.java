@@ -5,9 +5,9 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-03 20:59
- * @Description: 流程历史
+ * 流程历史
+ * @author MoJie
+ * @since 1.0  2024-11-03 20:59
  */
 @Data
 public class FlowProcessInstanceHistory {

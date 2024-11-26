@@ -17,10 +17,9 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.ui.resource}
- * @Date: 2024-10-09-9:18
- * @Description: 流程部署管理
- * @Author: MoJie
+ * 流程部署管理
+ * @since 1.0  2024-10-09-9:18
+ * @author MoJie
  */
 @RestController
 @RequestMapping(Constants.EASY_FLOWABLE + "/deployment")
@@ -34,8 +33,8 @@ public class EasyDeploymentResource {
      *
      * @param pageParams 分页参数
      * @return {@link Page<DeploymentProcessDef>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:15:19
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:15:19
      */
     @PostMapping("/page")
     public Result<Page<DeploymentProcessDef>> page(@RequestBody PageParams<DeploymentProcessDef> pageParams) {
@@ -47,8 +46,8 @@ public class EasyDeploymentResource {
      *
      * @param modelId 流程模型ID
      * @return {@link Result<String>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:19:05
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:19:05
      */
     @GetMapping("/{modelId}")
     public Result<String> deploymentModel(@PathVariable String modelId) {
@@ -61,8 +60,8 @@ public class EasyDeploymentResource {
      * @param deploymentId 实例id
      * @param cascade      是否级联删除
      * @return {@link Result}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:20:04
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:20:04
      */
     @GetMapping("/deleteDeployment")
     public Result<String> deleteDeployment(@RequestParam String deploymentId, @RequestParam Boolean cascade) {
@@ -79,8 +78,8 @@ public class EasyDeploymentResource {
      *
      * @param processDefinitionId 流程定义id
      * @return {@link Result<String>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:21:06
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:21:06
      */
     @GetMapping("deploymentState/{processDefinitionId}")
     public Result<String> deploymentState(@PathVariable String processDefinitionId) {
@@ -89,11 +88,9 @@ public class EasyDeploymentResource {
 
     /**
      * 流程定义用户任务节点 当前流程定义中存在用户任务的节点列表
-     *
      * @param flowKey 流程定义key
-     * @return {@link List<FlowUserTask>>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:21:50
+     * @return {@link Result} {@link List} {@link FlowUserTask}
+     * @author MoJie
      */
     @GetMapping("/flowUserList/{flowKey}")
     public Result<List<FlowUserTask>> getFlowUserTaskList(@PathVariable String flowKey) {
@@ -102,10 +99,10 @@ public class EasyDeploymentResource {
 
     /**
      * 流程部署图片
-     *
+     * @param response 响应信息
      * @param processDefinitionId 流程定义id
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:21:50
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:21:50
      */
     @SneakyThrows
     @GetMapping("deploymentImage/{processDefinitionId}")
@@ -117,10 +114,9 @@ public class EasyDeploymentResource {
 
     /**
      * 流程部署的XML
-     *
      * @param processDefinitionId 流程定义id
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:21:50
+     * @return {@link Result} {@link String}
+     * @author MoJie
      */
     @GetMapping("deploymentXml/{processDefinitionId}")
     public Result<String> deploymentXml(@PathVariable String processDefinitionId) {

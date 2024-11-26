@@ -6,10 +6,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.core.domain.dto}
- * @Date: 2024-10-09-10:33
- * @Description: 流程执行历史
- * @Author: MoJie
+ * 流程执行历史
+ * @since 1.0  2024-10-09-10:33
+ * @author MoJie
  */
 @Data
 public class FlowExecutionHistory {

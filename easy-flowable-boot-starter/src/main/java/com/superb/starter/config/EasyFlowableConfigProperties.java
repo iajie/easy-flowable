@@ -8,10 +8,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
- * @package: {@link com.superb.starter.config}
- * @Date: 2024-09-26-12:51
- * @Description: easy-flowable配置
- * @Author: MoJie
+ * easy-flowable配置
+ * @since 1.0  2024-09-26-12:51
+ * @author MoJie
  */
 @Data
 @ConfigurationProperties("easy-flowable")

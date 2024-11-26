@@ -6,10 +6,9 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * @package: {@link com.superb.core.domain.dto}
- * @Date: 2024-10-09-10:35
- * @Description: 任务执行意见
- * @Author: MoJie
+ * 任务执行意见
+ * @since 1.0  2024-10-09-10:35
+ * @author MoJie
  */
 @Data
 public class FlowComment {

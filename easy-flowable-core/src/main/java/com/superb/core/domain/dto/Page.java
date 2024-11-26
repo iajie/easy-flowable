@@ -5,9 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-09 11:52
- * @Description:
+ * @author MoJie
+ * @since 1.0  2024-11-09 11:52
  */
 @Data
 public class Page<T> {

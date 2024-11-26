@@ -4,9 +4,9 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-24 10:55
- * @Description:
+ * 数据源获取-存在问题
+ * @author MoJie
+ * @since 1.0  2024-11-24 10:55
  */
 @Data
 @ConfigurationProperties("spring.datasource")

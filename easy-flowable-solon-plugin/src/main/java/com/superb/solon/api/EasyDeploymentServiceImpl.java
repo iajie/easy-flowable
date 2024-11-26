@@ -20,24 +20,21 @@ import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.noear.solon.Utils;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.util.IoUtil;
-import sun.misc.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.starter.api}
- * @Date: 2024-10-09-11:19
- * @Description:
- * @Author: MoJie
+ * 自定义模型部署实现方法
+ * @since 1.0  2024-10-09-11:19
+ * 
+ * @author MoJie
  */
 @Component
 public class EasyDeploymentServiceImpl implements EasyDeploymentService {
@@ -154,8 +151,8 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
      * 根据流程模型KEY获取流程部署信息
      * @param flowKey 流程KEY
      * @return {@link Deployment}
-     * @Author: MoJie
-     * @Date: 2024-10-09 13:12:09
+     * @author MoJie
+     * @since 1.0  2024-10-09 13:12:09
      */
     private Deployment getDeployment(String flowKey) {
         List<Deployment> list = repositoryService.createDeploymentQuery()

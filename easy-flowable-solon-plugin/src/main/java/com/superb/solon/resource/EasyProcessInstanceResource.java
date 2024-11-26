@@ -15,10 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @package: {@link com.superb.ui.resource}
- * @Date: 2024-10-09-16:24
- * @Description: 流程实例接口
- * @Author: MoJie
+ * 流程实例接口
+ * @since 1.0  2024-10-09-16:24
+ * @author MoJie
  */
 @Controller
 @Mapping(Constants.EASY_FLOWABLE + "/processInstance")
@@ -31,8 +30,8 @@ public class EasyProcessInstanceResource {
      * 获取启动的流程实例 包含流程终止和激活的
      * @param processDefinitionId 流程定义ID
      * @return {@link List<FlowProcessInstance>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:26:52
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:26:52
      */
     @Mapping(value = "/list/{processDefinitionId}", method = MethodType.GET)
     public Result<List<FlowProcessInstance>> list(@Path("processDefinitionId") String processDefinitionId) {
@@ -43,8 +42,8 @@ public class EasyProcessInstanceResource {
      * 流程实例状态设置 当实例状态为激活时会设置为终止，当实例状态为终止时状态会激活
      * @param processInstanceId 实例ID
      * @return {@link Result<Boolean>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:27:37
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:27:37
      */
     @Mapping(value = "/stateSet/{processInstanceId}", method = MethodType.GET)
     public Result<Boolean> stateSet(@Param String processInstanceId) {
@@ -55,8 +54,8 @@ public class EasyProcessInstanceResource {
      * 根据流程实例Id获取可回退的节点
      * @param processInstanceId 实例ID
      * @return {@link List< Option >}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:28:20
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:28:20
      */
     @Mapping(value = "/backUserTasks/{processInstanceId}", method = MethodType.GET)
     public Result<List<Option>> backUserTasks(@Param String processInstanceId) {
@@ -67,8 +66,8 @@ public class EasyProcessInstanceResource {
      * 根据流程实例Id获取流程执行历史
      * @param processInstanceId 实例ID
      * @return {@link List< FlowExecutionHistory >}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:28:55
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:28:55
      */
     @Mapping(value = "/executionHistory/{processInstanceId}", method = MethodType.GET)
     public Result<List<FlowExecutionHistory>> executionHistory(@Param String processInstanceId) {
@@ -79,8 +78,8 @@ public class EasyProcessInstanceResource {
      * 启动流程实例
      * @param param 启动参数
      * @return {@link Result<String>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:32:43
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:32:43
      */
     @Mapping(value = "/start", method = MethodType.POST)
     public Result<String> start(@Body FlowStartParam param) {
@@ -95,8 +94,8 @@ public class EasyProcessInstanceResource {
      * @param processInstanceId 流程实例ID
      * @param status 业务表状态
      * @return {@link Result<String>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:32:43
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:32:43
      */
     @Mapping(value = "/businessStatus", method = MethodType.GET)
     public Result<String> start(@Param String processInstanceId, @Param String status) {
@@ -105,11 +104,12 @@ public class EasyProcessInstanceResource {
     }
 
     /**
+     * 流程动态
+     * @param processDefinitionId 流程定义ID
      * @param processInstanceId 流程实例ID
-     * @return: {@link Result} {@link Map} {@link Object}
-     * @Author: MoJie
-     * @Date: 2024/11/25 18:43
-     * @Description: 流程动态
+     * @return {@link Result} {@link Map} {@link Object}
+     * @author MoJie
+     * @since 1.0  2024/11/25 18:43
      */
     @Get
     @Mapping("processDynamics")
@@ -119,10 +119,10 @@ public class EasyProcessInstanceResource {
 
     /**
      * @param nodeId 流程实例ID
-     * @return: {@link Result} {@link Map} {@link Object}
-     * @Author: MoJie
-     * @Date: 2024/11/25 18:43
-     * @Description: 流程动态
+     * @return {@link Result} {@link Map} {@link Object}
+     * @author MoJie
+     * @since 1.0  2024/11/25 18:43
+     *  流程动态
      */
     @Get
     @Mapping("nodeInfo/{nodeId}")
@@ -130,6 +130,11 @@ public class EasyProcessInstanceResource {
         return Result.success(processInstanceService.nodeInfo(nodeId));
     }
 
+    /**
+     * 首页统计数量
+     * @return {@link Result} {@link Map} {@link Object}
+     * @author MoJie
+     */
     @Mapping(value = "/statics", method = MethodType.GET)
     public Result<Map<String, Object>> statics() {
         return Result.success(processInstanceService.statics());
@@ -137,10 +142,10 @@ public class EasyProcessInstanceResource {
 
     /**
      * @param pageParams 分页查询参数
-     * @return: {@link Result} {@link Page} {@link TodoTask}
-     * @Author: MoJie
-     * @Date: 2024/11/17 14:20
-     * @Description: 待办任务分页查询
+     * @return {@link Result} {@link Page} {@link TodoTask}
+     * @author MoJie
+     * @since 1.0  2024/11/17 14:20
+     *  待办任务分页查询
      */
     @Mapping(value = "/todoTaskPage", method = MethodType.POST)
     public Result<Page<DoneTask>> todoTaskPage(@Body PageParams<String> pageParams) {

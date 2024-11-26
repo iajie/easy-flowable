@@ -19,10 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.starter.api}
- * @Date: 2024-09-27-14:13
- * @Description:
- * @Author: MoJie
+ * @since 1.0  2024-09-27-14:13
+ * 模型操作方法
+ * @author MoJie
  */
 @Component
 public class EasyModelServiceImpl implements EasyModelService {

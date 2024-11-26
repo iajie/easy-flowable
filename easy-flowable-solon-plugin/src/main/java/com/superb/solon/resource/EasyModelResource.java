@@ -11,10 +11,9 @@ import org.noear.solon.annotation.*;
 import org.noear.solon.core.handle.MethodType;
 
 /**
- * @package: {@link com.superb.ui.resource}
- * @Date: 2024-09-27-12:47
- * @Description: 模型相关接口
- * @Author: MoJie
+ * 模型相关接口
+ * @since 1.0  2024-09-27-12:47
+ * @author MoJie
  */
 @Controller
 @Mapping(Constants.EASY_FLOWABLE + "/model")
@@ -26,9 +25,9 @@ public class EasyModelResource {
     /**
      * @param pageParams 分页查询
      * @return {@link Result} {@link Page} {@link EasyModel} 
-     * @Author: MoJie
-     * @Date: 2024-10-12 11:09
-     * @Description: 模型分页查询
+     * @author MoJie
+     * @since 1.0  2024-10-12 11:09
+     *  模型分页查询
      */
     @Mapping(value = "/pageQuery", method = MethodType.POST)
     public Result<Page<EasyModel>> page(@Body PageParams<EasyModel> pageParams) {
@@ -39,9 +38,9 @@ public class EasyModelResource {
     /**
      * @param model 模型参数
      * @return {@link Result<Boolean>}
-     * @Author: MoJie
-     * @Date: 2024-10-12 10:37
-     * @Description: 保存模型
+     * @author MoJie
+     * @since 1.0  2024-10-12 10:37
+     *  保存模型
      */
     @Mapping(value = "/save", method = MethodType.POST)
     public Result<Boolean> save(@Body EasyModel model) {
@@ -54,9 +53,9 @@ public class EasyModelResource {
     /**
      * @param id 模型ID
      * @return {@link Result<Boolean>}
-     * @Author: MoJie
-     * @Date: 2024-10-12 10:41
-     * @Description: 根据ID删除流程模型
+     * @author MoJie
+     * @since 1.0  2024-10-12 10:41
+     *  根据ID删除流程模型
      */
     @Mapping(value = "/remove/{id}", method = MethodType.GET)
     public Result<Boolean> remove(@Param String id) {
@@ -69,9 +68,9 @@ public class EasyModelResource {
     /**
      * @param id 模型ID
      * @return {@link Result<EasyModel>}
-     * @Author: MoJie
-     * @Date: 2024-10-12 10:42
-     * @Description: 根据ID获取模型信息
+     * @author MoJie
+     * @since 1.0  2024-10-12 10:42
+     *  根据ID获取模型信息
      */
     @Mapping(value = "/info/{id}", method = MethodType.GET)
     public Result<EasyModel> getInfo(@Param String id) {

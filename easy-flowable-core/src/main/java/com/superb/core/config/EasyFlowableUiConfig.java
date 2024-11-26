@@ -10,10 +10,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.core.config}
- * @Date: 2024-10-10-13:33
- * @Description: UI控制器参数
- * @Author: MoJie
+ * UI控制器参数
+ * @since 1.0  2024-10-10-13:33
+ * @author MoJie
  */
 @Data
 public class EasyFlowableUiConfig {
@@ -61,11 +60,21 @@ public class EasyFlowableUiConfig {
          */
         private String organId;
 
+        /**
+         * 默认用户
+         * @return {@link User}
+         * @author MoJie
+         */
         public static User defaultUser() {
             return new User("easy-flowable", "01", "easy-flowable", "222");
         }
     }
 
+    /**
+     * 默认用户组
+     * @return {@link List} {@link User}
+     * @author MoJie
+     */
     public List<User> getUsers() {
         if (users.isEmpty()) {
             users = new ArrayList<>();
@@ -78,6 +87,11 @@ public class EasyFlowableUiConfig {
         return users;
     }
 
+    /**
+     * 默认组
+     * @return {@link List} {@link Option}
+     * @author MoJie
+     */
     public List<Option> getGroups() {
         if (groups.isEmpty()) {
             groups = new ArrayList<>();

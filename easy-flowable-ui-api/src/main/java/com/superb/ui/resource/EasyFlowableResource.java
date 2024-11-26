@@ -11,14 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.ui.resource}
- * @Date: 2024-10-09-17:49
- * @Description:
- * @Author: MoJie
+ * 流程提供接口
+ * @since 1.0  2024-10-09-17:49
+ * @author MoJie
  */
 @RestController
 @RequestMapping(Constants.EASY_FLOWABLE)
@@ -31,9 +29,8 @@ public class EasyFlowableResource {
 
     /**
      * 获取用户列表
-     * @return {@link List<Option>>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 17:51:30
+     * @return {@link Result} {@link List} {@link Option}
+     * @author MoJie
      */
     @GetMapping("/users")
     public Result<List<Option>> users() {
@@ -42,9 +39,8 @@ public class EasyFlowableResource {
 
     /**
      * 获取候选组列表
-     * @return {@link List<Option>>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 17:51:30
+     * @return {@link Result} {@link List} {@link Option}
+     * @author MoJie
      */
     @GetMapping("/groups")
     public Result<List<Option>> groups() {
@@ -54,16 +50,23 @@ public class EasyFlowableResource {
     /**
      * 是否登录
      * @return {@link Result<Boolean>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 18:02:58
+     * @author MoJie
+     * @since 1.0  2024-10-09 18:02:58
      */
     @GetMapping("/isLogin")
     public Result<Boolean> isLogin() {
         return Result.success(properties.getUi().isLogin());
     }
 
+    /**
+     * 登录接口
+     * @param user 登录实体
+     * @param request 请求对象
+     * @return {@link Result}
+     * @author MoJie
+     */
     @PostMapping("/login")
-    public Result<?> login(@RequestBody EasyFlowableUiConfig.User user, HttpServletRequest request, HttpServletResponse response) {
+    public Result<?> login(@RequestBody EasyFlowableUiConfig.User user, HttpServletRequest request) {
         String username = user.getUsername();
         String password = user.getPassword();
         if (EasyFlowableStringUtils.isBlank(username) || EasyFlowableStringUtils.isBlank(password)) {

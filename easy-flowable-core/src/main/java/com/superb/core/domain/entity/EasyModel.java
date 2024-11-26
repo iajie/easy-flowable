@@ -6,10 +6,9 @@ import lombok.experimental.Accessors;
 import java.util.Date;
 
 /**
- * @package: {@link com.superb.core.domain.entity}
- * @Date: 2024-09-27-13:41
- * @Description: 流程引擎模型
- * @Author: MoJie
+ * 流程引擎模型
+ * @since 1.0  2024-09-27-13:41
+ * @author MoJie
  */
 @Data
 @Accessors(chain = true)

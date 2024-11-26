@@ -1,6 +1,5 @@
 package com.superb.ui.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.superb.core.config.EasyFlowableUiConfig;
 import com.superb.core.constans.Constants;
 import com.superb.core.constans.EasyFlowableContext;
@@ -21,16 +20,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
 
 /**
- * @package: {@link com.superb.ui.config}
- * @Date: 2024-09-27-15:34
- * @Description: 配置静态资源访问
- * @Author: MoJie
- * 源码打包后需要加以下logo
- * <link rel="icon" href="/easy-flowable/favicon.ico" type="image/x-icon">
- * <link rel="shortcut icon" href="/easy-flowable/favicon.ico" type="image/x-icon">
+ * 配置静态资源访问
+ * @since 1.0  2024-09-27-15:34
+ * @author MoJie
  */
 @Configuration
 public class MvConfiguration implements WebMvcConfigurer {
@@ -106,10 +100,10 @@ public class MvConfiguration implements WebMvcConfigurer {
 
     /**
      * @param path url
-     * @return: {@link boolean}
-     * @Author: MoJie
-     * @Date: 2024/11/23 17:35
-     * @Description: url匹配
+     * @return {@link boolean}
+     * @author MoJie
+     * @since 1.0  2024/11/23 17:35
+     * @description url匹配
      */
     private static boolean isMatch(String path) {
         AntPathMatcher antPathMatcher = new AntPathMatcher();

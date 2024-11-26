@@ -20,9 +20,9 @@ import org.noear.solon.core.route.RouterInterceptorChain;
 import org.smartboot.http.common.utils.AntPathMatcher;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-24 11:46
- * @Description:
+ * @author MoJie
+ * @since 1.0  2024-11-24 11:46
+ * 流程拦截器
  */
 @Slf4j
 @Component
@@ -35,19 +35,23 @@ public class EasyFlowableRouterInterceptor implements RouterInterceptor {
 
 
     /**
-     * @return: {@link PathRule}
-     * @Author: MoJie
-     * @Date: 2024/11/24 11:50
-     * @Description: 自定义拦截规则
+     * @return {@link PathRule}
+     * @author MoJie
+     * @since 1.0  2024/11/24 11:50
+     *  自定义拦截规则
      */
     @Override
     public PathRule pathPatterns() {
-        return new PathRule().include(Constants.BASE_URL);
+        return new PathRule().include(Constants.BASE_URL, "/" + Constants.EASY_FLOWABLE);
     }
 
     @Override
     public void doIntercept(Context ctx, Handler mainHandler, RouterInterceptorChain chain) throws Throwable {
         try {
+            if (ctx.path().equals("/" + Constants.EASY_FLOWABLE)) {
+                ctx.redirect("/" + Constants.EASY_FLOWABLE + "/index.html");
+                return;
+            }
             String tenantId = ctx.header(EasyFlowableContext.TENANT_ID);
             if (EasyFlowableStringUtils.isBlank(tenantId)) {
                 EasyFlowableContext.setLocal(EasyFlowableContext.TENANT_ID, tenantId);
@@ -77,12 +81,18 @@ public class EasyFlowableRouterInterceptor implements RouterInterceptor {
         }
     }
 
+    @Override
+    public Object postResult(Context ctx, Object result) throws Throwable {
+        EasyFlowableContext.clear();
+        return RouterInterceptor.super.postResult(ctx, result);
+    }
+
     /**
      * @param path url
-     * @return: {@link boolean}
-     * @Author: MoJie
-     * @Date: 2024/11/23 17:35
-     * @Description: url匹配
+     * @return {@link boolean}
+     * @author MoJie
+     * @since 1.0  2024/11/23 17:35
+     *  url匹配
      */
     private static boolean isMatch(String path) {
         AntPathMatcher antPathMatcher = new AntPathMatcher();

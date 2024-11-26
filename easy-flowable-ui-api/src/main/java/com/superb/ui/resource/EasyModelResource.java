@@ -11,10 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * @package: {@link com.superb.ui.resource}
- * @Date: 2024-09-27-12:47
- * @Description: 模型相关接口
- * @Author: MoJie
+ * 模型相关接口
+ * @since 1.0  2024-09-27-12:47
+ * @author MoJie
  */
 @RestController
 @RequestMapping(Constants.EASY_FLOWABLE + "/model")
@@ -24,11 +23,11 @@ public class EasyModelResource {
     private EasyModelService modelService;
 
     /**
+     * 模型分页查询
      * @param pageParams 分页查询
      * @return {@link Result} {@link Page} {@link EasyModel}
-     * @Author: MoJie
-     * @Date: 2024-10-12 11:09
-     * @Description: 模型分页查询
+     * @author MoJie
+     * @since 1.0  2024-10-12 11:09
      */
     @PostMapping("/pageQuery")
     public Result<Page<EasyModel>> page(@RequestBody PageParams<EasyModel> pageParams) {
@@ -37,11 +36,11 @@ public class EasyModelResource {
     }
 
     /**
+     * 保存模型
      * @param model 模型参数
      * @return {@link Result<Boolean>}
-     * @Author: MoJie
-     * @Date: 2024-10-12 10:37
-     * @Description: 保存模型
+     * @author MoJie
+     * @since 1.0  2024-10-12 10:37
      */
     @PostMapping("/save")
     public Result<Boolean> save(@RequestBody EasyModel model) {
@@ -52,11 +51,11 @@ public class EasyModelResource {
     }
 
     /**
+     * 根据ID删除流程模型
      * @param id 模型ID
      * @return {@link Result<Boolean>}
-     * @Author: MoJie
-     * @Date: 2024-10-12 10:41
-     * @Description: 根据ID删除流程模型
+     * @author MoJie
+     * @since 1.0  2024-10-12 10:41
      */
     @GetMapping("/remove/{id}")
     public Result<Boolean> remove(@PathVariable String id) {
@@ -67,11 +66,11 @@ public class EasyModelResource {
     }
 
     /**
+     * 根据ID获取模型信息
      * @param id 模型ID
      * @return {@link Result<EasyModel>}
-     * @Author: MoJie
-     * @Date: 2024-10-12 10:42
-     * @Description: 根据ID获取模型信息
+     * @author MoJie
+     * @since 1.0  2024-10-12 10:42
      */
     @GetMapping("/info/{id}")
     public Result<EasyModel> getInfo(@PathVariable String id) {

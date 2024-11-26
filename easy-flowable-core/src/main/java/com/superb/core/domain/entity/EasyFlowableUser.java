@@ -4,9 +4,9 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-23 17:01
- * @Description: 用户信息
+ * 用户信息
+ * @author MoJie
+ * @since 1.0  2024-11-23 17:01
  */
 @Data
 @Accessors(chain = true)

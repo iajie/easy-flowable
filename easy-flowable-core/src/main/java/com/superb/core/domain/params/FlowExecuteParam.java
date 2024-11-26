@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @package: {@link com.superb.core.domain.params}
- * @Date: 2024-10-09-10:46
- * @Description: 流程任务执行参数
- * @Author: MoJie
+ * 流程任务执行参数
+ * {@link com.superb.core.domain.params}
+ * @since 1.0  2024-10-09-10:46
+ * @author MoJie
  */
 @Data
 public class FlowExecuteParam {

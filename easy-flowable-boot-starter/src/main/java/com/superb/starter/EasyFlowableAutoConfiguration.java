@@ -25,10 +25,9 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 /**
- * @package: {@link com.superb.starter}
- * @Date: 2024-09-26-13:00
- * @Description:
- * @Author: MoJie
+ * easy-flowable自动装配
+ * @since 1.0  2024-09-26-13:00
+ * @author MoJie
  */
 @Configuration
 @ConditionalOnProperty(prefix = "easy-flowable", name = "enable", havingValue = "true", matchIfMissing = true)
@@ -39,6 +38,11 @@ public class EasyFlowableAutoConfiguration {
     @Resource
     private DataSourceProperties dataSourceProperties;
 
+    /**
+     * 数据源设置
+     * @return {@link DataSource}
+     * @author MoJie
+     */
     @Bean
     public DataSource easyFlowableDatasource() {
         DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
@@ -64,6 +68,11 @@ public class EasyFlowableAutoConfiguration {
         return dataSourceBuilder.build();
     }
 
+    /**
+     * 校验数据库配置
+     * @param jdbc 配置
+     * @author MoJie
+     */
     private void checkJdbc(EasyFlowableDataSourceConfig jdbc) {
         if (EasyFlowableStringUtils.isBlank(jdbc.getDriver())) {
             throw new EasyFlowableException("请配置数据库驱动");
@@ -79,6 +88,12 @@ public class EasyFlowableAutoConfiguration {
         }
     }
 
+    /**
+     * 流程引擎配置到容器中
+     * @param dataSource 传入数据源
+     * @return {@link ProcessEngine}
+     * @author MoJie
+     */
     @Bean
     public ProcessEngine processEngine(DataSource dataSource) {
         // 打印banner
@@ -115,36 +130,66 @@ public class EasyFlowableAutoConfiguration {
         return engineConfiguration.buildProcessEngine();
     }
 
+    /**
+     * 构建流程引擎运行任务
+     * @param processEngine 流程引擎
+     * @return {@link RuntimeService}
+     * @author MoJie
+     */
     @Bean
     public RuntimeService runtimeService(ProcessEngine processEngine) {
         return processEngine.getRuntimeService();
     }
 
+    /**
+     * 流程基础信息设置
+     * @param processEngine 流程引擎
+     * @return {@link RepositoryService}
+     * @author MoJie
+     */
     @Bean
     public RepositoryService repositoryService(ProcessEngine processEngine) {
         return processEngine.getRepositoryService();
     }
 
+    /**
+     * 构建流程引擎历史执行器
+     * @param processEngine 流程引擎
+     * @return {@link HistoryService}
+     * @author MoJie
+     */
     @Bean
     public HistoryService historyService(ProcessEngine processEngine) {
         return processEngine.getHistoryService();
     }
 
+    /**
+     * 流程任务执行器
+     * @param processEngine 流程引擎
+     * @return {@link TaskService}
+     * @author MoJie
+     */
     @Bean
     public TaskService taskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
     }
 
+    /**
+     * 流程图实现器
+     * @param processEngine 流程引擎
+     * @return {@link ProcessDiagramGenerator}
+     * @author MoJie
+     */
     @Bean
     public ProcessDiagramGenerator processDiagramGenerator(ProcessEngine processEngine) {
         return processEngine.getProcessEngineConfiguration().getProcessDiagramGenerator();
     }
 
     /**
+     * 打印banner
      * @param isBanner 是否打印banner
-     * @Author: MoJie
-     * @Date: 2024/10/6 11:24
-     * @Description: 打印banner
+     * @author MoJie
+     * @since 1.0  2024/10/6 11:24
      */
     private void printBanner(boolean isBanner) {
         if (isBanner) {
@@ -152,29 +197,54 @@ public class EasyFlowableAutoConfiguration {
         }
     }
 
+    /**
+     * 配置默认用户信息，如果没有自定义实现就是用默认的实现
+     * @return {@link EasyUserService}
+     * @author MoJie
+     */
     @Bean
     @ConditionalOnMissingBean
     public EasyUserService easyUserService() {
         return new DefaultEasyUserServiceImpl(properties.getUi());
     }
 
+    /**
+     * 模型实现方法
+     * @return {@link EasyModelService}
+     * @author MoJie
+     */
     @Bean
     public EasyModelService easyModelService() {
         return new EasyModelServiceImpl();
     }
 
+    /**
+     * 实现流程部署方法
+     * @return {@link EasyDeploymentService}
+     * @author MoJie
+     */
     @Bean
     @ConditionalOnClass({RepositoryService.class, RuntimeService.class})
     public EasyDeploymentService easyFlowDeploymentService() {
         return new EasyDeploymentServiceImpl();
     }
 
+    /**
+     * 构建流程实例实现
+     * @return {@link EasyProcessInstanceService}
+     * @author MoJie
+     */
     @Bean
     @ConditionalOnClass({RepositoryService.class, RuntimeService.class, TaskService.class, HistoryService.class})
     public EasyProcessInstanceService easyFlowProcessInstanceService() {
         return new EasyProcessInstanceServiceImpl();
     }
 
+    /**
+     * 构建任务实现
+     * @return {@link EasyTaskService}
+     * @author MoJie
+     */
     @Bean
     @ConditionalOnClass({RuntimeService.class, TaskService.class, HistoryService.class})
     public EasyTaskService easyFlowTaskService() {

@@ -8,9 +8,9 @@ import org.noear.solon.annotation.Configuration;
 import org.noear.solon.annotation.Inject;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-23 20:15
- * @Description: easy-flowable配置
+ * @author MoJie
+ * @since 1.0  2024-11-23 20:15
+ *  easy-flowable配置
  */
 @Data
 @Configuration

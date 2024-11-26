@@ -4,10 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * @package: {@link com.superb.core.enums}
- * @Date: 2024-09-27-14:23
- * @Description:
- * @Author: MoJie
+ * @since 1.0  2024-09-27-14:23
+ * @author MoJie
  */
 @Getter
 @AllArgsConstructor

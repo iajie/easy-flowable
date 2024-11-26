@@ -37,10 +37,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @package: {@link com.superb.starter.api}
- * @Date: 2024-10-09-13:29
- * @Description:
- * @Author: MoJie
+ * 流程实例提供方法
+ * @since 1.0  2024-10-09-13:29
+ * @author MoJie
  */
 public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceService {
 
@@ -198,10 +197,10 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
 
     /***
      * @param startParam 启动参数
-     * @Return: {@link boolean}
-     * @Author: MoJie
-     * @Date: 2024/10/28 21:10
-     * @Description: 校验启动参数
+     * @return {@link boolean}
+     * @author MoJie
+     * @since 1.0  2024/10/28 21:10
+     * @description 校验启动参数
      */
     private boolean checkStartParam(FlowStartParam startParam) {
         String flowKey = startParam.getFlowKey();

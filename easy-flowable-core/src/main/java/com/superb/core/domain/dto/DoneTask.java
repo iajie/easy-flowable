@@ -7,9 +7,9 @@ import lombok.experimental.Accessors;
 import java.util.Date;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-17 13:56
- * @Description: 已办
+ * 已办实体
+ * @author MoJie
+ * @since 1.0  2024-11-17 13:56
  */
 @Data
 @Accessors(chain = true)

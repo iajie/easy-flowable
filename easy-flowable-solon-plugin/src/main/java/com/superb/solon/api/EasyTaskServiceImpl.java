@@ -36,10 +36,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @package: {@link com.superb.starter.api}
- * @Date: 2024-10-09-14:29
- * @Description:
- * @Author: MoJie
+ * @since 1.0  2024-10-09-14:29
+ * 任务执行方法实现
+ * @author MoJie
  */
 @Component
 public class EasyTaskServiceImpl implements EasyTaskService {
@@ -145,8 +144,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
     /**
      * 校验流程状态 
      * @param processInstanceId 流程实例ID
-     * @Author: MoJie
-     * @Date: 2024-10-09 14:37:20
+     * @author MoJie
+     * @since 1.0  2024-10-09 14:37:20
      */
     private void checkFlowable(String processInstanceId) {
         // 先获取当前任务是否还在运行
@@ -164,8 +163,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      * 组装审批意见并保存 
      * @param task 执行任务对象
      * @param param 执行参数
-     * @Author: MoJie
-     * @Date: 2024-10-09 14:40:28
+     * @author MoJie
+     * @since 1.0  2024-10-09 14:40:28
      */
     private void saveFlowComment(Task task, FlowExecuteParam param) {
         FlowComment flowComment = new FlowComment();
@@ -213,8 +212,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      * 执行下一步
      * @param task 任务对象
      * @param param 执行信息
-     * @Author: MoJie
-     * @Date: 2024-10-09 14:36:46
+     * @author MoJie
+     * @since 1.0  2024-10-09 14:36:46
      */
     private void complete(Task task, FlowExecuteParam param) {
         // 委派人执行任务
@@ -252,8 +251,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      *
      * @param task         任务信息
      * @param executeParam 执行参数
-     * @Author: MoJie
-     * @Date: 2024-10-09 15:15:37
+     * @author MoJie
+     * @since 1.0  2024-10-09 15:15:37
      */
     private void revocation(Task task, FlowExecuteParam executeParam) {
         try {
@@ -282,8 +281,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      *
      * @param task         任务
      * @param executeParam 执行参数
-     * @Author: MoJie
-     * @Date: 2024-10-09 15:17:30
+     * @author MoJie
+     * @since 1.0  2024-10-09 15:17:30
      */
     private void reject(Task task, FlowExecuteParam executeParam) {
         try {
@@ -303,8 +302,8 @@ public class EasyTaskServiceImpl implements EasyTaskService {
      * 驳回到指定节点
      * @param task 任务
      * @param param 执行参数
-     * @Author: MoJie
-     * @Date: 2024-10-09 15:18:12
+     * @author MoJie
+     * @since 1.0  2024-10-09 15:18:12
      */
     private void rejectToTask(Task task, FlowExecuteParam param) {
         try {
@@ -337,10 +336,10 @@ public class EasyTaskServiceImpl implements EasyTaskService {
 
     /**
      * @param task 任务对象
-     * @return: {@link Object}
-     * @Author: MoJie
-     * @Date: 2024/11/17 12:18
-     * @Description: 获取上次提交的表单信息
+     * @return {@link Object}
+     * @author MoJie
+     * @since 1.0  2024/11/17 12:18
+     *  获取上次提交的表单信息
      */
     private Object upNodeSubmitForm(Task task) {
         // 重新提交的实例

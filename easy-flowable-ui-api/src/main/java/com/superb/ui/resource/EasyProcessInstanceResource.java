@@ -15,10 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @package: {@link com.superb.ui.resource}
- * @Date: 2024-10-09-16:24
- * @Description: 流程实例接口
- * @Author: MoJie
+ * 流程实例接口
+ * @since 1.0  2024-10-09-16:24
+ * @author MoJie
  */
 @RestController
 @RequestMapping(Constants.EASY_FLOWABLE + "/processInstance")
@@ -32,8 +31,8 @@ public class EasyProcessInstanceResource {
      *
      * @param processDefinitionId 流程定义ID
      * @return {@link List< FlowProcessInstance >}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:26:52
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:26:52
      */
     @GetMapping(value = "/list/{processDefinitionId}")
     public Result<List<FlowProcessInstance>> list(@PathVariable String processDefinitionId) {
@@ -45,8 +44,8 @@ public class EasyProcessInstanceResource {
      *
      * @param processInstanceId 实例ID
      * @return {@link Result<Boolean>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:27:37
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:27:37
      */
     @GetMapping(value = "/stateSet/{processInstanceId}")
     public Result<Boolean> stateSet(@PathVariable String processInstanceId) {
@@ -58,8 +57,8 @@ public class EasyProcessInstanceResource {
      *
      * @param processInstanceId 实例ID
      * @return {@link List< Option >}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:28:20
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:28:20
      */
     @GetMapping(value = "/backUserTasks/{processInstanceId}")
     public Result<List<Option>> backUserTasks(@PathVariable String processInstanceId) {
@@ -71,8 +70,8 @@ public class EasyProcessInstanceResource {
      *
      * @param processInstanceId 实例ID
      * @return {@link List< FlowExecutionHistory >}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:28:55
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:28:55
      */
     @GetMapping(value = "/executionHistory/{processInstanceId}")
     public Result<List<FlowExecutionHistory>> executionHistory(@PathVariable String processInstanceId) {
@@ -84,8 +83,8 @@ public class EasyProcessInstanceResource {
      *
      * @param param 启动参数
      * @return {@link Result<String>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:32:43
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:32:43
      */
     @PostMapping("/start")
     public Result<String> start(@RequestBody FlowStartParam param) {
@@ -101,8 +100,8 @@ public class EasyProcessInstanceResource {
      * @param processInstanceId 流程实例ID
      * @param status            业务表状态
      * @return {@link Result<String>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 16:32:43
+     * @author MoJie
+     * @since 1.0  2024-10-09 16:32:43
      */
     @GetMapping("/businessStatus")
     public Result<String> start(@RequestParam String processInstanceId, @RequestParam String status) {
@@ -111,11 +110,12 @@ public class EasyProcessInstanceResource {
     }
 
     /**
+     * 流程动态
      * @param processInstanceId 流程实例ID
-     * @return: {@link Result} {@link Map} {@link Object}
-     * @Author: MoJie
-     * @Date: 2024/11/25 18:43
-     * @Description: 流程动态
+     * @param processDefinitionId 流程定义ID
+     * @return {@link Result} {@link Map} {@link Object}
+     * @author MoJie
+     * @since 1.0  2024/11/25 18:43
      */
     @GetMapping("processDynamics")
     public Result<Map<String, Object>> processDynamics(@RequestParam String processInstanceId, @RequestParam String processDefinitionId) {
@@ -123,28 +123,33 @@ public class EasyProcessInstanceResource {
     }
 
     /**
+     * 流程动态
      * @param nodeId 流程实例ID
-     * @return: {@link Result} {@link Map} {@link Object}
-     * @Author: MoJie
-     * @Date: 2024/11/25 18:43
-     * @Description: 流程动态
+     * @return {@link Result} {@link Map} {@link Object}
+     * @author MoJie
+     * @since 1.0  2024/11/25 18:43
      */
     @GetMapping("nodeInfo/{nodeId}")
     public Result<Map<String, Object>> nodeInfo(@PathVariable String nodeId) {
         return Result.success(processInstanceService.nodeInfo(nodeId));
     }
 
+    /**
+     * 首页统计数量
+     * @return {@link Result} {@link Map} {@link Object}
+     * @author MoJie
+     */
     @GetMapping("/statics")
     public Result<Map<String, Object>> statics() {
         return Result.success(processInstanceService.statics());
     }
 
     /**
+     * 待办任务分页查询
      * @param pageParams 分页查询参数
-     * @return: {@link Result} {@link Page} {@link TodoTask}
-     * @Author: MoJie
-     * @Date: 2024/11/17 14:20
-     * @Description: 待办任务分页查询
+     * @return {@link Result} {@link Page} {@link TodoTask}
+     * @author MoJie
+     * @since 1.0  2024/11/17 14:20
      */
     @PostMapping("/todoTaskPage")
     public Result<Page<DoneTask>> todoTaskPage(@RequestBody PageParams<String> pageParams) {

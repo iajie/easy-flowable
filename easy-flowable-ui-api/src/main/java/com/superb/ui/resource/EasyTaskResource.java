@@ -20,10 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @package: {@link com.superb.ui.resource}
- * @Date: 2024-10-09-17:03
- * @Description:
- * @Author: MoJie
+ * 任务相关api
+ * @since 1.0  2024-10-09-17:03
+ * @author MoJie
  */
 @RestController
 @RequestMapping(Constants.EASY_FLOWABLE + "/task")
@@ -36,11 +35,9 @@ public class EasyTaskResource {
 
     /**
      * 执行任务
-     *
      * @param param {@link FlowExecuteParam} 执行参数
-     * @return {@link List<FlowUserTask>>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 17:05:06
+     * @return {@link Result}
+     * @author MoJie
      */
     @PostMapping(value = "/execute")
     public Result<?> execute(@RequestBody FlowExecuteParam param) {
@@ -49,13 +46,13 @@ public class EasyTaskResource {
     }
 
     /**
+     * 上传附件, 返回附件ID
      * @param file              文件
      * @param taskId            任务ID
      * @param processInstanceId 流程实例ID
-     * @Return: {@link Result}
-     * @Author: MoJie
-     * @Date: 2024/10/29 19:28
-     * @Description: 上传附件, 返回附件ID
+     * @return {@link Result}
+     * @author MoJie
+     * @since 1.0  2024/10/29 19:28
      */
     @SneakyThrows
     @PostMapping(value = "/addAttachment")
@@ -66,11 +63,11 @@ public class EasyTaskResource {
     }
 
     /**
+     * 删除附件
      * @param attachmentId 文件ID
-     * @Return: {@link Result}
-     * @Author: MoJie
-     * @Date: 2024/10/29 19:28
-     * @Description: 删除附件
+     * @return {@link Result}
+     * @author MoJie
+     * @since 1.0  2024/10/29 19:28
      */
     @GetMapping(value = "/delAttachment/{attachmentId}")
     public Result<String> delAttachment(@PathVariable String attachmentId) {
@@ -79,11 +76,11 @@ public class EasyTaskResource {
     }
 
     /**
+     * 获取附件
      * @param attachmentId 附件ID
      * @param response     响应
-     * @Author: MoJie
-     * @Date: 2024/10/29 22:11
-     * @Description: 获取附件
+     * @author MoJie
+     * @since 1.0  2024/10/29 22:11
      */
     @SneakyThrows
     @GetMapping(value = "/getAttachment/{attachmentId}")
@@ -103,8 +100,8 @@ public class EasyTaskResource {
      *
      * @param cancellation 作废流程
      * @return {@link Result}
-     * @Author: MoJie
-     * @Date: 2024-10-09 17:06:15
+     * @author MoJie
+     * @since 1.0  2024-10-09 17:06:15
      */
     @PostMapping(value = "/cancellation")
     public Result<?> cancellation(@RequestBody FlowCancellationParam cancellation) {
@@ -114,11 +111,9 @@ public class EasyTaskResource {
 
     /**
      * 获取当前任务节点执行人(候选人)
-     *
      * @param taskId 任务ID
-     * @return {@link List<String>>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 17:06:59
+     * @return {@link Result} {@link List} {@link String}
+     * @author MoJie
      */
     @GetMapping(value = "/executors/{taskId}")
     public Result<List<String>> getUserTaskExecutors(@PathVariable String taskId) {
@@ -127,17 +122,21 @@ public class EasyTaskResource {
 
     /**
      * 获取当前任务节点执行部门(候选组)
-     *
      * @param taskId 任务ID
-     * @return {@link List<String>>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 17:08:34
+     * @return {@link Result} {@link List} {@link String}
+     * @author MoJie
      */
     @GetMapping(value = "/executeOrgan/{taskId}")
     public Result<List<String>> executeOrgan(@PathVariable String taskId) {
         return Result.success(easyTaskService.getUserTaskOrganIds(taskId));
     }
 
+    /**
+     * 获取下一节点信息、流程局部变量、操作方式
+     * @param taskId 任务ID
+     * @return {@link Result} {@link Map} {@link Object}
+     * @author MoJie
+     */
     @GetMapping(value = "/nextNodeVariables/{taskId}")
     public Result<Map<String, Object>> nextNodeVariables(@PathVariable String taskId) {
         return Result.success(easyTaskService.nextNodeVariables(taskId));

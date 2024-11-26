@@ -5,10 +5,9 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @package: {@link com.superb.core.domain.dto}
- * @Date: 2024-10-09-10:23
- * @Description: 运行中的流程实例
- * @Author: MoJie
+ * 运行中的流程实例
+ * @since 1.0  2024-10-09-10:23
+ * @author MoJie
  */
 @Data
 public class FlowProcessInstance {

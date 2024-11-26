@@ -6,10 +6,9 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * @package: {@link com.superb.core.domain.model}
- * @Date: 2024-09-27-14:20
- * @Description:
- * @Author: MoJie
+ * {@link com.superb.core.domain.model}
+ * @since 1.0  2024-09-27-14:20
+ * @author MoJie
  */
 @Data
 public class Result<T> implements Serializable {
@@ -26,6 +25,11 @@ public class Result<T> implements Serializable {
     /** 具体的返回结果 */
     private T result;
 
+    /**
+     * 成功消息
+     * @return {@link Result} {@link T}
+     * @author MoJie
+     */
     public static<T> Result<T> success() {
         Result<T> r = new Result<>();
         r.setMessage("成功！");
@@ -34,6 +38,12 @@ public class Result<T> implements Serializable {
         return r;
     }
 
+    /**
+     * 成功，设置消息
+     * @param message 消息
+     * @return {@link Result} {@link T}
+     * @author MoJie
+     */
     public static<T> Result<T> success(String message) {
         Result<T> r = new Result<>();
         r.setSuccess(true);
@@ -43,6 +53,12 @@ public class Result<T> implements Serializable {
         return r;
     }
 
+    /**
+     * 成功返回
+     * @param data 数据
+     * @return {@link Result} {@link T}
+     * @author MoJie
+     */
     public static<T> Result<T> success(T data) {
         Result<T> r = new Result<>();
         r.setSuccess(true);
@@ -52,6 +68,13 @@ public class Result<T> implements Serializable {
         return r;
     }
 
+    /**
+     * 成功
+     * @param message 消息
+     * @param data 数据
+     * @return {@link Result} {@link T}
+     * @author MoJie
+     */
     public static<T> Result<T> success(String message, T data) {
         Result<T> r = new Result<>();
         r.setSuccess(true);
@@ -61,6 +84,11 @@ public class Result<T> implements Serializable {
         return r;
     }
 
+    /**
+     * 错误信息返回
+     * @return {@link Result} {@link T}
+     * @author MoJie
+     */
     public static<T> Result<T> error() {
         Result<T> r = new Result<>();
         r.setSuccess(false);
@@ -69,6 +97,12 @@ public class Result<T> implements Serializable {
         return r;
     }
 
+    /**
+     * 错误自定义消息
+     * @param message 消息
+     * @return {@link Result} {@link T}
+     * @author MoJie
+     */
     public static<T> Result<T> error(String message) {
         Result<T> r = new Result<>();
         r.setSuccess(false);
@@ -78,32 +112,13 @@ public class Result<T> implements Serializable {
         return r;
     }
 
-    public static<T> Result<T> error(SuperbCodeEnum code) {
-        Result<T> r = new Result<>();
-        r.setSuccess(false);
-        r.setCode(code.getCode());
-        r.setResult(null);
-        r.setMessage(code.getMessage());
-        return r;
-    }
-
-    public static<T> Result<T> error(int code, String message) {
-        Result<T> r = new Result<>();
-        r.setCode(code);
-        r.setMessage(message);
-        r.setSuccess(false);
-        return r;
-    }
-
-    public static<T> Result<T> error(SuperbCodeEnum code, T data) {
-        Result<T> r = new Result<>();
-        r.setCode(code.getCode());
-        r.setResult(data);
-        r.setMessage(code.getMessage());
-        r.setSuccess(false);
-        return r;
-    }
-
+    /**
+     * 错误并返回消息和数据
+     * @param message 消息
+     * @param data 数据
+     * @return {@link Result} {@link T}
+     * @author MoJie
+     */
     public static<T> Result<T> error(String message, T data) {
         Result<T> r = new Result<>();
         r.setSuccess(false);

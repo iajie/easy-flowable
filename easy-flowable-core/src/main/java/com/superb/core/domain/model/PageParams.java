@@ -3,10 +3,9 @@ package com.superb.core.domain.model;
 import lombok.Data;
 
 /**
- * @package: {@link com.superb.core.domain.model}
- * @Date: 2024-09-27-14:20
- * @Description: 分页查询
- * @Author: MoJie
+ * 分页查询
+ * @since 1.0  2024-09-27-14:20
+ * @author MoJie
  */
 @Data
 public class PageParams<T> {

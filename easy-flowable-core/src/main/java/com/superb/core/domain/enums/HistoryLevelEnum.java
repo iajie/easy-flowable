@@ -5,10 +5,8 @@ import lombok.Getter;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 
 /**
- * @package: {@link com.superb.core.enums}
- * @Date: 2024-09-26-11:21
- * @Description:
- * @Author: MoJie
+ * @since 1.0  2024-09-26-11:21
+ * @author MoJie
  */
 @Getter
 @AllArgsConstructor
@@ -35,7 +33,7 @@ public enum HistoryLevelEnum {
      * @param key 请求key
      * @return {@link String}
      * @author MoJie
-     * @date 2024-09-26 11:27:08
+     * @since 1.0  2024-09-26 11:27:08
      */
     public static HistoryLevel getKey(String key) {
         for (HistoryLevelEnum value : values()) {

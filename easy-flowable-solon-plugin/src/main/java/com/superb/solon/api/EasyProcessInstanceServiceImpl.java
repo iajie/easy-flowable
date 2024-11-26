@@ -40,10 +40,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @package: {@link com.superb.starter.api}
- * @Date: 2024-10-09-13:29
- * @Description:
- * @Author: MoJie
+ * @since 1.0  2024-10-09-13:29
+ * 流程实例提供方法
+ * @author MoJie
  */
 @Component
 public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceService {
@@ -62,13 +61,13 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
     private EasyUserService userService;
 
     @Override
-    public List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow, boolean isProcessInstance) {
+    public List<FlowProcessInstance> getFlowInstanceList(String key, boolean isFlow, boolean isProcessDef) {
         if (EasyFlowableStringUtils.isBlank(key)) {
-            throw new EasyFlowableException((isProcessInstance ? "流程定义ID" : "流程标识") + "不能为空！");
+            throw new EasyFlowableException((isProcessDef ? "流程定义ID" : "流程标识") + "不能为空！");
         }
         ProcessInstanceQuery instanceQuery = runtimeService.createProcessInstanceQuery();
         if (isFlow) {
-            if (isProcessInstance) {
+            if (isProcessDef) {
                 instanceQuery.processDefinitionId(key);
             } else {
                 instanceQuery.processDefinitionKey(key);
@@ -202,10 +201,10 @@ public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceServic
 
     /***
      * @param startParam 启动参数
-     * @Return: {@link boolean}
-     * @Author: MoJie
-     * @Date: 2024/10/28 21:10
-     * @Description: 校验启动参数
+     * @return {@link boolean}
+     * @author MoJie
+     * @since 1.0  2024/10/28 21:10
+     *  校验启动参数
      */
     private boolean checkStartParam(FlowStartParam startParam) {
         String flowKey = startParam.getFlowKey();

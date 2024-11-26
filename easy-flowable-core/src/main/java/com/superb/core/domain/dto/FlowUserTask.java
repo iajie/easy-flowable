@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @package: {@link com.superb.core.domain.dto}
- * @Date: 2024-10-09-10:18
- * @Description:
- * @Author: MoJie
+ * @since 1.0  2024-10-09-10:18
+ * @author MoJie
  */
 @Data
 public class FlowUserTask {

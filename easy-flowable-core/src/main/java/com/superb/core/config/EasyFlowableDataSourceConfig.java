@@ -3,10 +3,8 @@ package com.superb.core.config;
 import lombok.Data;
 
 /**
- * @package: {@link com.superb.core.config}
- * @Date: 2024-09-26-13:27
- * @Description:
- * @Author: MoJie
+ * @since 1.0  2024-09-26-13:27
+ * @author MoJie
  */
 @Data
 public class EasyFlowableDataSourceConfig {

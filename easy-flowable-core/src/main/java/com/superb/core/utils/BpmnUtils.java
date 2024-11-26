@@ -11,31 +11,29 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Author: MoJie
- * @Date: 2024-11-09 11:29
- * @Description:
+ * @author MoJie
+ * @since 1.0  2024-11-09 11:29
  */
 public class BpmnUtils {
 
     private final static BpmnXMLConverter BPMN_XML_CONVERTER = new BpmnXMLConverter();
 
     /**
+     * 根据xml字符串转bpmn对象
      * @param xml 设计器结果
-     * @return: {@link BpmnModel}
-     * @Author: MoJie
-     * @Date: 2024/11/9 11:32
-     * @Description: 根据xml字符串转bpmn对象
+     * @return {@link BpmnModel}
+     * @author MoJie
+     * @since 1.0  2024/11/9 11:32
      */
     public static BpmnModel getBpmnModel(String xml) {
         return BPMN_XML_CONVERTER.convertToBpmnModel(new StringStreamSource(xml), false, false);
     }
 
     /**
+     * 校验流程结果
      * @param xml 设计器结果
-     * @return: {@link BpmnModel}
-     * @Author: MoJie
-     * @Date: 2024/11/9 11:32
-     * @Description: 根据xml字符串转bpmn对象
+     * @author MoJie
+     * @since 1.0  2024/11/9 11:32
      */
     public static void validateModel(String xml) {
         try {
@@ -49,8 +47,8 @@ public class BpmnUtils {
      * 获取任务变量
      * @param attributes 节点额外变量
      * @return {@link Map}
-     * @Author: MoJie
-     * @Date: 2024-10-09 13:26:35
+     * @author MoJie
+     * @since 1.0  2024-10-09 13:26:35
      */
     public static Map<String, Object> getTaskAttributes(Map<String, List<ExtensionAttribute>> attributes) {
         Map<String, Object> map = new HashMap<>();

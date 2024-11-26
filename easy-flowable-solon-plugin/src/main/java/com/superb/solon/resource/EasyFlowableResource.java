@@ -17,10 +17,9 @@ import org.noear.solon.core.handle.MethodType;
 import java.util.List;
 
 /**
- * @package: {@link com.superb.ui.resource}
- * @Date: 2024-10-09-17:49
- * @Description:
- * @Author: MoJie
+ * 流程提供接口
+ * @since 1.0  2024-10-09-17:49
+ * @author MoJie
  */
 @Controller
 @Mapping(Constants.EASY_FLOWABLE)
@@ -33,9 +32,8 @@ public class EasyFlowableResource {
 
     /**
      * 获取用户列表
-     * @return {@link List<Option>>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 17:51:30
+     * @return {@link Result} {@link List} {@link Option}
+     * @author MoJie
      */
     @Mapping(value = "/users", method = MethodType.GET)
     public Result<List<Option>> users() {
@@ -44,9 +42,8 @@ public class EasyFlowableResource {
 
     /**
      * 获取候选组列表
-     * @return {@link List<Option>>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 17:51:30
+     * @return {@link Result} {@link List} {@link Option}
+     * @author MoJie
      */
     @Mapping(value = "/groups", method = MethodType.GET)
     public Result<List<Option>> groups() {
@@ -56,14 +53,21 @@ public class EasyFlowableResource {
     /**
      * 是否登录
      * @return {@link Result<Boolean>}
-     * @Author: MoJie
-     * @Date: 2024-10-09 18:02:58
+     * @author MoJie
+     * @since 1.0  2024-10-09 18:02:58
      */
     @Mapping(value = "/isLogin", method = MethodType.GET)
     public Result<Boolean> isLogin() {
         return Result.success(properties.getUi().isLogin());
     }
 
+    /**
+     * 登录接口
+     * @param user 登录实体
+     * @param ctx 请求对象
+     * @return {@link Result}
+     * @author MoJie
+     */
     @Mapping(value = "/login", method = MethodType.POST)
     public Result<?> login(@Body EasyFlowableUiConfig.User user, Context ctx) {
         String username = user.getUsername();

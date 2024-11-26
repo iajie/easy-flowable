@@ -3,10 +3,10 @@ package com.superb.core.domain.params;
 import lombok.Data;
 
 /**
- * @package: {@link com.superb.core.domain.params}
- * @Date: 2024-10-09-10:52
- * @Description: 流程作废参数
- * @Author: MoJie
+ * 流程作废参数
+ * {@link com.superb.core.domain.params}
+ * @since 1.0  2024-10-09-10:52
+ * @author MoJie
  */
 @Data
 public class FlowCancellationParam {
