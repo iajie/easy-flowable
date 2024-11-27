@@ -27,6 +27,7 @@ public class Result<T> implements Serializable {
 
     /**
      * 成功消息
+     * @param <T> 泛型
      * @return {@link Result} {@link T}
      * @author MoJie
      */
@@ -40,6 +41,7 @@ public class Result<T> implements Serializable {
 
     /**
      * 成功，设置消息
+     * @param <T> 泛型
      * @param message 消息
      * @return {@link Result} {@link T}
      * @author MoJie
@@ -55,6 +57,7 @@ public class Result<T> implements Serializable {
 
     /**
      * 成功返回
+     * @param <T> 泛型
      * @param data 数据
      * @return {@link Result} {@link T}
      * @author MoJie
@@ -70,6 +73,7 @@ public class Result<T> implements Serializable {
 
     /**
      * 成功
+     * @param <T> 泛型
      * @param message 消息
      * @param data 数据
      * @return {@link Result} {@link T}
@@ -86,6 +90,7 @@ public class Result<T> implements Serializable {
 
     /**
      * 错误信息返回
+     * @param <T> 泛型
      * @return {@link Result} {@link T}
      * @author MoJie
      */
@@ -99,6 +104,7 @@ public class Result<T> implements Serializable {
 
     /**
      * 错误自定义消息
+     * @param <T> 泛型
      * @param message 消息
      * @return {@link Result} {@link T}
      * @author MoJie
@@ -116,6 +122,7 @@ public class Result<T> implements Serializable {
      * 错误并返回消息和数据
      * @param message 消息
      * @param data 数据
+     * @param <T> 泛型
      * @return {@link Result} {@link T}
      * @author MoJie
      */

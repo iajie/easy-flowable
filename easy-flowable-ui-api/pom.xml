@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>parent</artifactId>
+        <artifactId>easy-flowable</artifactId>
         <groupId>com.easy-flowable</groupId>
         <version>1.0.0</version>
     </parent>
@@ -11,8 +11,7 @@
 
     <artifactId>easy-flowable-ui-api</artifactId>
     <packaging>jar</packaging>
-    <description>流程设计器可视化界面</description>
-
+    <description>Easy-Flowable is a superb framework.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
