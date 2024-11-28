@@ -21,7 +21,6 @@
 > easy-flowable 在如今前后端分离，一般业务系统都有自己的用户体系以及部门等组信息，如果你是新手，那么想要使用自己的数据使用成了难题， easy-flowable
 > 帮助你很快实现这件事。
 
-
 ## 交流群群
 
 QQ 群
@@ -98,6 +97,45 @@ POST /easy-flowable/processInstance/start
   "variables": {}
 }
 ```
+
+## 如何使用自己系统中的用户体系
+```java
+import com.superb.core.service.EasyUserService;
+
+@Component
+public class EasyUserServiceImpl implements EasyUserService {
+
+    private final EasyFlowableUiConfig properties;
+
+    @Override
+    public EasyFlowableUser getCurrentUser(Object userId) {
+        EasyFlowableUser user = new EasyFlowableUser();
+        // 根据当前用户获取信息，如果您没有使用ui登陆那么userId就可以不用管，返回自己系统中的用户即可
+        return user;
+    }
+
+    @Override
+    public Object login(String username, String password) {
+        // 如果使用ui控制条会使用到，需要开启登录功能
+        return userId;
+    }
+
+    @Override
+    public List<Option> users() {
+        List<Option> list = new ArrayList<>();
+        // 添加自己的用户列表
+        return list;
+    }
+
+    @Override
+    public List<Option> groups() {
+        List<Option> list = new ArrayList<>();
+        // 添加自己的组
+        return list;
+    }
+}
+```
+
 
 ## 更多文档
 
