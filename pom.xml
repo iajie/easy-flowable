@@ -6,22 +6,23 @@
 
     <groupId>com.easy-flowable</groupId>
     <artifactId>easy-flowable</artifactId>
+    <name>${project.artifactId}</name>
     <packaging>pom</packaging>
     <version>1.0.0</version>
     <url>https://github.com/iajie/easy-flowable</url>
     <developers>
         <developer>
-            <id>iajie</id>
             <email>ajie20999@163.com</email>
             <name>MoJie</name>
             <url>https://github.com/iajie</url>
+            <timezone>+8</timezone>
         </developer>
     </developers>
 
     <scm>
-        <url>https://gitee.com/iajie/easy-flowable/tree/master</url>
-        <connection>scm:git:https://gitee.com/iajie/easy-flowable.git</connection>
-        <developerConnection>scm:git:https://gitee.com/iajie/easy-flowable.git</developerConnection>
+        <url>https://github.com/iajie/easy-flowable/tree/master</url>
+        <connection>scm:git:https://github.com/iajie/easy-flowable.git</connection>
+        <developerConnection>scm:git:https://github.com/iajie/easy-flowable.git</developerConnection>
     </scm>
 
     <licenses>
@@ -136,10 +137,25 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
+                    <compilerArgument>-parameters</compilerArgument>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
+            </plugin>
+            <!-- GPG -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-- maven Source插件 -->
             <plugin>
@@ -169,35 +185,30 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- gpg插件 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- 发布插件 -->
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.5.0</version>
+                <version>0.6.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
                     <autoPublish>true</autoPublish>
-                    <!-- 一直等到发布完成 -->
                     <waitUntil>published</waitUntil>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>central</id>
+            <name>snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>central</id>
+            <name>releases</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 </project>
