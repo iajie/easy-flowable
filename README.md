@@ -6,9 +6,6 @@
 
 # easy-flowable： 一个出色的 flowable 增强框架
 
-它基于flowable进行拓展，去除flowable多余的api，使用最基础的flowable-engine进行拓展，
-easy-flowable摒弃了自带的flowable-ui，使用easy-flowable自行开发的控制台，来操作。
-
 ## 特征
 
 #### 1. 很轻量
