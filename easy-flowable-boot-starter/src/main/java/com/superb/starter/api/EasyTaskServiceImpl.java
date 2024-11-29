@@ -12,7 +12,7 @@ import com.superb.core.domain.params.FlowCancellationParam;
 import com.superb.core.domain.params.FlowExecuteParam;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyTaskService;
-import com.superb.core.utils.BpmnUtils;
+import com.superb.core.utils.EasyUtils;
 import com.superb.core.utils.EasyFlowableStringUtils;
 import lombok.SneakyThrows;
 import org.flowable.bpmn.model.*;
@@ -25,7 +25,6 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Comment;
-import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
@@ -514,7 +513,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         if (flowElement instanceof UserTask) {
             UserTask userTask = (UserTask) flowElement;
-            Map<String, Object> taskAttributes = BpmnUtils.getTaskAttributes(userTask.getAttributes());
+            Map<String, Object> taskAttributes = EasyUtils.getTaskAttributes(userTask.getAttributes());
             if (taskAttributes.containsKey("actions")) {
                 String actions = taskAttributes.get("actions").toString();
                 taskAttributes.put("actions", Arrays.asList(actions.split(",")));

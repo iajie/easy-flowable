@@ -1,10 +1,12 @@
 package com.superb.core.utils;
 
+import com.superb.core.domain.entity.EasyModel;
 import com.superb.core.exception.EasyFlowableException;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.common.engine.impl.util.io.StringStreamSource;
+import org.flowable.engine.repository.Model;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.Map;
  * @author MoJie
  * @since 1.0  2024-11-09 11:29
  */
-public class BpmnUtils {
+public class EasyUtils {
 
     private final static BpmnXMLConverter BPMN_XML_CONVERTER = new BpmnXMLConverter();
 
@@ -56,5 +58,24 @@ public class BpmnUtils {
             map.put(key, attributes.get(key).get(0).getValue());
         }
         return map;
+    }
+
+    /**
+     * 根据模型转换基础信息
+     * @param model flowable模型
+     * @return {@link EasyModel}
+     * @author MoJie
+     */
+    public static EasyModel getModel(Model model) {
+        return new EasyModel()
+                .setId(model.getId())
+                .setKey(model.getKey())
+                .setName(model.getName())
+                .setModelType(model.getCategory())
+                .setRemarks(model.getMetaInfo())
+                .setCreateTime(model.getCreateTime())
+                .setUpdateTime(model.getLastUpdateTime())
+                .setPublishVersion(model.getVersion())
+                .setTenantId(model.getTenantId());
     }
 }

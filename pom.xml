@@ -8,7 +8,7 @@
     <artifactId>easy-flowable</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <url>https://github.com/iajie/easy-flowable</url>
     <developers>
         <developer>
@@ -41,7 +41,7 @@
     </modules>
 
     <properties>
-        <easy.flowable.version>1.0.0</easy.flowable.version>
+        <easy.flowable.version>1.0.1</easy.flowable.version>
         <flowable.version>6.8.1</flowable.version>
         <lombok.version>1.18.28</lombok.version>
         <spring.version>5.3.27</spring.version>

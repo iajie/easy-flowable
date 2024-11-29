@@ -8,7 +8,7 @@ import com.superb.core.domain.entity.EasyModel;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyDeploymentService;
 import com.superb.core.service.EasyModelService;
-import com.superb.core.utils.BpmnUtils;
+import com.superb.core.utils.EasyUtils;
 import com.superb.core.utils.EasyFlowableStringUtils;
 import lombok.SneakyThrows;
 import org.flowable.bpmn.model.BpmnModel;
@@ -187,7 +187,7 @@ public class EasyDeploymentServiceImpl implements EasyDeploymentService {
             flowUserTask.setAssignee(userTask.getAssignee());
             flowUserTask.setCandidateUsers(userTask.getCandidateUsers());
             flowUserTask.setCandidateGroups(userTask.getCandidateGroups());
-            flowUserTask.setFlowCustomProps(BpmnUtils.getTaskAttributes(userTask.getAttributes()));
+            flowUserTask.setFlowCustomProps(EasyUtils.getTaskAttributes(userTask.getAttributes()));
             list.add(flowUserTask);
         }
         return list;

@@ -6,6 +6,9 @@ import com.superb.core.domain.entity.EasyFlowableUser;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyUserService;
 import lombok.AllArgsConstructor;
+import org.noear.solon.annotation.Component;
+import org.noear.solon.annotation.Condition;
+import org.noear.solon.annotation.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +19,12 @@ import java.util.Optional;
  * @since 1.0  2024-11-22 21:15
  * 默认对用户的实现
  */
-@AllArgsConstructor
+@Component
+@Condition(onMissingBean = EasyUserService.class)
 public class DefaultEasyUserServiceImpl implements EasyUserService {
 
-    private final EasyFlowableUiConfig properties;
+    @Inject(value = "${easy-flowable.ui}", autoRefreshed = true)
+    private EasyFlowableUiConfig properties;
 
     @Override
     public EasyFlowableUser getCurrentUser(Object userId) {

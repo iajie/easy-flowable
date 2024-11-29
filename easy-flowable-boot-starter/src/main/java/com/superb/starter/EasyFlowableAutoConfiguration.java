@@ -55,7 +55,7 @@ public class EasyFlowableAutoConfiguration {
                     .driverClassName(jdbc.getDriver())
                     .password(jdbc.getPassword());
         } else {
-            if (this.dataSourceProperties == null) {
+            if (this.dataSourceProperties.getUrl() == null) {
                 throw new EasyFlowableException("如果您不想使用项目中的数据源，" +
                         "请设置easy-flowable.project-datasource为false, 否则请配置spring.datasource");
             }

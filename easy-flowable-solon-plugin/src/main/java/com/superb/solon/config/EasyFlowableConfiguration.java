@@ -5,9 +5,7 @@ import com.superb.core.config.EasyFlowableDataSourceConfig;
 import com.superb.core.constans.Constants;
 import com.superb.core.domain.enums.HistoryLevelEnum;
 import com.superb.core.exception.EasyFlowableException;
-import com.superb.core.service.*;
 import com.superb.core.utils.EasyFlowableStringUtils;
-import com.superb.solon.api.*;
 import com.superb.solon.properties.EasyFlowableConfigProperties;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.*;
@@ -17,7 +15,6 @@ import org.noear.solon.annotation.Bean;
 import org.noear.solon.annotation.Condition;
 import org.noear.solon.annotation.Configuration;
 import org.noear.solon.annotation.Inject;
-import org.noear.solon.data.dynamicds.DynamicDataSource;
 
 import javax.sql.DataSource;
 
@@ -128,7 +125,6 @@ public class EasyFlowableConfiguration {
      * @author MoJie
      */
     @Bean
-    @Condition(onBean = ProcessEngine.class)
     public RuntimeService runtimeService(ProcessEngine processEngine) {
         return processEngine.getRuntimeService();
     }
@@ -140,7 +136,6 @@ public class EasyFlowableConfiguration {
      * @author MoJie
      */
     @Bean
-    @Condition(onBean = ProcessEngine.class)
     public RepositoryService repositoryService(ProcessEngine processEngine) {
         return processEngine.getRepositoryService();
     }
@@ -152,7 +147,6 @@ public class EasyFlowableConfiguration {
      * @author MoJie
      */
     @Bean
-    @Condition(onBean = ProcessEngine.class)
     public HistoryService historyService(ProcessEngine processEngine) {
         return processEngine.getHistoryService();
     }
@@ -164,7 +158,6 @@ public class EasyFlowableConfiguration {
      * @author MoJie
      */
     @Bean
-    @Condition(onBean = ProcessEngine.class)
     public TaskService taskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
     }
@@ -176,7 +169,6 @@ public class EasyFlowableConfiguration {
      * @author MoJie
      */
     @Bean
-    @Condition(onBean = ProcessEngine.class)
     public ProcessDiagramGenerator processDiagramGenerator(ProcessEngine processEngine) {
         return processEngine.getProcessEngineConfiguration().getProcessDiagramGenerator();
     }
@@ -191,61 +183,6 @@ public class EasyFlowableConfiguration {
         if (isBanner) {
             System.out.println(Constants.BANNER);
         }
-    }
-
-    /**
-     * 配置默认用户信息，如果没有自定义实现就是用默认的实现
-     * @return {@link EasyUserService}
-     * @author MoJie
-     */
-    @Bean
-    @Condition(onMissingBean = EasyUserService.class)
-    public EasyUserService easyUserService() {
-        return new DefaultEasyUserServiceImpl(properties.getUi());
-    }
-
-    /**
-     * 模型实现方法
-     * @return {@link EasyModelService}
-     * @author MoJie
-     */
-    @Bean
-    @Condition(onBean = ProcessEngine.class)
-    public EasyModelService easyModelService() {
-        return new EasyModelServiceImpl();
-    }
-
-    /**
-     * 实现流程部署方法
-     * @return {@link EasyDeploymentService}
-     * @author MoJie
-     */
-    @Bean
-    @Condition(onBean = ProcessEngine.class)
-    public EasyDeploymentService easyFlowDeploymentService() {
-        return new EasyDeploymentServiceImpl();
-    }
-
-    /**
-     * 构建流程实例实现
-     * @return {@link EasyProcessInstanceService}
-     * @author MoJie
-     */
-    @Bean
-    @Condition(onBean = ProcessEngine.class)
-    public EasyProcessInstanceService easyFlowProcessInstanceService() {
-        return new EasyProcessInstanceServiceImpl();
-    }
-
-    /**
-     * 构建任务实现
-     * @return {@link EasyTaskService}
-     * @author MoJie
-     */
-    @Bean
-    @Condition(onBean = ProcessEngine.class)
-    public EasyTaskService easyFlowTaskService() {
-        return new EasyTaskServiceImpl();
     }
 
 }
