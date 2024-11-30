@@ -44,7 +44,7 @@
         <easy.flowable.version>1.0.1</easy.flowable.version>
         <flowable.version>6.8.1</flowable.version>
         <lombok.version>1.18.28</lombok.version>
-        <spring.version>5.3.27</spring.version>
+        <spring.version>5.3.32</spring.version>
         <spring.boot.version>2.7.11</spring.boot.version>
         <HikariCP.version>4.0.3</HikariCP.version>
         <hutool.version>5.8.31</hutool.version>
@@ -68,10 +68,6 @@
                     <exclusion>
                         <groupId>commons-io</groupId>
                         <artifactId>commons-io</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
                     </exclusion>
                 </exclusions>
                 <version>${flowable.version}</version>
@@ -112,9 +108,10 @@
                 <version>${spring.boot.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>${spring.boot.version}</version>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring.version}</version>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.zaxxer</groupId>

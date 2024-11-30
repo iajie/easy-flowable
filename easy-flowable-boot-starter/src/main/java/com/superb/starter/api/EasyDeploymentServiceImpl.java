@@ -8,8 +8,8 @@ import com.superb.core.domain.entity.EasyModel;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyDeploymentService;
 import com.superb.core.service.EasyModelService;
-import com.superb.core.utils.EasyUtils;
 import com.superb.core.utils.EasyFlowableStringUtils;
+import com.superb.core.utils.EasyUtils;
 import lombok.SneakyThrows;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.UserTask;
@@ -20,8 +20,9 @@ import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -34,13 +35,14 @@ import java.util.Scanner;
  * @since 1.0  2024-10-09-11:19
  * @author MoJie
  */
+@Service
 public class EasyDeploymentServiceImpl implements EasyDeploymentService {
 
-    @Resource
+    @Autowired(required = false)
     private EasyModelService modelService;
-    @Resource
+    @Autowired(required = false)
     private RepositoryService repositoryService;
-    @Resource
+    @Autowired(required = false)
     private RuntimeService runtimeService;
 
     @Override

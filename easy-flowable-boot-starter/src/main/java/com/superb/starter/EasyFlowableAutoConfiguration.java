@@ -5,23 +5,19 @@ import com.superb.core.config.EasyFlowableDataSourceConfig;
 import com.superb.core.constans.Constants;
 import com.superb.core.domain.enums.HistoryLevelEnum;
 import com.superb.core.exception.EasyFlowableException;
-import com.superb.core.service.*;
 import com.superb.core.utils.EasyFlowableStringUtils;
-import com.superb.starter.api.*;
 import com.superb.starter.config.DataSourceProperties;
 import com.superb.starter.config.EasyFlowableConfigProperties;
 import com.zaxxer.hikari.HikariDataSource;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.*;
 import org.flowable.image.ProcessDiagramGenerator;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 /**
@@ -33,9 +29,9 @@ import javax.sql.DataSource;
 @ConditionalOnProperty(prefix = "easy-flowable", name = "enable", havingValue = "true", matchIfMissing = true)
 public class EasyFlowableAutoConfiguration {
 
-    @Resource
+    @Autowired
     private EasyFlowableConfigProperties properties;
-    @Resource
+    @Autowired
     private DataSourceProperties dataSourceProperties;
 
     /**
@@ -195,60 +191,6 @@ public class EasyFlowableAutoConfiguration {
         if (isBanner) {
             System.out.println(Constants.BANNER);
         }
-    }
-
-    /**
-     * 配置默认用户信息，如果没有自定义实现就是用默认的实现
-     * @return {@link EasyUserService}
-     * @author MoJie
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public EasyUserService easyUserService() {
-        return new DefaultEasyUserServiceImpl(properties.getUi());
-    }
-
-    /**
-     * 模型实现方法
-     * @return {@link EasyModelService}
-     * @author MoJie
-     */
-    @Bean
-    public EasyModelService easyModelService() {
-        return new EasyModelServiceImpl();
-    }
-
-    /**
-     * 实现流程部署方法
-     * @return {@link EasyDeploymentService}
-     * @author MoJie
-     */
-    @Bean
-    @ConditionalOnClass({RepositoryService.class, RuntimeService.class})
-    public EasyDeploymentService easyFlowDeploymentService() {
-        return new EasyDeploymentServiceImpl();
-    }
-
-    /**
-     * 构建流程实例实现
-     * @return {@link EasyProcessInstanceService}
-     * @author MoJie
-     */
-    @Bean
-    @ConditionalOnClass({RepositoryService.class, RuntimeService.class, TaskService.class, HistoryService.class})
-    public EasyProcessInstanceService easyFlowProcessInstanceService() {
-        return new EasyProcessInstanceServiceImpl();
-    }
-
-    /**
-     * 构建任务实现
-     * @return {@link EasyTaskService}
-     * @author MoJie
-     */
-    @Bean
-    @ConditionalOnClass({RuntimeService.class, TaskService.class, HistoryService.class})
-    public EasyTaskService easyFlowTaskService() {
-        return new EasyTaskServiceImpl();
     }
 
 }

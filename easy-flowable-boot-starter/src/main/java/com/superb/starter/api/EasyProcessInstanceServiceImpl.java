@@ -1,17 +1,17 @@
 package com.superb.starter.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.superb.core.constans.Constants;
 import com.superb.core.constans.EasyFlowableContext;
 import com.superb.core.domain.dto.*;
 import com.superb.core.domain.entity.EasyFlowableUser;
 import com.superb.core.domain.enums.FlowCommentType;
-import com.superb.core.service.EasyUserService;
 import com.superb.core.domain.params.FlowStartParam;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyProcessInstanceService;
 import com.superb.core.service.EasyTaskService;
+import com.superb.core.service.EasyUserService;
 import com.superb.core.utils.EasyFlowableStringUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
@@ -30,8 +30,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Comment;
 import org.flowable.task.api.Task;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,19 +42,20 @@ import java.util.stream.Collectors;
  * @since 1.0  2024-10-09-13:29
  * @author MoJie
  */
+@Service
 public class EasyProcessInstanceServiceImpl implements EasyProcessInstanceService {
 
-    @Resource
+    @Autowired(required = false)
     private RepositoryService repositoryService;
-    @Resource
+    @Autowired(required = false)
     private RuntimeService runtimeService;
-    @Resource
+    @Autowired(required = false)
     private TaskService taskService;
-    @Resource
+    @Autowired(required = false)
     private HistoryService historyService;
-    @Resource
+    @Autowired(required = false)
     private EasyTaskService easyTaskService;
-    @Resource
+    @Autowired(required = false)
     private EasyUserService userService;
 
     @Override

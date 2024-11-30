@@ -28,11 +28,9 @@ public class EasyProcessInstanceResource {
 
     /**
      * 获取启动的流程实例 包含流程终止和激活的
-     *
      * @param processDefinitionId 流程定义ID
-     * @return {@link List< FlowProcessInstance >}
+     * @return {@link Result} {@link List} {@link FlowProcessInstance}
      * @author MoJie
-     * @since 1.0  2024-10-09 16:26:52
      */
     @GetMapping(value = "/list/{processDefinitionId}")
     public Result<List<FlowProcessInstance>> list(@PathVariable String processDefinitionId) {

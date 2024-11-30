@@ -4,15 +4,15 @@ import com.superb.core.domain.dto.Page;
 import com.superb.core.domain.entity.EasyModel;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyModelService;
-import com.superb.core.utils.EasyUtils;
 import com.superb.core.utils.EasyFlowableStringUtils;
+import com.superb.core.utils.EasyUtils;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +23,10 @@ import java.util.List;
  * @author MoJie
  * @since 1.0  2024-09-27-14:13
  */
+@Service
 public class EasyModelServiceImpl implements EasyModelService {
 
-    @Resource
+    @Autowired(required = false)
     private RepositoryService repositoryService;
 
     @Override
