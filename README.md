@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://gitee.com/iajie/easy-flowable-ui-admin/raw/master/src/assets/logo-full.png" alt=""/>
+    <img src="./docs/logo-full.png" alt=""/>
 </p>
 
 
@@ -32,9 +32,9 @@ QQ 群
 ## 开始
 
 - [快速开始](https://easy-flowable.online/quick-start.html)
-- 示例 1：[easy-flowable + Spring boot](https://gitee.com/iajie/easy-flowable-test/spring-boot)
-- 示例 2：[easy-flowable + solon](https://gitee.com/iajie/easy-flowable-test/solon)
-
+- 示例 1：[easy-flowable + Spring boot](https://gitee.com/iajie/easy-flowable-test/tree/master/spring-boot-demo)
+- 示例 2：[easy-flowable + solon](https://gitee.com/iajie/easy-flowable-test/tree/master/solon-demo)
+- ui控制台：[easy-flowable-ui-admin(umi.js+antd pro)](https://gitee.com/iajie/easy-flowable-ui-admin)
 
 ```xml
 <dependency>
@@ -45,6 +45,14 @@ QQ 群
 ```
 
 **启动访问：** http://localhost:port/easy-flowable/index.html
+
+## 控制台
+**控制台首页**
+![home.png](./docs/home.png)
+**设计器**
+![img.png](./docs/designer.png)
+**流程动态**
+![img.png](./docs/viewer.png)
 
 ## 模型操作
 
