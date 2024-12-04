@@ -23,7 +23,7 @@ public class EasyFlowableConfigProperties {
     private boolean banner = true;
 
     /** 是否使用项目中的数据源 */
-    private boolean projectDatasource = true;
+    private boolean projectDatasource = false;
 
     /** 数据源配置，非必填 */
     @NestedConfigurationProperty

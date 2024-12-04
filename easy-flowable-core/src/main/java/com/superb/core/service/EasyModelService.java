@@ -17,7 +17,7 @@ public interface EasyModelService {
      * @author MoJie
      * @since 1.0  2024-10-22 12:39
      */
-    boolean insert(EasyModel model);
+    String insert(EasyModel model);
 
     /**
      * @param model 模型
@@ -33,7 +33,26 @@ public interface EasyModelService {
      * @author MoJie
      * @since 1.0  2024-10-22 12:40
      */
-    EasyModel getById(String id);
+    default EasyModel getById(String id) {
+        return this.getById(id, true);
+    }
+
+    /**
+     * @param id 主键
+     * @param existsError 是否抛出异常
+     * @return {@link EasyModel} 根据ID查询模型详情
+     * @author MoJie
+     * @since 1.0  2024-10-22 12:40
+     */
+    EasyModel getById(String id, boolean existsError);
+
+    /**
+     * 根据模型标识获取模型
+     * @param key 模型标识
+     * @return {@link EasyModel}
+     * @author MoJie
+     */
+    EasyModel getByKey(String key);
 
     /**
      * @param id 主键

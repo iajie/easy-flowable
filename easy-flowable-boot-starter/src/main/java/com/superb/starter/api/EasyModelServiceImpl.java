@@ -4,31 +4,33 @@ import com.superb.core.domain.dto.Page;
 import com.superb.core.domain.entity.EasyModel;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyModelService;
-import com.superb.core.utils.BpmnUtils;
 import com.superb.core.utils.EasyFlowableStringUtils;
+import com.superb.core.utils.EasyUtils;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 模型操作方法
- * @since 1.0  2024-09-27-14:13
+ *
  * @author MoJie
+ * @since 1.0  2024-09-27-14:13
  */
+@Service
 public class EasyModelServiceImpl implements EasyModelService {
 
-    @Resource
+    @Autowired(required = false)
     private RepositoryService repositoryService;
 
     @Override
-    public boolean insert(EasyModel easyModel) {
+    public String insert(EasyModel easyModel) {
         Model result = repositoryService.createModelQuery().modelKey(easyModel.getKey()).singleResult();
         if (result != null) {
             throw new EasyFlowableException("当前模型标识已存在，无法创建!");
@@ -40,7 +42,7 @@ public class EasyModelServiceImpl implements EasyModelService {
         model.setCategory(easyModel.getModelType());
         model.setMetaInfo(easyModel.getRemarks());
         repositoryService.saveModel(model);
-        return true;
+        return model.getId();
     }
 
     @Override
@@ -48,16 +50,6 @@ public class EasyModelServiceImpl implements EasyModelService {
         Model result = repositoryService.createModelQuery().modelId(model.getId()).singleResult();
         if (result == null) {
             throw new EasyFlowableException("当前模型不存在，无法操作!");
-        }
-        if (EasyFlowableStringUtils.isNotBlank(model.getModelEditorXml())) {
-            // 校验流程信息
-            BpmnUtils.validateModel(model.getModelEditorXml());
-            repositoryService.addModelEditorSource(model.getId(), model.getModelEditorXml()
-                    .getBytes(StandardCharsets.UTF_8));
-        }
-        if (EasyFlowableStringUtils.isNotBlank(model.getPicture())) {
-            repositoryService.addModelEditorSourceExtra(model.getId(), model.getPicture()
-                    .getBytes(StandardCharsets.UTF_8));
         }
         if (EasyFlowableStringUtils.isNotBlank(model.getModelType())) {
             result.setCategory(model.getModelType());
@@ -69,25 +61,33 @@ public class EasyModelServiceImpl implements EasyModelService {
             result.setMetaInfo(model.getRemarks());
         }
         repositoryService.saveModel(result);
+        if (EasyFlowableStringUtils.isNotBlank(model.getModelEditorXml())) {
+            // 校验流程信息
+            EasyUtils.validateModel(model.getModelEditorXml());
+            repositoryService.addModelEditorSource(model.getId(), model.getModelEditorXml()
+                    .getBytes(StandardCharsets.UTF_8));
+        }
+        if (EasyFlowableStringUtils.isNotBlank(model.getPicture())) {
+            repositoryService.addModelEditorSourceExtra(model.getId(), model.getPicture()
+                    .getBytes(StandardCharsets.UTF_8));
+        }
         return true;
     }
 
     @Override
-    public EasyModel getById(String id) {
-        Model result = repositoryService.createModelQuery().modelId(id).latestVersion().singleResult();
-        if (result == null) {
-            throw new EasyFlowableException("模型不存在！");
+    public EasyModel getById(String id, boolean existsError) {
+        Model model = repositoryService.createModelQuery().modelId(id).latestVersion().singleResult();
+        if (model == null) {
+            if (existsError) {
+                throw new EasyFlowableException("模型不存在！");
+            }
+            return null;
         }
-        ModelEntityImpl model = (ModelEntityImpl) result;
-        EasyModel easyModel = new EasyModel();
-        easyModel.setModelType(model.getCategory());
-        easyModel.setId(id);
-        easyModel.setName(model.getName());
-        easyModel.setKey(model.getKey());
-        easyModel.setTenantId(model.getTenantId());
-        easyModel.setCreateTime(model.getCreateTime());
-        easyModel.setUpdateTime(model.getLastUpdateTime());
-        easyModel.setPublishVersion(model.getVersion());
+        return this.getModelAndSource(model);
+    }
+
+    private EasyModel getModelAndSource(Model model) {
+        EasyModel easyModel = EasyUtils.getModel(model);
         if (model.hasEditorSource()) {
             byte[] modelEditorSource = repositoryService.getModelEditorSource(model.getId());
             easyModel.setModelEditorXml(new String(modelEditorSource, StandardCharsets.UTF_8));
@@ -97,6 +97,15 @@ public class EasyModelServiceImpl implements EasyModelService {
             easyModel.setPicture(new String(modelEditorSourceExtra, StandardCharsets.UTF_8));
         }
         return easyModel;
+    }
+
+    @Override
+    public EasyModel getByKey(String key) {
+        Model model = this.repositoryService.createModelQuery().modelKey(key).singleResult();
+        if (model != null) {
+            return this.getModelAndSource(model);
+        }
+        return null;
     }
 
     @Override
@@ -120,7 +129,7 @@ public class EasyModelServiceImpl implements EasyModelService {
         Page<EasyModel> page = new Page<>();
         page.setTotal(modelQuery.count());
         List<EasyModel> list = new ArrayList<>();
-        List<Model> models = modelQuery.listPage((current-1) * size, size);
+        List<Model> models = modelQuery.listPage((current - 1) * size, size);
         for (Model model : models) {
             EasyModel modelDo = new EasyModel()
                     .setId(model.getId())

@@ -7,13 +7,12 @@ import com.superb.core.domain.dto.FlowExecutionHistory;
 import com.superb.core.domain.dto.Option;
 import com.superb.core.domain.entity.EasyFlowableUser;
 import com.superb.core.domain.enums.FlowCommentType;
-import com.superb.core.service.EasyUserService;
 import com.superb.core.domain.params.FlowCancellationParam;
 import com.superb.core.domain.params.FlowExecuteParam;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyTaskService;
-import com.superb.core.utils.BpmnUtils;
 import com.superb.core.utils.EasyFlowableStringUtils;
+import com.superb.core.utils.EasyUtils;
 import lombok.SneakyThrows;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -25,13 +24,13 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Comment;
-import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,18 +39,17 @@ import java.util.stream.Collectors;
  * @since 1.0  2024-10-09-14:29
  * @author MoJie
  */
+@Service
 public class EasyTaskServiceImpl implements EasyTaskService {
 
-    @Resource
+    @Autowired(required = false)
     private RuntimeService runtimeService;
-    @Resource
+    @Autowired(required = false)
     private TaskService taskService;
-    @Resource
+    @Autowired(required = false)
     private HistoryService historyService;
-    @Resource
+    @Autowired(required = false)
     private RepositoryService repositoryService;
-    @Resource
-    private EasyUserService userInterface;
 
     @Override
     public void executeNextStep(FlowExecuteParam executeParam) {
@@ -514,7 +512,7 @@ public class EasyTaskServiceImpl implements EasyTaskService {
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         if (flowElement instanceof UserTask) {
             UserTask userTask = (UserTask) flowElement;
-            Map<String, Object> taskAttributes = BpmnUtils.getTaskAttributes(userTask.getAttributes());
+            Map<String, Object> taskAttributes = EasyUtils.getTaskAttributes(userTask.getAttributes());
             if (taskAttributes.containsKey("actions")) {
                 String actions = taskAttributes.get("actions").toString();
                 taskAttributes.put("actions", Arrays.asList(actions.split(",")));

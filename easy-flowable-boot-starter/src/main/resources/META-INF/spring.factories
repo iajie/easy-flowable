@@ -1,4 +1,9 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration =\
     com.superb.starter.EasyFlowableAutoConfiguration,\
     com.superb.starter.config.EasyFlowableConfigProperties,\
-    com.superb.starter.config.DataSourceProperties
+    com.superb.starter.config.DataSourceProperties,\
+    com.superb.starter.api.EasyModelServiceImpl,\
+    com.superb.starter.api.EasyDeploymentServiceImpl,\
+    com.superb.starter.api.EasyProcessInstanceServiceImpl,\
+    com.superb.starter.api.EasyTaskServiceImpl,\
+    com.superb.starter.api.DefaultEasyUserServiceImpl

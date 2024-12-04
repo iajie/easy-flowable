@@ -13,7 +13,7 @@
             "type": "java.lang.Boolean"
         },
         {
-            "defaultValue": true,
+            "defaultValue": false,
             "name": "easy-flowable.project-datasource",
             "description": "是否使用项目中的数据源.",
             "type": "java.lang.Boolean"

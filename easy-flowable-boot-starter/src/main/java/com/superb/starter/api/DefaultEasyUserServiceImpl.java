@@ -5,7 +5,10 @@ import com.superb.core.domain.dto.Option;
 import com.superb.core.domain.entity.EasyFlowableUser;
 import com.superb.core.exception.EasyFlowableException;
 import com.superb.core.service.EasyUserService;
-import lombok.AllArgsConstructor;
+import com.superb.starter.config.EasyFlowableConfigProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +19,17 @@ import java.util.Optional;
  * @author MoJie
  * @since 1.0  2024-11-22 21:15
  */
-@AllArgsConstructor
+@Service
+@ConditionalOnMissingBean(EasyUserService.class)
 public class DefaultEasyUserServiceImpl implements EasyUserService {
 
-    private final EasyFlowableUiConfig properties;
+    @Autowired(required = false)
+    private EasyFlowableConfigProperties properties;
 
     @Override
     public EasyFlowableUser getCurrentUser(Object userId) {
         EasyFlowableUser user = new EasyFlowableUser();
-        Optional<EasyFlowableUiConfig.User> first = properties.getUsers().stream().filter(i -> i.getId().equals(userId)).findFirst();
+        Optional<EasyFlowableUiConfig.User> first = properties.getUi().getUsers().stream().filter(i -> i.getId().equals(userId)).findFirst();
         if (!first.isPresent()) {
             return user;
         }
@@ -38,7 +43,7 @@ public class DefaultEasyUserServiceImpl implements EasyUserService {
 
     @Override
     public Object login(String username, String password) {
-        List<EasyFlowableUiConfig.User> users = properties.getUsers();
+        List<EasyFlowableUiConfig.User> users = properties.getUi().getUsers();
         Optional<EasyFlowableUiConfig.User> first = users.stream().filter(i -> i.getUsername().equals(username)).findFirst();
         if (!first.isPresent()) {
             throw new EasyFlowableException("账号/密码错误");
@@ -53,7 +58,7 @@ public class DefaultEasyUserServiceImpl implements EasyUserService {
     @Override
     public List<Option> users() {
         List<Option> list = new ArrayList<>();
-        for (EasyFlowableUiConfig.User user : properties.getUsers()) {
+        for (EasyFlowableUiConfig.User user : properties.getUi().getUsers()) {
             list.add(new Option(user.getUsername(), user.getId()));
         }
         return list;
@@ -61,6 +66,6 @@ public class DefaultEasyUserServiceImpl implements EasyUserService {
 
     @Override
     public List<Option> groups() {
-        return properties.getGroups();
+        return properties.getUi().getGroups();
     }
 }
